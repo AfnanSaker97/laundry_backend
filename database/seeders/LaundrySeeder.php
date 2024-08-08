@@ -12,13 +12,49 @@ class LaundrySeeder extends Seeder
      */
     public function run(): void
     {
-        $laundries = [
-            [ 'name' => '','email'=>'','photo'=> 'name','phone_number'=>'','country'=>'','city'=>'','address_line_1'=>'','lat'=>'','lng'=>''],
-            [ 'name' => '','email'=>'','photo'=> 'name','phone_number'=>'','country'=>'','city'=>'','address_line_1'=>'','lat'=>'','lng'=>''],
-            [ 'name' => '','email'=>'','photo'=> 'name','phone_number'=>'','country'=>'','city'=>'','address_line_1'=>'','lat'=>'','lng'=>''],
-            [ 'name' => '','email'=>'','photo'=> 'name','phone_number'=>'','country'=>'','city'=>'','address_line_1'=>'','lat'=>'','lng'=>''],
-         
-           ];
+$laundries = [
+    [
+        'name' => 'Pesana Laundry',
+       
+        'photo' => 'pesana_photo.jpg',
+        'phone_number' => '0978678678567',
+        'country' => 'Syria',
+        'city' => 'Damas',
+        'address_line_1' => '123 Main St',
+        'lat' => '33.5138',
+        'lng' => '36.2765'
+    ],
+    [
+        'name' => 'Sunshine Laundry',
+        'photo' => 'sunshine_photo.jpg',
+        'phone_number' => '0987654321',
+        'country' => 'Lebanon',
+        'city' => 'Beirut',
+        'address_line_1' => '456 Elm St',
+        'lat' => '33.8886',
+        'lng' => '35.4955'
+    ],
+    [
+        'name' => 'Quick Clean Laundry',
+        'photo' => 'quickclean_photo.jpg',
+        'phone_number' => '0123456789',
+        'country' => 'Jordan',
+        'city' => 'Amman',
+        'address_line_1' => '789 Oak St',
+        'lat' => '31.9539',
+        'lng' => '35.9106'
+    ],
+    [
+        'name' => 'Fresh Start Laundry',
+        'photo' => 'freshstart_photo.jpg',
+        'phone_number' => '0234567890',
+        'country' => 'Egypt',
+        'city' => 'Cairo',
+        'address_line_1' => '101 Palm St',
+        'lat' => '30.0444',
+        'lng' => '31.2357'
+    ]
+];
           foreach ($laundries as $laundry) {
             Laundry::create($laundry);
         } 
