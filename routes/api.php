@@ -9,4 +9,10 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
+//Route::middleware('auth:sanctum')->group( function () {
+
 Route::get('launderies', [LaundryController::class, 'index']);
+Route::get('search-launderies', [LaundryController::class, 'search']);
+Route::get('laundry', [LaundryController::class, 'show']);
+
+//});

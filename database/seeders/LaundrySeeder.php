@@ -15,11 +15,11 @@ class LaundrySeeder extends Seeder
 $laundries = [
     [
         'name' => 'Pesana Laundry',
-       
+
         'photo' => 'pesana_photo.jpg',
         'phone_number' => '0978678678567',
-        'country' => 'Syria',
-        'city' => 'Damas',
+
+        'city' => 'Abu Dabi',
         'address_line_1' => '123 Main St',
         'lat' => '33.5138',
         'lng' => '36.2765'
@@ -28,8 +28,7 @@ $laundries = [
         'name' => 'Sunshine Laundry',
         'photo' => 'sunshine_photo.jpg',
         'phone_number' => '0987654321',
-        'country' => 'Lebanon',
-        'city' => 'Beirut',
+        'city' => 'Dubi',
         'address_line_1' => '456 Elm St',
         'lat' => '33.8886',
         'lng' => '35.4955'
@@ -38,7 +37,6 @@ $laundries = [
         'name' => 'Quick Clean Laundry',
         'photo' => 'quickclean_photo.jpg',
         'phone_number' => '0123456789',
-        'country' => 'Jordan',
         'city' => 'Amman',
         'address_line_1' => '789 Oak St',
         'lat' => '31.9539',
@@ -48,8 +46,7 @@ $laundries = [
         'name' => 'Fresh Start Laundry',
         'photo' => 'freshstart_photo.jpg',
         'phone_number' => '0234567890',
-        'country' => 'Egypt',
-        'city' => 'Cairo',
+        'city' => 'Dubi',
         'address_line_1' => '101 Palm St',
         'lat' => '30.0444',
         'lng' => '31.2357'

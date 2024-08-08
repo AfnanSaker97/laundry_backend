@@ -19,8 +19,41 @@ class LaundryController extends BaseController
     {
         
         $Laundries = Cache::remember('Laundries', 60, function () {
-            return Laundry::all();
+            return Laundry::with('prices')->get();
         });
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     }
+
+
+    public function search(Request $request)
+{
+    $query = $request->input('name');
+
+    // If the query is empty, return an empty array
+    $results = $query 
+        ? Laundry::where('name', 'LIKE', '%' . $query . '%')->get()
+        : [];
+
+    return $this->sendResponse($results, 'Laundries fetched successfully.');
+}
+
+
+
+
+
+public function show(Request $request)
+{
+    $validator =Validator::make($request->all(), [
+        'id' => 'required|exists:laundries',
+    
+    ]);
+   
+    if($validator->fails()){
+        return $this->sendError('Validation Error.', $validator->errors()->all());       
+    }
+      // Find the country by ID
+    $laundry = Laundry::with('prices')->findOrFail($request->id);
+    return $this->sendResponse($laundry,'laundry fetched successfully.');
+}
+
 }

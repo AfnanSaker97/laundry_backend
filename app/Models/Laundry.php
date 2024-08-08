@@ -19,4 +19,10 @@ class Laundry extends Model
         'lat',
         'lng'
     ];
+
+
+    public function prices()
+    {
+        return $this->hasMany(LaundryPrice::class);
+    }
 }

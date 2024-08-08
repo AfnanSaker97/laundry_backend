@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('laundries', function (Blueprint $table) {
+        Schema::create('laundry_prices', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('photo')->default('0');
-            $table->string('phone_number');
-        
-            $table->string('city');
-            $table->string('address_line_1')->default('0');
-            $table->decimal('lat');
-            $table->decimal('lng');
+            $table->string('item_type');
+            $table->string('price');
+            $table->foreignId('laundry_id')->constrained('laundries');  
             $table->timestamps();
         });
     }
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laundries');
+        Schema::dropIfExists('laundry_prices');
     }
 };
