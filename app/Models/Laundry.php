@@ -10,7 +10,8 @@ class Laundry extends Model
     use HasFactory;
     
     protected $fillable = [
-        'name',
+        'name_en',
+        'name_ar',
         'email',
         'phone_number',
         'country',

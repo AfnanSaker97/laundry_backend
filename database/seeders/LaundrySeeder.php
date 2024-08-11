@@ -14,9 +14,9 @@ class LaundrySeeder extends Seeder
     {
 $laundries = [
     [
-        'name' => 'Pesana Laundry',
-
-        'photo' => 'pesana_photo.jpg',
+        'name_en' => 'Pesana Laundry',
+        'name_ar' => 'غسيل الملابس بيسانا',
+        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0978678678567',
 
         'city' => 'Abu Dabi',
@@ -25,8 +25,9 @@ $laundries = [
         'lng' => '36.2765'
     ],
     [
-        'name' => 'Sunshine Laundry',
-        'photo' => 'sunshine_photo.jpg',
+        'name_en' => 'Sunshine Laundry',
+        'name_ar' => 'غسيل الملابس في صن شاين',
+        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0987654321',
         'city' => 'Dubi',
         'address_line_1' => '456 Elm St',
@@ -34,8 +35,9 @@ $laundries = [
         'lng' => '35.4955'
     ],
     [
-        'name' => 'Quick Clean Laundry',
-        'photo' => 'quickclean_photo.jpg',
+        'name_en' => 'Quick Clean Laundry',
+        'name_ar' => 'غسيل سريع التنظيف',
+        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0123456789',
         'city' => 'Amman',
         'address_line_1' => '789 Oak St',
@@ -43,8 +45,9 @@ $laundries = [
         'lng' => '35.9106'
     ],
     [
-        'name' => 'Fresh Start Laundry',
-        'photo' => 'freshstart_photo.jpg',
+        'name_en' => 'Fresh Start Laundry',
+        'name_ar' =>'بداية جديدة للغسيل',
+        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0234567890',
         'city' => 'Dubi',
         'address_line_1' => '101 Palm St',

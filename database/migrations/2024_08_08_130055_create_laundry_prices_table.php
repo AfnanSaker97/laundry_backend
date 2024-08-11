@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('laundry_prices', function (Blueprint $table) {
             $table->id();
-            $table->string('item_type');
+            $table->string('item_type_en');
+            $table->string('item_type_ar');
             $table->string('price');
             $table->foreignId('laundry_id')->constrained('laundries');  
             $table->timestamps();

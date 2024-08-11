@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('laundries', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name_ar');
+            $table->string('name_en');
             $table->string('photo')->default('0');
             $table->string('phone_number');
-        
             $table->string('city');
             $table->string('address_line_1')->default('0');
             $table->decimal('lat');
