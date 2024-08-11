@@ -38,4 +38,8 @@ class Order extends Model
     {
         return $this->belongsTo(Address::class);
     }
+    public function Laundry()
+    {
+        return $this->belongsTo(Laundry::class);
+    }
 }
