@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 class AdminController extends BaseController
 {
+
+       
+   public function index()
+   {  
+   $users= User::where('user_type_id',2)->get();
+   return $this->sendResponse($users, 'Users fetched successfully.');
+    }
+
+
+    public function getDriver()
+    {  
+    $users= User::where('user_type_id',3)->get();
+    return $this->sendResponse($users, 'Dreviers fetched successfully.');
+     }
     public function registerAdmin(Request $request)
     {
         try {
