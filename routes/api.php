@@ -35,6 +35,7 @@ Route::post('Address', [AddressController::class, 'store']);
 Route::get('logout', [RegisterController::class, 'logout']);
 
 Route::get('User', [RegisterController::class, 'getUser']);
+Route::post('User-update', [RegisterController::class, 'update']);
 
 
 Route::post('order', [OrderItemController::class, 'store']);

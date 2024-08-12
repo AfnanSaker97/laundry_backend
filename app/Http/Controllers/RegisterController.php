@@ -91,4 +91,22 @@ public function logout(Request $request)
     return $this->sendResponse($success, 'User is logged out successfully.');
 
 } 
+
+
+
+public function update(Request $request)
+{
+    $user =Auth::user();
+    if ($request->filled('first_name')) {
+        $user->update(['first_name' => $request->first_name]);
+    }
+    if ($request->filled('last_name')) {
+        $user->update(['last_name' => $request->last_name]);
+    }
+ 
+    return $this->sendResponse($user, 'User updated successfully.');
+ 
+
+}
+
 }
