@@ -7,12 +7,17 @@ use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
 //Route::middleware('auth:sanctum')->group( function () {
+
+Route::post('register-admin', [AdminController::class, 'registerAdmin']);
+Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
+
 
 Route::get('launderies', [LaundryController::class, 'index']);
 Route::get('search-launderies', [LaundryController::class, 'search']);
