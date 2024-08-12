@@ -11,6 +11,7 @@ use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Validator;
+use Auth;
 class RegisterController extends BaseController
 {
     
@@ -68,4 +69,26 @@ class RegisterController extends BaseController
       
                
      }  
+
+
+
+     public function getUser(Request $request)
+{
+
+    $user =Auth::user();
+    return $this->sendResponse($user, 'User fetched successfully.');
+ 
+
+}
+
+
+public function logout(Request $request)
+{
+    $user = auth()->user();
+    $user->tokens()->delete();
+  //  $user->mySession()->delete();
+    $success['user'] =  $user;
+    return $this->sendResponse($success, 'User is logged out successfully.');
+
+} 
 }
