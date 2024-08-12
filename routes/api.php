@@ -18,7 +18,7 @@ Route::post('register-Password', [RegisterController::class, 'registerPassword']
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
-
+Route::get('order-admin', [OrderController::class, 'index']);
 Route::get('users', [AdminController::class,'index']);
 Route::get('Driver', [AdminController::class,'getDriver']);
 

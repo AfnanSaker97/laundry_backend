@@ -29,4 +29,15 @@ class OrderController extends BaseController
             return $this->sendResponse($order, 'order fetched successfully.');
         }
 
+
+        public function index()
+        {
+            $userId = Auth::id();
+            // Adjust the pagination size as needed      
+            $Orders= Order::with(['user','OrderItems.LaundryPrice','address'])
+             ->orderByDesc('created_at')->get();
+           
+           return $this->sendResponse($Orders, 'order fetched successfully.');
+        }
+
 }
