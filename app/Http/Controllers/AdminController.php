@@ -14,18 +14,26 @@ class AdminController extends BaseController
 {
 
        
-   public function index()
-   {  
-   $users= User::where('user_type_id',2)->get();
-   return $this->sendResponse($users, 'Users fetched successfully.');
+    public function index(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status_id' => 'required|in:2,3',  // Corrected the validation rule
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+    
+        $userTypeId = $request->status_id;
+        $users = User::where('user_type_id', $userTypeId)->get();
+        
+        $message = $userTypeId == 2 ? 'Users fetched successfully.' : 'Drivers fetched successfully.';
+        
+        return $this->sendResponse($users, $message);
     }
 
 
-    public function getDriver()
-    {  
-    $users= User::where('user_type_id',3)->get();
-    return $this->sendResponse($users, 'Dreviers fetched successfully.');
-     }
+   
     public function registerAdmin(Request $request)
     {
         try {
@@ -34,7 +42,7 @@ class AdminController extends BaseController
             'name'=>'required|min:3',
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
-    
+ 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
@@ -45,7 +53,7 @@ class AdminController extends BaseController
                     'password' => Hash::make($request->password),
                     'user_type_id'=> 1, 
                 ]);  
-                      
+              
                 $data['token'] = $user->createToken($request->email)->plainTextToken;
                 $data['user'] = $user;
                 return $this->sendResponse($data,'admin is created successfully');

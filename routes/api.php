@@ -19,8 +19,7 @@ Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
 Route::get('order-admin', [OrderController::class, 'index']);
-Route::get('users', [AdminController::class,'index']);
-Route::get('Driver', [AdminController::class,'getDriver']);
+Route::get('Filter-users', [AdminController::class,'index']);
 
 Route::get('launderies', [LaundryController::class, 'index']);
 Route::get('search-launderies', [LaundryController::class, 'search']);

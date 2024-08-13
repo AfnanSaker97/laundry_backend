@@ -27,6 +27,7 @@ class User extends Authenticatable
         'lng',
         'driver_id',
         'user_type_id',
+        'password',
     ];
 
     /**
