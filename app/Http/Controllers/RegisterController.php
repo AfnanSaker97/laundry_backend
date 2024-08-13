@@ -96,6 +96,8 @@ public function logout(Request $request)
 
 public function update(Request $request)
 {
+
+    try {
     $user =Auth::user();
     if ($request->filled('first_name')) {
         $user->update(['first_name' => $request->first_name]);
@@ -104,9 +106,23 @@ public function update(Request $request)
         $user->update(['last_name' => $request->last_name]);
     }
  
+    if ($request->photo) {
+    
+        $imageName = time() . '.' . $request->photo->extension();
+        $request->photo->move(public_path('driver'), $imageName);
+        $url = url('driver/' . $imageName);
+        $user->photo = $url;
+        return $user;
+        $user->save();
+    }
+ 
     return $this->sendResponse($user, 'User updated successfully.');
  
-
+} catch (\Exception $e) {
+    // Log error and return empty array
+    return response()->json(['error' =>  $e->getMessage()], 500);
+  
+}
 }
 
 }
