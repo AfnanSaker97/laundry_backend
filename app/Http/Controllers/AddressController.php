@@ -41,7 +41,9 @@ class AddressController extends BaseController
                 'postcode' => $request->postcode,
                 'contact_number' => $request->contact_number,
                 'postcode' => $request->postcode,
-                'contact_number' => $request->contact_number,
+                'lat' => $request->latitude,
+                'lng' => $request->longitude,
+
            ]);
             
         return $this->sendResponse($address,'Address created successfully.');

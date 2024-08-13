@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CarController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -29,6 +30,8 @@ Route::get('order-admin', [OrderController::class, 'index']);
 Route::post('createDriver', [AdminController::class, 'createDriver']);
 
 
+//Car
+Route::get('CarByLaundry', [CarController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function() {
 
 //Address
