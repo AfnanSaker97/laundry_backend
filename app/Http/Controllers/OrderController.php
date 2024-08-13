@@ -40,4 +40,40 @@ class OrderController extends BaseController
            return $this->sendResponse($Orders, 'order fetched successfully.');
         }
 
+
+
+        
+public function getOrderByProximity(Request $request)
+{
+ 
+    try {
+    $user = Auth::user();
+    $driverLatitude =  $user ->lat;
+    $driverLongitude =  $user ->lng;
+
+    
+    $orders = DB::table('orders')
+    ->join('addresses', 'orders.address_id', '=', 'addresses.id')
+    ->join('users', 'orders.user_id', '=', 'users.id')
+    ->select(
+        'orders.id',
+        'orders.total_price',
+        'orders.note',
+        'users.first_name',
+        'users.last_name',
+        'addresses.lat',
+        'addresses.lng',
+        DB::raw("( 6371 * acos( cos( radians($driverLatitude) ) * cos( radians(addresses.lat) ) * cos( radians(addresses.lng) - radians($driverLongitude) ) + sin( radians($driverLatitude) ) * sin( radians(addresses.lat) ) ) ) AS distance")  )
+    ->orderBy('distance')
+    ->get();
+    return $this->sendResponse($orders, 'Laundries fetched successfully.');
+} catch (\Exception $e) {
+    DB::rollBack();
+    // Log error and return empty array
+    return response()->json(['error' =>  $e->getMessage()], 500);
+  
 }
+    }   
+}
+
+

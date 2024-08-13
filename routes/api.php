@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function() {
 Route::post('Address', [AddressController::class, 'store']);
 
 Route::get('Nearby', [LaundryController::class, 'getLaundriesByProximity']);
+Route::get('getOrderByProximity', [OrderController::class, 'getOrderByProximity']);
 
 
 Route::get('logout', [RegisterController::class, 'logout']);
