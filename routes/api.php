@@ -18,12 +18,15 @@ Route::post('register-Password', [RegisterController::class, 'registerPassword']
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
-Route::get('order-admin', [OrderController::class, 'index']);
 Route::get('Filter-users', [AdminController::class,'index']);
 
 Route::get('launderies', [LaundryController::class, 'index']);
 Route::get('search-launderies', [LaundryController::class, 'search']);
 Route::get('laundry', [LaundryController::class, 'show']);
+
+
+Route::get('order-admin', [OrderController::class, 'index']);
+Route::post('createDriver', [AdminController::class, 'createDriver']);
 
 
 Route::middleware('auth:sanctum')->group(function() {

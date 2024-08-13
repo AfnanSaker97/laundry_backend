@@ -97,5 +97,50 @@ class AdminController extends BaseController
                 return response()->json(['error' => $e->getMessage()], 500);
             }
              }
+
+
+
      
+
+
+
+             public function createDriver(Request $request)
+             {
+             
+                 try {
+                 $validator = Validator::make($request->all(), [
+                    'first_name'=>'required|min:3',
+                    'last_name'=>'required|min:3',
+                     'email' => 'required|email|max:255|unique:users,email',
+                     'password' => ['required', 'string', 'min:8', 'confirmed'],
+                 ]);
+          
+                 if ($validator->fails()) {
+                     return $this->sendError('Validation Error.', $validator->errors()->all());
+                 }
+               
+                 $user = User::create([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'user_type_id'=> 3, 
+                    'driver_id' => $this->generateDriverId(),
+                ]);  
+              
+                         $data['token'] = $user->createToken($request->email)->plainTextToken;
+                         $data['user'] = $user;
+                         return $this->sendResponse($data,'Driver is created successfully');
+                     } catch (\Exception $e) {
+                         DB::rollBack();
+                         return response()->json(['error' => $e->getMessage()], 500);
+                     }
+              }  
+
+ private function generateDriverId()
+{
+    // Example implementation - you can customize this as needed
+    return 'DRV-' . strtoupper(uniqid());
+}
+         
 }
