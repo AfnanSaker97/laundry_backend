@@ -46,7 +46,6 @@ class OrderController extends BaseController
             // Convert to a string format
             $delivery_time = $pickup_time->toDateTimeString();
             
-
           $order = Order::findOrFail($request->order_id);
           $order->pickup_time= $request->delivery_date;
           $order->delivery_time=  $delivery_time;

@@ -14,7 +14,49 @@ use Validator;
 use Auth;
 class RegisterController extends BaseController
 {
-    
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|min:3',
+            'last_name' => 'required|min:3',
+            'email' => 'required|email',
+        ]);
+   
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        try {
+            $email = $request->email;
+            $email_verification_code = random_int(1000, 9999); 
+           
+            // Create a new user
+            $user = User::create([
+                'first_name' =>  $request->first_name,
+                'last_name' =>  $request->last_name,
+                'email' =>  $email,
+                'verification_code' => $email_verification_code ,
+                'user_type_id' =>  2,
+            ]);
+
+            MySession::create([
+                'user_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+                'payload' => base64_encode($request->getContent()), 
+                'last_activity' => time(),
+            ]);
+            $success['user'] =  $user;
+           // Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
+        return $this->sendResponse($success,'Verification code sent to your email.');
+  
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+}
+
 
     public function registerPassword(Request $request)
     {

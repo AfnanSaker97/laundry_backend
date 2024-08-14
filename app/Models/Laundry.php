@@ -18,7 +18,8 @@ class Laundry extends Model
         'city',
         'address_line_1',
         'lat',
-        'lng'
+        'lng',
+        'admin_id'
     ];
 
 

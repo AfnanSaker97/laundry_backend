@@ -13,6 +13,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
+Route::post('register', [RegisterController::class, 'register']);
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
 //Route::middleware('auth:sanctum')->group( function () {
 
@@ -52,4 +54,10 @@ Route::post('Driver-update', [RegisterController::class, 'update']);
 Route::post('order', [OrderItemController::class, 'store']);
 Route::get('order', [OrderItemController::class, 'index']);
 Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
+
+
+
+//laundry Admin
+
+Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 });

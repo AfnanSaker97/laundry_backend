@@ -17,7 +17,17 @@ use Auth;
 class LaundryController extends BaseController
 {
 
- public function index()
+ public function LaundryByAdmin()
+    {
+        $user = Auth::user();
+        $Laundries = Laundry::with('prices')->where('admin_id', $user->id)->get();
+
+  
+        return $this->sendResponse($Laundries,'Laundries fetched successfully.');
+    }
+
+
+    public function index()
     {
         
         $Laundries = Cache::remember('Laundries', 60, function () {
@@ -25,6 +35,7 @@ class LaundryController extends BaseController
         });
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     }
+
 
 
     public function search(Request $request)

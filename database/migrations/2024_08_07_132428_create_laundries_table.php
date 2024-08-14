@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('address_line_1')->default('0');
             $table->decimal('lat');
             $table->decimal('lng');
+            $table->foreignId('admin_id')->constrained('users');
             $table->timestamps();
         });
     }
