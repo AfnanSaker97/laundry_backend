@@ -60,4 +60,7 @@ Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
 //laundry Admin
 
 Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
+
+//MyOrder
+Route::get('MyOrders', [OrderController::class, 'MyOrder']);
 });

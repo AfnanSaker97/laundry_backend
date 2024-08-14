@@ -25,6 +25,38 @@ class OrderController extends BaseController
        return $this->sendResponse($Orders, 'order fetched successfully.');
     }
 
+
+    public function MyOrder()
+    {
+        try {
+        $userId = Auth::id();
+
+        // Define the start and end of the current day
+        $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
+        $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
+
+
+        // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry'])
+            ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
+            ->where('status','pending')
+            ->whereHas('Laundry', function ($query) use ($userId) {
+                $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+            })
+            ->orderByDesc('order_date')
+            ->get();
+
+       
+       return $this->sendResponse($orders, 'order fetched successfully.');
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+    }
+
+
      
     public function store(Request $request)
     {   
