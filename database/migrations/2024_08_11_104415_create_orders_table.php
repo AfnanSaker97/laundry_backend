@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->Time('pickup_time');
-            $table->Time('delivery_time');
+                    // Custom columns for date and time
+            $table->timestamp('pickup_time')->nullable(); 
+            $table->timestamp('delivery_time')->nullable();
+            $table->timestamp('order_date')->nullable(); 
             $table->string('status')->default('pending');
-            $table->Time('order_date');
             $table->string('total_price')->default('0');
             $table->string('note')->default('0');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses');
             $table->foreignId('laundry_id')->constrained('laundries');
-            $table->foreignId('car_id')->constrained('cars');
+            $table->foreignId('car_id')->nullable()->constrained('cars');
             $table->timestamps();
         });
     }

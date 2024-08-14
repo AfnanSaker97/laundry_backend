@@ -42,6 +42,21 @@ class OrderItemController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
+
+        $utcTimestamp =now();
+        
+        // Convert the UTC timestamp to a Carbon instance
+        $utcTime = Carbon::parse($utcTimestamp);
+        
+        // Convert the UTC time to your local time zone (UTC+3)
+        $localTime = $utcTime->copy()->setTimezone('Etc/GMT-3');
+        
+        $time =$localTime->toDateTimeString();
+        $pickup_localTime=$localTime->addHour();
+        $pickup_time =$localTime->toDateTimeString();
+
+        $pickup_localTime->addHours(24); 
+        $delivery_time =$pickup_localTime->toDateTimeString();
         // Retrieve the product and current user ID
         $laundryPrice = LaundryPrice::find($request->laundry_price_id);
  
@@ -60,9 +75,9 @@ class OrderItemController extends BaseController
             'laundry_id' =>  $request->laundry_id,
             'user_id' => $userId,
             'address_id' => $request->address_id,
-            'order_date' => $date,
-            'pickup_time' => $date,
-            'delivery_time' => $date,
+            'order_date' => $time,
+            'pickup_time' => $pickup_time,
+            'delivery_time' => $delivery_time,
             'note' => $request->note?? '0',
         ]);
  

@@ -19,7 +19,7 @@ class Order extends Model
         'laundry_id',
         'order_id',
         'address_id',
-     
+          'car_id',
       
     ];
 
