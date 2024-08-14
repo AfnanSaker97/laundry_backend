@@ -38,10 +38,20 @@ class OrderController extends BaseController
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
+            $pickup_time = Carbon::parse($request->delivery_date);
+
+            // Add 24 hours to the pickup time
+            $pickup_time->addHours(24);
+            
+            // Convert to a string format
+            $delivery_time = $pickup_time->toDateTimeString();
+            
+
           $order = Order::findOrFail($request->order_id);
           $order->pickup_time= $request->delivery_date;
+          $order->delivery_time=  $delivery_time;
           $order->car_id= $request->car_id;
-          $order->status='confirmed';
+          $order->status='confirmed'; 
           $order->save();
           return $this->sendResponse($order, 'order updated successfully.');
         }
