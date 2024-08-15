@@ -43,4 +43,9 @@ class Order extends Model
     {
         return $this->belongsTo(Laundry::class);
     }
+
+    public function OrderType()
+    {
+        return $this->belongsTo(OrderType::class);
+    }
 }

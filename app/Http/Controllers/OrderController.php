@@ -26,8 +26,14 @@ class OrderController extends BaseController
     }
 
 
-    public function MyOrder()
+    public function MyOrder(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'status_id' => 'required|in:1,2,3,4,5,6', // Add validation for allowed status_id values
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
         try {
         $userId = Auth::id();
 
@@ -35,9 +41,10 @@ class OrderController extends BaseController
         $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
         $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
 
-
-        // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry'])
+         if($request->status_id ==1)
+         {
+  // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
             ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
             ->where('status','pending')
             ->whereHas('Laundry', function ($query) use ($userId) {
@@ -46,6 +53,35 @@ class OrderController extends BaseController
             ->orderByDesc('order_date')
             ->get();
 
+         }
+         //غير مباشر
+      if($request->status_id ==2)
+      {
+         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
+         ->where('status','pending')
+         ->where('order_type_id','1')
+         ->whereHas('Laundry', function ($query) use ($userId) {
+             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+         })
+         ->orderByDesc('order_date')
+         ->get();
+      }
+      //مباشر
+      if($request->status_id ==3)
+      {
+         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
+         ->where('status','pending')
+         ->where('order_type_id','2')
+         ->whereHas('Laundry', function ($query) use ($userId) {
+             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+         })
+         ->orderByDesc('order_date')
+         ->get();
+      }
        
        return $this->sendResponse($orders, 'order fetched successfully.');
     }catch (\Throwable $th) {
@@ -115,7 +151,7 @@ class OrderController extends BaseController
     
     public function OrderDetails(Request $request)
     {   
-
+    
         $validator = Validator::make($request->all(), [
             'order_id' => 'required|exists:orders,id',  
             ]);
@@ -123,7 +159,14 @@ class OrderController extends BaseController
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-            $order = Order::with(['user','address','Laundry','OrderItems','OrderItems.LaundryPrice'])->findOrFail($request->order_id);
+            $order = Order::with(['user','address','Laundry','OrderType','OrderItems','OrderItems.LaundryPrice'])->findOrFail($request->order_id);
+            $cartItemsTotal = OrderItem::where('order_id', $order->id)
+            ->sum('sub_total_price');
+            $Delivery_cost=$order->total_price -$cartItemsTotal;
+            $order['Delivery_cost'] =  $Delivery_cost;
+            $order['sub_total_price'] =  $cartItemsTotal;
+            $order['user'] =  $order;
+       
             return $this->sendResponse($order, 'order fetched successfully.');
         }
 
