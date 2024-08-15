@@ -29,7 +29,7 @@ class OrderController extends BaseController
     public function MyOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:1,2,3,4,5,6', // Add validation for allowed status_id values
+            'status_id' => 'required|in:1,2,3', // Add validation for allowed status_id values
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -109,7 +109,7 @@ class OrderController extends BaseController
             $pickup_time = Carbon::parse($request->delivery_date);
 
             // Add 24 hours to the pickup time
-            $pickup_time->addHours(24);
+            $pickup_time->addHours(1);
             
             // Convert to a string format
             $delivery_time = $pickup_time->toDateTimeString();
@@ -122,6 +122,34 @@ class OrderController extends BaseController
           $order->save();
           return $this->sendResponse($order, 'order updated successfully.');
         }
+    
+
+
+        
+    public function filterMyOrder(Request $request)
+    {
+        $userId = Auth::id();
+        $validator = Validator::make($request->all(), [
+            'status_id' => 'required|in:1,2,3,4,5,6', // Add validation for allowed status_id values
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        
+        $status = [
+            1 => 'pending',
+            2 => 'confirmed',
+            3 => 'Processing',
+            4 => 'Shipped',
+            5 => 'Delivered',
+            6 => 'Cancelled',
+        ];
+        $orders = Order::with(['user','address','Laundry','OrderItems','OrderItems.LaundryPrice'])
+        ->where('status', $status[$request->status_id])
+        ->where('user_id', $userId)
+        ->get();
+        return $this->sendResponse($orders, 'orders fetched successfully.');
+    }
 
 
     public function filterOrder(Request $request)

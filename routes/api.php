@@ -41,7 +41,7 @@ Route::post('Address', [AddressController::class, 'store']);
 
 Route::get('Nearby', [LaundryController::class, 'getLaundriesByProximity']);
 Route::get('getOrderByProximity', [OrderController::class, 'getOrderByProximity']); //driver
-Route::get('filterOrder', [OrderController::class, 'filterOrder']); //admin
+Route::get('filterOrder', [OrderController::class, 'filterOrder']); //supre
 Route::post('confirm-Order', [OrderController::class, 'store']);//admin
 
 
@@ -63,4 +63,6 @@ Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 
 //MyOrder
 Route::get('MyOrders', [OrderController::class, 'MyOrder']);
+Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
+
 });

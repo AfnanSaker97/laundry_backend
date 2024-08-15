@@ -18,7 +18,9 @@ return new class extends Migration
             $table->timestamp('delivery_time')->nullable();
             $table->timestamp('order_date')->nullable(); 
             $table->string('status')->default('pending');
-            $table->string('total_price')->default('0');
+            $table->decimal('base_cost')->default('0');
+            $table->decimal('total_price')->default('0');
+            $table->decimal('distance'); // -- المسافة بالكيلومترات
             $table->string('note')->default('0');
             $table->foreignId('order_type_id')->constrained('order_types');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
