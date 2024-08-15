@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificationCodeMail;
 use Validator;
 use Auth;
 class RegisterController extends BaseController
@@ -46,7 +48,7 @@ class RegisterController extends BaseController
                 'last_activity' => time(),
             ]);
             $success['user'] =  $user;
-           // Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
+            Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
         return $this->sendResponse($success,'Verification code sent to your email.');
   
     }catch (\Throwable $th) {
