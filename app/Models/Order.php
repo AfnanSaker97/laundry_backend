@@ -20,6 +20,7 @@ class Order extends Model
         'order_id',
         'address_id',
           'car_id',
+          'order_type_id'
       
     ];
 

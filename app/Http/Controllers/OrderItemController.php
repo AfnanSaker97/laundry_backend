@@ -8,6 +8,7 @@ use App\Models\LaundryPrice;
 use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\MySession;
+use App\Models\OrderType;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,7 @@ class OrderItemController extends BaseController
             'laundry_id' => 'required|exists:laundries,id',
             'address_id' => 'required|exists:addresses,id',
             'laundry_price_id' => 'required|exists:laundry_prices,id',
+            'order_type_id' => 'required|exists:order_types,id',
             'quantity' => 'required|numeric',
             'note' => 'nullable',
        
@@ -59,7 +61,7 @@ class OrderItemController extends BaseController
         $delivery_time =$pickup_localTime->toDateTimeString();
         // Retrieve the product and current user ID
         $laundryPrice = LaundryPrice::find($request->laundry_price_id);
- 
+        $orderType = OrderType::find($request->order_type_id);
         $userId = Auth::id();
       
         $date = Carbon::now()->format('Y-m-d H:i:s');
@@ -79,6 +81,7 @@ class OrderItemController extends BaseController
             'pickup_time' => $pickup_time,
             'delivery_time' => $delivery_time,
             'note' => $request->note?? '0',
+            'order_type_id' => $request->order_type_id,
         ]);
  
             // Create a new cart item
@@ -93,7 +96,9 @@ class OrderItemController extends BaseController
          
             $cartItemsTotal = OrderItem::where('order_id', $order->id)->where('user_id', $userId)
             ->sum('sub_total_price');
-            $order->total_price = $cartItemsTotal;
+            $price =$orderType->price;
+            $total_price = $cartItemsTotal+ $price;
+            $order->total_price = $total_price;
             $order->save();
     
         DB::commit();

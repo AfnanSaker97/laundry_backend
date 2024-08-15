@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('total_price')->default('0');
             $table->string('note')->default('0');
+            $table->foreignId('order_type_id')->constrained('order_types');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses');
             $table->foreignId('laundry_id')->constrained('laundries');
