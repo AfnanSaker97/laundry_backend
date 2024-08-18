@@ -16,20 +16,22 @@ Route::get('/user', function (Request $request) {
 
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
+Route::post('login', [RegisterController::class, 'login']);
+
 //Route::middleware('auth:sanctum')->group( function () {
 
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
-Route::get('Filter-users', [AdminController::class,'index']);
+Route::get('Filter-users', [AdminController::class,'index']);//super admin
 
-Route::get('launderies', [LaundryController::class, 'index']);
-Route::get('search-launderies', [LaundryController::class, 'search']);
+Route::get('launderies', [LaundryController::class, 'index']);//super admin
+Route::get('search-launderies', [LaundryController::class, 'search']); //users
 Route::get('laundry', [LaundryController::class, 'show']);
 
 
 Route::get('order-admin', [OrderController::class, 'index']);
-Route::post('createDriver', [AdminController::class, 'createDriver']);
+Route::post('createDriver', [AdminController::class, 'createDriver']); 
 
 
 //Car
@@ -60,7 +62,6 @@ Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
 //laundry Admin
 
 Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
-
 //MyOrder
 Route::get('MyOrders', [OrderController::class, 'MyOrder']);
 Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
