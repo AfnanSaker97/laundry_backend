@@ -19,8 +19,7 @@ class RegisterController extends BaseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|min:3',
-            'last_name' => 'required|min:3',
+            'name' => 'required|min:3',
             'email' => 'required|email',
         ]);
    
@@ -30,11 +29,12 @@ class RegisterController extends BaseController
         try {
             $email = $request->email;
             $email_verification_code = random_int(1000, 9999); 
-           
+            $existingUser = User::where('email', $request->email)->first();
+            if(!$existingUser)
+            {
             // Create a new user
             $user = User::create([
-                'first_name' =>  $request->first_name,
-                'last_name' =>  $request->last_name,
+                'name' =>  $request->name,
                 'email' =>  $email,
                 'verification_code' => $email_verification_code ,
                 'user_type_id' =>  2,
@@ -49,9 +49,24 @@ class RegisterController extends BaseController
             ]);
             $success['user'] =  $user;
             Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
-        return $this->sendResponse($success,'Verification code sent to your email.');
   
-    }catch (\Throwable $th) {
+    }
+    else{
+        $existingUser->verification_code =$email_verification_code;
+        $existingUser->save();
+        MySession::create([
+            'user_id' => $existingUser->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'payload' => base64_encode($request->getContent()), 
+            'last_activity' => time(),
+        ]);
+        $success['user'] =  $existingUser;
+        Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code)); 
+       
+    }
+    return $this->sendResponse($success,'Verification code sent to your email.');
+ }catch (\Throwable $th) {
         return response()->json([
             'status' => false,
             'message' => $th->getMessage()
@@ -61,46 +76,6 @@ class RegisterController extends BaseController
 
 
 
-public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
-   
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors()->all());       
-        }
-        try {
-            $email = $request->email;
-            $email_verification_code = random_int(1000, 9999); 
-            $existingUser = User::where('email', $request->email)->first();
-            if($existingUser)
-            {
-            $existingUser->verification_code = $email_verification_code ;
-            $existingUser->save();
-            MySession::create([
-                'user_id' => $existingUser->id,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->header('User-Agent'),
-                'payload' => base64_encode($request->getContent()), 
-                'last_activity' => time(),
-            ]);
-            $success['user'] =  $existingUser;
-            Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code));
-            return $this->sendResponse($success,'Verification code sent to your email.');
-  
-        }
-           else
-           {
-            return $this->sendError(' Error.', 'Email not found');  
-           }
-        }catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
 
 
 

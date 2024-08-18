@@ -48,7 +48,7 @@ class AdminController extends BaseController
         }
       
                 $user = User::create([
-                    'first_name' => $request->name,
+                    'name' => $request->name,
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
                     'user_type_id'=> 1, 
