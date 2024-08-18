@@ -103,6 +103,51 @@ public function login(Request $request)
     }
 
 
+
+    
+public function verify(Request $request)
+{
+    try {
+    // Validate the request input
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email|exists:users,email',
+        'verification_code' => 'required|string',
+    ]);
+
+    // Check if validation fails
+  
+    if($validator->fails()){
+        return $this->sendError('Validation Error.', $validator->errors()->all());       
+    }
+
+    // Retrieve the user by email and check the verification code
+    $user = User::where('email', $request->email)
+                ->where('verification_code', $request->verification_code)
+                ->first();
+
+    // If user does not exist or code is incorrect, return an error response
+    if (!$user) {
+        return $this->sendError('Validation Error.',['Invalid verification code!']);
+    }
+      
+        // Update user's email verification timestamp
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+
+        // Create a new API token for the user
+        $data['token'] = $user->createToken($request->email)->plainTextToken;
+        $data['user'] = $user;
+
+        return $this->sendResponse($data,'Email verified successfully.');
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $th->getMessage()
+        ], 500);
+    }
+}
+
+
     public function registerPassword(Request $request)
     {
         try {

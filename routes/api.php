@@ -17,6 +17,7 @@ Route::get('/user', function (Request $request) {
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
 Route::post('login', [RegisterController::class, 'login']);
+Route::post('verify', [RegisterController::class, 'verify']);
 
 //Route::middleware('auth:sanctum')->group( function () {
 
