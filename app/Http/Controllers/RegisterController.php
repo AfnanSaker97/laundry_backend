@@ -82,6 +82,16 @@ class RegisterController extends BaseController
     
 public function verify(Request $request)
 {
+     // Check if the user has sent a request recently
+     $lastRequestTime = session('last_verification_request_time');
+     if ($lastRequestTime && now()->diffInSeconds($lastRequestTime) < 30) {
+         return $this->sendError('Please wait 30 seconds before trying again.');
+     }
+
+     // Store the current time as the last request time
+     session(['last_verification_request_time' => now()]);
+
+
     try {
     // Validate the request input
     $validator = Validator::make($request->all(), [

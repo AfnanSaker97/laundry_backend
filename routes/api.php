@@ -9,6 +9,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\LaundryPriceController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -66,5 +67,8 @@ Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 //MyOrder
 Route::get('MyOrders', [OrderController::class, 'MyOrder']);
 Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
+
+Route::post('update-Laundryprice', [LaundryPriceController::class, 'update']);
+
 
 });
