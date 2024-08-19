@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Laundry;
+use App\Models\Car;
 use App\Models\LaundryPrice;
 use App\Models\OrderItem;
 use App\Models\Order;
@@ -46,7 +47,7 @@ class OrderController extends BaseController
   // Fetch orders created today for the authenticated user where Laundry.admin_id matches
         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
             ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-            ->where('status','pending')
+         //   ->where('status','pending')
             ->whereHas('Laundry', function ($query) use ($userId) {
                 $query->where('admin_id', $userId); // Filter by Laundry's admin_id
             })
@@ -60,7 +61,7 @@ class OrderController extends BaseController
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
          $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
          ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-         ->where('status','pending')
+       //  ->where('status','pending')
          ->where('order_type_id','1')
          ->whereHas('Laundry', function ($query) use ($userId) {
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
@@ -74,7 +75,7 @@ class OrderController extends BaseController
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
          $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
          ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-         ->where('status','pending')
+       //  ->where('status','pending')
          ->where('order_type_id','2')
          ->whereHas('Laundry', function ($query) use ($userId) {
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
@@ -235,6 +236,38 @@ public function getOrderByProximity(Request $request)
   
 }
     }   
+
+
+
+    public function getTotal()
+{
+    try {
+        $userId = Auth::id();
+        $laundry =Laundry::where('admin_id',$userId)->first();
+     
+        // Define the start and end of the current day
+        $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
+        $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
+
+        // حساب المجموع الكلي للطلبات
+        $totalOrdersToday = Order::where('laundry_id',$laundry->id)->whereBetween('order_date', [$startOfDay, $endOfDay])->count();
+        $totalOrders = Order::where('laundry_id',$laundry->id)->count();
+        $pendingOrders = Order::where('laundry_id',$laundry->id)->where('status','pending')->count();
+        $carservice = Car::where('laundry_id',$laundry->id)->where('status','1')->count();
+        
+        $data = [
+            'orders_for_today' => $totalOrdersToday,
+            'totalOrders' => $totalOrders,
+            'pendingOrders' => $pendingOrders,
+            'carservice' => $carservice,
+            'incomeThisMonth'=>25,
+        ];
+        return $this->sendResponse([$data], 'Total orders fetched successfully.');
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
 }
 
 
