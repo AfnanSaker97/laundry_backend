@@ -54,64 +54,68 @@ class OrderItemController extends BaseController
             $now = Carbon::now('Etc/GMT-3');
             $pickupTime = $now->copy()->addHour();
             $deliveryTime = $pickupTime->copy()->addDay();
-
-          $laundryPrice = LaundryPrice::findOrFail($request->laundry_price_id);
-          $laundry = Laundry::findOrFail($request->laundry_id);
-          $address = Address::findOrFail($request->address_id);
-        $orderType = OrderType::findOrFail($request->order_type_id);
-        $userId = Auth::id();
+    
+            $laundryPrice = LaundryPrice::findOrFail($request->laundry_price_id);
+            $laundry = Laundry::findOrFail($request->laundry_id);
+            $address = Address::findOrFail($request->address_id);
+            $orderType = OrderType::findOrFail($request->order_type_id);
+            $userId = Auth::id();
  
      
+     // Calculate distance
+     $distance = round($this->calculateDistance($laundry->lat, $laundry->lng, $address->lat, $address->lng), 1);
 
-    // حساب المسافة باستخدام دالة calculateDistance
-    $distance = $this->calculateDistance($laundry->lat, $laundry->lng, $address->lat, $address->lng);
-    $distance = round($distance, 1);
-        $order = Order::create([
-            'laundry_id' => $request->laundry_id,
-            'user_id' => $userId,
-            'address_id' => $request->address_id,
-            'order_date' => $now,
-            'pickup_time' => $pickupTime,
-            'delivery_time' => $deliveryTime,
-            'note' => $request->note ?? '0',
-            'order_type_id' => $request->order_type_id,
-            'distance' =>  $distance,
-        ]);
+     // Create the order
+     $order = Order::create([
+         'laundry_id' => $request->laundry_id,
+         'user_id' => $userId,
+         'address_id' => $request->address_id,
+         'order_date' => $now,
+         'pickup_time' => $pickupTime,
+         'delivery_time' => $deliveryTime,
+         'note' => $request->note ?? '0',
+         'order_type_id' => $request->order_type_id,
+         'distance' => $distance,
+     ]);
 
-           
-        $subTotalPrice = $laundryPrice->price * $request->quantity;
+     // Calculate subtotal
+     $subTotalPrice = $laundryPrice->price * $request->quantity;
 
-        $orderItem = OrderItem::create([
-            'quantity' => $request->quantity,
-            'user_id' => $userId,
-            'laundry_price_id' => $request->laundry_price_id,
-            'price' => $laundryPrice->price,
-            'sub_total_price' => $subTotalPrice,
-            'order_id' => $order->id,
-        ]);
-        $cartItemsTotal = OrderItem::where('order_id', $order->id)->where('user_id', $userId)
-        ->sum('sub_total_price');
-        if($request->order_type_id==1)
-        {
-            $cost_deliver=$orderType->price* $order->distance;
-            $totalPrice =  $cartItemsTotal  +   $cost_deliver;
-        }
-        else
-        {
-            $orderType_km = OrderType::findOrFail(1)->price;
-            
-            $cost_deliver=$orderType->price+ $orderType_km*$order->distance;
-       
-            $totalPrice =  $cartItemsTotal  +   $cost_deliver;
-        }
-       
+     // Create order item
+     OrderItem::create([
+         'quantity' => $request->quantity,
+         'user_id' => $userId,
+         'laundry_price_id' => $request->laundry_price_id,
+         'price' => $laundryPrice->price,
+         'sub_total_price' => $subTotalPrice,
+         'order_id' => $order->id,
+     ]);
 
-        $order->update(['base_cost' => $cartItemsTotal ]);
-        $order->update(['total_price' => $totalPrice]);
-       
+     // Calculate cart total
+     $cartItemsTotal = OrderItem::where('order_id', $order->id)
+                                ->where('user_id', $userId)
+                                ->sum('sub_total_price');
 
-        DB::commit();
+     // Calculate delivery cost and total price
+    $orderTypeKmPrice = OrderType::findOrFail(1)->price;
+     $costDeliverKm = $orderTypeKmPrice * $distance;
+     $costDeliver = $costDeliverKm;
+     
+     if ($request->order_type_id == 2) {
+        $costDeliver += $orderType->price; // Add the specific order type's price
     
+    }
+
+
+     $totalPrice = $cartItemsTotal + $costDeliver;
+     
+     // Update order with calculated costs
+     $order->update([
+         'base_cost' => $cartItemsTotal,
+         'total_price' => $totalPrice,
+     ]);
+
+       
         return $this->sendResponse($order, 'order successfully.');
     } catch (\Exception $e) {
         DB::rollBack();

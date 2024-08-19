@@ -61,11 +61,16 @@ class RegisterController extends BaseController
             'payload' => base64_encode($request->getContent()), 
             'last_activity' => time(),
         ]);
-        $success['user'] =  $existingUser;
+      //  $success['user'] =  $existingUser;
         Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code)); 
        
     }
-    return $this->sendResponse($success,'Verification code sent to your email.');
+    $response = [
+        'success' => true,
+        'message' => 'Verification code sent to your email.',
+    ];
+
+    return response()->json($response, 200);
  }catch (\Throwable $th) {
         return response()->json([
             'status' => false,
@@ -82,16 +87,7 @@ class RegisterController extends BaseController
     
 public function verify(Request $request)
 {
- /*    // Check if the user has sent a request recently
-     $lastRequestTime = session('last_verification_request_time');
-     if ($lastRequestTime && now()->diffInSeconds($lastRequestTime) < 30) {
-         return $this->sendError('Please wait 30 seconds before trying again.');
-     }
 
-     // Store the current time as the last request time
-     session(['last_verification_request_time' => now()]);
-
-*/
     try {
     // Validate the request input
     $validator = Validator::make($request->all(), [
@@ -120,8 +116,20 @@ public function verify(Request $request)
         $user->save();
 
         // Create a new API token for the user
-        $data['token'] = $user->createToken($request->email)->plainTextToken;
-        $data['user'] = $user;
+        $token = $user->createToken($request->email)->plainTextToken;
+        // Filtered user data (excluding sensitive fields)
+        $filteredUser = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            
+        ];
+
+        $data = [
+            'token' => $token,
+            'user' => $filteredUser,
+        ];
 
         return $this->sendResponse($data,'Email verified successfully.');
     } catch (\Throwable $th) {
@@ -204,8 +212,13 @@ public function logout(Request $request)
     $user = auth()->user();
     $user->tokens()->delete();
   //  $user->mySession()->delete();
-    $success['user'] =  $user;
-    return $this->sendResponse($success, 'User is logged out successfully.');
+    $response = [
+        'success' => true,
+        'message' => 'User is logged out successfully.',
+    ];
+
+    return response()->json($response, 200);
+
 
 } 
 
