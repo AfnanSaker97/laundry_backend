@@ -24,7 +24,7 @@ class VerificationCodeMail extends Mailable
 
     public function build()
     { 
-        return $this->from("laundry@tecrek.com")
+        return $this->from("dobepro@tecrek.com")
         ->subject('Verification Code Mail')
         ->view('emails.verification_code')
         ->with('code', $this->code);

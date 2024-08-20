@@ -34,17 +34,15 @@ class OrderItemController extends BaseController
     
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
-            'address_id' => 'required|exists:addresses,id',
-
-          //  'array_laundry_price_ids' => 'sometimes|min:1',
-            'laundry_price_id' => 'required|exists:laundry_prices,id',
-          //  'array_quantity' => 'sometimes|min:1',
-            'quantity' => 'required|integer|min:1',
-
-            'order_type_id' => 'required|exists:order_types,id',
-            'note' => 'nullable|string',
+        'address_id' => 'required|exists:addresses,id',
+        'array_ids' => 'required|array',
+        'array_ids.*.laundry_price_id' => 'required|exists:laundry_prices,id',
+        'array_ids.*.quantity' => 'required|integer|min:1',
+        'order_type_id' => 'required|exists:order_types,id',
+        'note' => 'nullable|string',
+    ]);
        
-        ]);
+   
  
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -56,7 +54,7 @@ class OrderItemController extends BaseController
                 $pickupTime = $now->copy()->addHour();
                 $deliveryTime = $pickupTime->copy()->addDay();
     
-                $laundryPrice = LaundryPrice::findOrFail($request->laundry_price_id);
+               
                 $laundry = Laundry::findOrFail($request->laundry_id);
                 $address = Address::findOrFail($request->address_id);
                 $orderType = OrderType::findOrFail($request->order_type_id);
@@ -77,19 +75,23 @@ class OrderItemController extends BaseController
                     'order_type_id' => $request->order_type_id,
                     'distance' => $distance,
                 ]);
+                foreach ($request->array_ids as $item) {
+                    $laundryPrice = LaundryPrice::findOrFail($item['laundry_price_id']);
+                    
+                    // Calculate subtotal
+                    $subTotalPrice = $laundryPrice->price * $item['quantity'];
     
-                // Calculate subtotal
-                $subTotalPrice = $laundryPrice->price * $request->quantity;
-    
-                // Create order item
-                OrderItem::create([
-                    'quantity' => $request->quantity,
-                    'user_id' => $userId,
-                    'laundry_price_id' => $request->laundry_price_id,
-                    'price' => $laundryPrice->price,
-                    'sub_total_price' => $subTotalPrice,
-                    'order_id' => $order->id,
-                ]);
+                    // Create order item
+                    OrderItem::create([
+                        'quantity' => $item['quantity'],
+                        'user_id' => $userId,
+                        'laundry_price_id' => $item['laundry_price_id'],
+                        'price' => $laundryPrice->price,
+                        'sub_total_price' => $subTotalPrice,
+                        'order_id' => $order->id,
+                    ]);
+                }
+
     
                 // Calculate cart total
                 $cartItemsTotal = OrderItem::where('order_id', $order->id)
@@ -123,6 +125,46 @@ class OrderItemController extends BaseController
         }
     }
 
+/*
+
+    public function totalPrice(Request $request)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'laundry_id' => 'required|exists:laundries,id',
+        'address_id' => 'required|exists:addresses,id',
+        'array_ids' => 'required|array',
+        'array_ids.*.laundry_price_id' => 'required|exists:laundry_prices,id',
+        'array_ids.*.quantity' => 'required|integer|min:1',
+        'order_type_id' => 'required|exists:order_types,id',
+       // 'note' => 'nullable|string',
+    ]);
+       
+   
+ 
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+    
+                $orderType = OrderType::findOrFail($request->order_type_id);
+                $userId = Auth::id();
+    
+             
+                foreach ($request->array_ids as $item) {
+                    $laundryPrice = LaundryPrice::findOrFail($item['laundry_price_id']);
+                    
+                    // Calculate subtotal
+                    $subTotalPrice = $laundryPrice->price * $item['quantity'];
+    
+                }
+          
+        return $this->sendResponse($order, 'Order created successfully.');
+        } catch (\Exception $e) {
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+*/
 
 
 
