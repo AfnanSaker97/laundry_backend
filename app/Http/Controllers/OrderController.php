@@ -129,28 +129,61 @@ class OrderController extends BaseController
         
     public function filterMyOrder(Request $request)
     {
-        $userId = Auth::id();
         $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:1,2,3,4,5,6', // Add validation for allowed status_id values
+            'status_id' => 'required|in:1,2,3', // Add validation for allowed status_id values
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
-        
-        $status = [
-            1 => 'pending',
-            2 => 'confirmed',
-            3 => 'Processing',
-            4 => 'Shipped',
-            5 => 'Delivered',
-            6 => 'Cancelled',
-        ];
-        $orders = Order::with(['user','address','Laundry','OrderItems','OrderItems.LaundryPrice'])
-        ->where('status', $status[$request->status_id])
-        ->where('user_id', $userId)
-        ->get();
-        return $this->sendResponse($orders, 'orders fetched successfully.');
-    }
+        try {
+        $userId = Auth::id();
+
+    
+         if($request->status_id ==1)
+         {
+  // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+
+            ->whereHas('Laundry', function ($query) use ($userId) {
+                $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+            })
+            ->orderByDesc('order_date')
+            ->get();
+
+         }
+         //غير مباشر
+      if($request->status_id ==2)
+      {
+         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+       
+         ->where('order_type_id','1')
+         ->whereHas('Laundry', function ($query) use ($userId) {
+             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+         })
+         ->orderByDesc('order_date')
+         ->get();
+      }
+      //مباشر
+      if($request->status_id ==3)
+      {
+         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
+         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         ->where('order_type_id','2')
+         ->whereHas('Laundry', function ($query) use ($userId) {
+             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
+         })
+         ->orderByDesc('order_date')
+         ->get();
+      }
+       
+       return $this->sendResponse($orders, 'order fetched successfully.');
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }  }
 
 
     public function filterOrder(Request $request)
