@@ -71,7 +71,7 @@ Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
 
 Route::post('update-Laundryprice', [LaundryPriceController::class, 'update']);
 
-Route::get('getTotalPrice', [OrderController::class, 'getTotal']);
+Route::get('getTotal', [OrderController::class, 'getTotal']);
 
 
 });
