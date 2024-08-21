@@ -35,9 +35,9 @@ class OrderItemController extends BaseController
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
         'address_id' => 'required|exists:addresses,id',
-        'array_ids' => 'required|array',
-        'array_ids.*.laundry_price_id' => 'required|exists:laundry_prices,id',
-        'array_ids.*.quantity' => 'required|integer|min:1',
+        'ids' => 'required|array',
+        'ids.*.price_id' => 'required|exists:laundry_prices,id',
+        'ids.*.quantity' => 'required|integer|min:1',
         'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
     ]);
@@ -75,8 +75,8 @@ class OrderItemController extends BaseController
                     'order_type_id' => $request->order_type_id,
                     'distance' => $distance,
                 ]);
-                foreach ($request->array_ids as $item) {
-                    $laundryPrice = LaundryPrice::findOrFail($item['laundry_price_id']);
+                foreach ($request->ids as $item) {
+                    $laundryPrice = LaundryPrice::findOrFail($item['price_id']);
                     
                     // Calculate subtotal
                     $subTotalPrice = $laundryPrice->price * $item['quantity'];
@@ -85,7 +85,7 @@ class OrderItemController extends BaseController
                     OrderItem::create([
                         'quantity' => $item['quantity'],
                         'user_id' => $userId,
-                        'laundry_price_id' => $item['laundry_price_id'],
+                        'laundry_price_id' => $item['price_id'],
                         'price' => $laundryPrice->price,
                         'sub_total_price' => $subTotalPrice,
                         'order_id' => $order->id,

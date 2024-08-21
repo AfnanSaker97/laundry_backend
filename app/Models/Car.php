@@ -17,4 +17,9 @@ class Car extends Model
         'lat',
         'lng'
     ];
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
 }

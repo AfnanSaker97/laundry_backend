@@ -28,7 +28,7 @@ public function index(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundries = Car::where('laundry_id',$request->laundry_id)->get();
+    $laundries = Car::with('driver')->where('laundry_id',$request->laundry_id)->get();
     return $this->sendResponse($laundries,'laundry fetched successfully.');
 }
 }
