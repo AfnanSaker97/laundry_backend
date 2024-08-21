@@ -20,7 +20,7 @@ class OrderController extends BaseController
     {
         $userId = Auth::id();
         // Adjust the pagination size as needed      
-        $Orders= Order::with(['user','OrderItems.LaundryPrice','address'])
+        $Orders= Order::with(['user','OrderItems.LaundryItem','address'])
          ->orderByDesc('created_at')->get();
        
        return $this->sendResponse($Orders, 'order fetched successfully.');
@@ -45,7 +45,7 @@ class OrderController extends BaseController
          if($request->status_id ==1)
          {
   // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+        $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
             ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
          //   ->where('status','pending')
             ->whereHas('Laundry', function ($query) use ($userId) {
@@ -59,7 +59,7 @@ class OrderController extends BaseController
       if($request->status_id ==2)
       {
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
          ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
        //  ->where('status','pending')
          ->where('order_type_id','1')
@@ -73,7 +73,7 @@ class OrderController extends BaseController
       if($request->status_id ==3)
       {
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
          ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
        //  ->where('status','pending')
          ->where('order_type_id','2')
@@ -142,7 +142,7 @@ class OrderController extends BaseController
          if($request->status_id ==1)
          {
   // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-        $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+        $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
 
             ->whereHas('Laundry', function ($query) use ($userId) {
                 $query->where('admin_id', $userId); // Filter by Laundry's admin_id
@@ -155,7 +155,7 @@ class OrderController extends BaseController
       if($request->status_id ==2)
       {
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
        
          ->where('order_type_id','1')
          ->whereHas('Laundry', function ($query) use ($userId) {
@@ -168,7 +168,7 @@ class OrderController extends BaseController
       if($request->status_id ==3)
       {
          // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryPrice', 'address','Laundry','OrderType'])
+         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
          ->where('order_type_id','2')
          ->whereHas('Laundry', function ($query) use ($userId) {
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
@@ -203,7 +203,7 @@ class OrderController extends BaseController
             5 => 'Delivered',
             6 => 'Cancelled',
         ];
-        $orders = Order::with(['user','address','Laundry','OrderItems','OrderItems.LaundryPrice'])
+        $orders = Order::with(['user','address','Laundry','OrderItems','OrderItems.LaundryItem'])
         ->where('status', $status[$request->status_id])
         ->get();
 
@@ -253,8 +253,7 @@ public function getOrderByProximity(Request $request)
         'orders.id',
         'orders.total_price',
         'orders.note',
-        'users.first_name',
-        'users.last_name',
+        'users.name',
         'addresses.lat',
         'addresses.lng',
         DB::raw("( 6371 * acos( cos( radians(cars.lat) ) * cos( radians(addresses.lat) ) * cos( radians(addresses.lng) - radians(cars.lng) ) + sin( radians(cars.lat) ) * sin( radians(addresses.lat) ) ) ) AS distance")  )

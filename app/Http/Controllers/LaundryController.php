@@ -46,14 +46,21 @@ class LaundryController extends BaseController
 
     public function search(Request $request)
 {
+    try{
     $query = $request->input('name');
-
-    // If the query is empty, return an empty array
     $results = $query 
-        ? Laundry::where('name', 'LIKE', '%' . $query . '%')->get()
-        : [];
+    ? Laundry::where(function($queryBuilder) use ($query) {
+        $queryBuilder->where('name_en', 'LIKE', '%' . $query . '%')
+                     ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
+    })->get()
+    : [];
 
     return $this->sendResponse($results, 'Laundries fetched successfully.');
+} catch (\Exception $e) {
+    // Log error and return empty array
+    return response()->json(['error' =>  $e->getMessage()], 500);
+  
+}
 }
 
 

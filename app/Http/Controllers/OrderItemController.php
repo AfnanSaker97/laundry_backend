@@ -21,7 +21,7 @@ class OrderItemController extends BaseController
     {
         $userId = Auth::id();
         // Adjust the pagination size as needed      
-        $Orders= Order::with(['user','OrderItems.LaundryPrice','address'])
+        $Orders= Order::with(['user','OrderItems.LaundryItem','address'])
        ->where('user_id',  $userId )->orderByDesc('created_at')->get();
        
        return $this->sendResponse($Orders, 'order fetched successfully.');
@@ -77,18 +77,21 @@ class OrderItemController extends BaseController
                     'distance' => $distance,
                 ]);
                 foreach ($request->ids as $item) {
-                    $LaundryItem = LaundryItem::findOrFail($item['item_id']);
-                    return  $LaundryItem ;
-                    $prices = $laundry->  $LaundryItem->price;
+                    $laundryItem = $laundry->LaundryItem()->where('laundry_items.id', $item['item_id'])->first();
+                    
+                    if (!$laundryItem) {
+                        throw new \Exception('Item not found for this laundry.');
+                    }
+                    $price = $laundryItem->pivot->price;
                     // Calculate subtotal
-                    $subTotalPrice = $laundryPrice->price * $item['quantity'];
-    
+                    $subTotalPrice = $price * $item['quantity'];
+
                     // Create order item
                     OrderItem::create([
                         'quantity' => $item['quantity'],
                         'user_id' => $userId,
-                        'laundry_price_id' => $item['price_id'],
-                        'price' => $laundryPrice->price,
+                        'laundry_item_id' => $item['item_id'],
+                        'price' => $price,
                         'sub_total_price' => $subTotalPrice,
                         'order_id' => $order->id,
                     ]);
@@ -134,7 +137,7 @@ class OrderItemController extends BaseController
             'laundry_id' => 'required|exists:laundries,id',
             'address_id' => 'required|exists:addresses,id',
             'ids' => 'required|array',
-            'ids.*.price_id' => 'required|exists:laundry_prices,id',
+            'ids.*.item_id' => 'required|exists:laundry_items,id',
             'ids.*.quantity' => 'required|integer|min:1',
             'order_type_id' => 'required|exists:order_types,id',
         ]);
@@ -147,14 +150,23 @@ class OrderItemController extends BaseController
         try {
             $orderType = OrderType::findOrFail($request->order_type_id);
             $userId = Auth::id();
-    
+            $laundry = Laundry::findOrFail($request->laundry_id);
+              
             $totalPrice = 0;
     
             foreach ($request->ids as $item) {
-                $laundryPrice = LaundryPrice::findOrFail($item['price_id']);
+                $laundryItem = $laundry->LaundryItem()->where('laundry_items.id', $item['item_id'])->first();
                 
-                // حساب السعر الفرعي
-                $subTotalPrice = $laundryPrice->price * $item['quantity'];
+                if (!$laundryItem) {
+                    throw new \Exception('Item not found for this laundry.');
+                }
+                $price = $laundryItem->pivot->price;
+                // Calculate subtotal
+                $subTotalPrice = $price * $item['quantity'];
+
+              
+                
+
     
                 // جمع الأسعار الفرعية لحساب السعر الكلي
                 $totalPrice += $subTotalPrice;
