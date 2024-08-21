@@ -52,7 +52,7 @@ Route::post('confirm-Order', [OrderController::class, 'store']);//admin
 Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
 
 
-Route::get('aundryItem', [LaundryItemController::class, 'index']);
+Route::get('laundryItem', [LaundryItemController::class, 'index']);
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 

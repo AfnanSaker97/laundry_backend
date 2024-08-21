@@ -221,7 +221,7 @@ class OrderController extends BaseController
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-            $order = Order::with(['user','address','Laundry','OrderType','OrderItems','OrderItems.LaundryPrice'])->findOrFail($request->order_id);
+            $order = Order::with(['user','address','Laundry','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
         
            $Delivery_cost=$order->total_price -$order->base_cost;
            $order['delivery_cost'] =  $Delivery_cost;

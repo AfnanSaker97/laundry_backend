@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Validator;
 use Auth;
-class LaundryItemController extends Controller
+class LaundryItemController extends BaseController
 {
     public function index()
     {
@@ -31,7 +31,7 @@ class LaundryItemController extends Controller
     {
      
         $validator =Validator::make($request->all(), [
-            'id' => 'required|exists:laundry_prices',
+            'id' => 'required|exists:laundry_items',
             'laundry_id' => 'required|exists:laundries,id',
         ]);
        
