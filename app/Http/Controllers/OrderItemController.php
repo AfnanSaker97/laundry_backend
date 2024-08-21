@@ -131,9 +131,9 @@ class OrderItemController extends BaseController
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
             'address_id' => 'required|exists:addresses,id',
-            'array_ids' => 'required|array',
-            'array_ids.*.laundry_price_id' => 'required|exists:laundry_prices,id',
-            'array_ids.*.quantity' => 'required|integer|min:1',
+            'ids' => 'required|array',
+            'ids.*.price_id' => 'required|exists:laundry_prices,id',
+            'ids.*.quantity' => 'required|integer|min:1',
             'order_type_id' => 'required|exists:order_types,id',
         ]);
     
@@ -147,8 +147,8 @@ class OrderItemController extends BaseController
     
             $totalPrice = 0;
     
-            foreach ($request->array_ids as $item) {
-                $laundryPrice = LaundryPrice::findOrFail($item['laundry_price_id']);
+            foreach ($request->ids as $item) {
+                $laundryPrice = LaundryPrice::findOrFail($item['price_id']);
                 
                 // حساب السعر الفرعي
                 $subTotalPrice = $laundryPrice->price * $item['quantity'];
