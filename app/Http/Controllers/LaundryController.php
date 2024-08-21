@@ -19,11 +19,17 @@ class LaundryController extends BaseController
 
  public function LaundryByAdmin()
     {
+        try{
         $user = Auth::user();
-        $Laundries = Laundry::with('prices')->where('admin_id', $user->id)->get();
+        $Laundries = Laundry::with('LaundryItem')->where('admin_id', $user->id)->get();
 
   
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
+    } catch (\Exception $e) {
+        // Log error and return empty array
+        return response()->json(['error' =>  $e->getMessage()], 500);
+      
+    }
     }
 
 
@@ -31,7 +37,7 @@ class LaundryController extends BaseController
     {
         
         $Laundries = Cache::remember('Laundries', 60, function () {
-            return Laundry::with('prices')->get();
+            return Laundry::with('LaundryItem')->get();
         });
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     }
@@ -65,7 +71,7 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with('prices')->findOrFail($request->id);
+    $laundry = Laundry::with('LaundryItem')->findOrFail($request->id);
     return $this->sendResponse($laundry,'laundry fetched successfully.');
 }
 

@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('laundry_prices', function (Blueprint $table) {
+        Schema::create('laundry_items', function (Blueprint $table) {
             $table->id();
             $table->string('item_type_en');
             $table->string('item_type_ar');
-            $table->string('price');
-            $table->foreignId('laundry_id')->constrained('laundries');  
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('laundry_prices');
+        Schema::dropIfExists('laundry_items');
     }
 };

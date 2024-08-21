@@ -10,7 +10,7 @@ class OrderItem extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'laundry_price_id',
+        'item_id',
         'quantity',
         'price',
         'sub_total_price',
@@ -21,8 +21,8 @@ class OrderItem extends Model
     ];
 
 
-    public function LaundryPrice()
+    public function LaundryItem()
     {
-        return $this->belongsTo(LaundryPrice::class, 'laundry_price_id');
+        return $this->belongsTo(LaundryItem::class);
     }
 }

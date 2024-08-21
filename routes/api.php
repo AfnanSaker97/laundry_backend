@@ -9,7 +9,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CarController;
-use App\Http\Controllers\LaundryPriceController;
+use App\Http\Controllers\LaundryItemController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\OrderTypeController;
 Route::get('/user', function (Request $request) {
@@ -52,7 +52,7 @@ Route::post('confirm-Order', [OrderController::class, 'store']);//admin
 Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
 
 
-Route::get('Laundryprice', [LaundryPriceController::class, 'index']);
+Route::get('aundryItem', [LaundryItemController::class, 'index']);
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 

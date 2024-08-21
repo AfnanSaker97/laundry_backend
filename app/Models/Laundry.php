@@ -21,10 +21,12 @@ class Laundry extends Model
         'lng',
         'admin_id'
     ];
-
-
-    public function prices()
+   public function LaundryItem()
     {
-        return $this->hasMany(LaundryPrice::class);
+      
+        return $this->belongsToMany(LaundryItem::class, 'prices')
+        ->withPivot('price');
+      
     }
+   
 }
