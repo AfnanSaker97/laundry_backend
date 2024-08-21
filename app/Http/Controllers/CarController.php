@@ -27,8 +27,11 @@ public function index(Request $request)
     if($validator->fails()){
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
-      // Find the country by ID
-    $laundries = Car::with('driver')->where('laundry_id',$request->laundry_id)->get();
-    return $this->sendResponse($laundries,'laundry fetched successfully.');
+      // استخدام Eager Loading لتحميل العلاقة مع السائق
+      $cars = Car::with('driver') // تحميل السائق مع كل سيارة
+      ->where('laundry_id', $request->laundry_id)
+      ->get();
+
+    return $this->sendResponse($cars,'car fetched successfully.');
 }
 }

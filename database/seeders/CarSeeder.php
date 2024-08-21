@@ -14,15 +14,19 @@ class CarSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
+    // افترض أن لديك من 1 إلى 10 في جدول `laundries`
+    $laundryIds = DB::table('laundries')->pluck('id')->toArray();
+ // استرجاع معرّفات السائقين الذين لديهم user_type_id = 3
+ $driverIds = DB::table('users')->where('user_type_id', 3)->pluck('id')->toArray();
 
         for ($i = 0; $i < 4; $i++) { // عدد السجلات التي تريد إنشائها
             DB::table('cars')->insert([
-                'driver_id' => $faker->uuid, // أو استخدم قيمة ثابتة للتجربة
+                'driver_id' => $faker->randomElement($driverIds), // اختيار عشوائي من معرّفات السائقين
                 'driver_phone' => $faker->phoneNumber,
                 'status' => $faker->boolean,
                 'lat' => $faker->latitude,
                 'lng' => $faker->longitude,
-                'laundry_id' => $faker->numberBetween(1, 4), // افترض أن لديك من 1 إلى 10 في جدول `laundries`
+                'laundry_id' => $faker->randomElement($laundryIds), // اختيار عشوائي من معرّفات المغاسل
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

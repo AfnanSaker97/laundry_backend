@@ -35,14 +35,14 @@ class OrderItemController extends BaseController
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
         'address_id' => 'required|exists:addresses,id',
-        'ids' => 'required|array',
-        'ids.*.price_id' => 'required|exists:laundry_prices,id',
-        'ids.*.quantity' => 'required|integer|min:1',
+     
+        '*.price_id' => 'required|exists:laundry_prices,id',
+        '*.quantity' => 'required|integer|min:1',
         'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
     ]);
        
-   
+    return $request;
  
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -136,6 +136,7 @@ class OrderItemController extends BaseController
             'ids.*.quantity' => 'required|integer|min:1',
             'order_type_id' => 'required|exists:order_types,id',
         ]);
+       
     
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       

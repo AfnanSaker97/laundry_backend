@@ -109,8 +109,8 @@ class AdminController extends BaseController
              
                  try {
                  $validator = Validator::make($request->all(), [
-                    'first_name'=>'required|min:3',
-                    'last_name'=>'required|min:3',
+                    'name'=>'required|min:3',
+                    
                      'email' => 'required|email|max:255|unique:users,email',
                      'password' => ['required', 'string', 'min:8', 'confirmed'],
                  ]);
@@ -120,8 +120,8 @@ class AdminController extends BaseController
                  }
                
                  $user = User::create([
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
+                    'name' => $request->name,
+                   
                     'email' => $request->email,
                     'password' => Hash::make($request->password),
                     'user_type_id'=> 3, 

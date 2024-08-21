@@ -10,7 +10,7 @@ class Car extends Model
     use HasFactory;
       
     protected $fillable = [
-        'driver_id',
+       // 'driver_id',
         'driver_phone',
         'status',
         'laundry_id',
@@ -20,6 +20,7 @@ class Car extends Model
 
     public function driver()
     {
-        return $this->belongsTo(User::class, 'driver_id');
+         
+        return $this->belongsTo(User::class,'driver_id');
     }
 }
