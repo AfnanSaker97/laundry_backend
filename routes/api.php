@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\LaundryPriceController;
 use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\OrderTypeController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -49,6 +50,11 @@ Route::get('getOrderByProximity', [OrderController::class, 'getOrderByProximity'
 Route::get('filterOrder', [OrderController::class, 'filterOrder']); //supre
 Route::post('confirm-Order', [OrderController::class, 'store']);//admin
 Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
+
+
+Route::get('Laundryprice', [LaundryPriceController::class, 'index']);
+
+Route::get('OrderType', [OrderTypeController::class, 'index']);
 
 Route::get('Advertisement', [AdvertisementController::class,'index']);
 

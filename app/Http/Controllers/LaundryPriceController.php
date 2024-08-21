@@ -7,10 +7,22 @@ use App\Models\LaundryPrice;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Validator;
 use Auth;
 class LaundryPriceController extends BaseController
 {
+
+
+    public function index()
+    {
+      
+        $LaundryPrice = Cache::remember('LaundryPrice', 60, function () {
+            return LaundryPrice::all();
+        });
+        return $this->sendResponse($LaundryPrice,'LaundryPrice fetched successfully.');
+  
+    }
     public function update(Request $request)
 {
  
