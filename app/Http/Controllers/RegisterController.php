@@ -169,8 +169,8 @@ public function verify(Request $request)
         }
         else{
             $user = User::create([
-                'first_name' => $request->name,
-                'last_name' =>'0',
+                'name' => $request->name,
+               // 'last_name' =>'0',
                 'email' => $request->email,
                 'password' => Hash::make('12345678'),
                 'user_type_id'=> 2, 

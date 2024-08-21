@@ -222,11 +222,10 @@ class OrderController extends BaseController
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
             $order = Order::with(['user','address','Laundry','OrderType','OrderItems','OrderItems.LaundryPrice'])->findOrFail($request->order_id);
-            $cartItemsTotal = OrderItem::where('order_id', $order->id)
-            ->sum('sub_total_price');
-            $Delivery_cost=$order->total_price -$cartItemsTotal;
-            $order['Delivery_cost'] =  $Delivery_cost;
-            $order['sub_total_price'] =  $cartItemsTotal;
+        
+           $Delivery_cost=$order->total_price -$order->base_cost;
+           $order['delivery_cost'] =  $Delivery_cost;
+     
             $order['user'] =  $order;
        
             return $this->sendResponse($order, 'order fetched successfully.');
