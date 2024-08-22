@@ -83,5 +83,5 @@ Route::post('update-Laundryprice', [LaundryItemController::class,'update']);
 
 Route::get('getTotal', [OrderController::class, 'getTotal']);
 
-
+Route::get('order-stats', [OrderController::class, 'getOrderStats']);
 });

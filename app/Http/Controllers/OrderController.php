@@ -299,6 +299,108 @@ public function getOrderByProximity(Request $request)
     }
 }
 
+
+
+public function getOrderStats(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'status_id' => 'required|in:1,2,3',
+        'start_date' => 'required|date',  
+        'end_date' => 'required|date', 
+        ]);
+        // Custom validation rule for status_id = 1
+  // Custom validation rule based on status_id
+  $validator->after(function ($validator) use ($request) {
+    $startDate = Carbon::parse($request->start_date);
+    $endDate = Carbon::parse($request->end_date);
+
+    if ($request->status_id == 1) {
+        $dateDifference = $startDate->diffInDays($endDate);
+        if ($dateDifference >= 30) {
+            $validator->errors()->add('end_date', 'The difference between start_date and end_date must be less than 30 days when status_id is 1.');
+        }
+    }
+
+    if ($request->status_id == 2) {
+        $dateDifferenceInMonths = $startDate->diffInMonths($endDate);
+        if ($dateDifferenceInMonths >= 12) {
+            $validator->errors()->add('end_date', 'The difference between start_date and end_date must be less than 12 months when status_id is 2.');
+        }
+    }
+
+    if ($request->status_id == 3) {
+        $dateDifferenceInYears = $startDate->diffInYears($endDate);
+        if ($dateDifferenceInYears >= 5) {
+            $validator->errors()->add('end_date', 'The difference between start_date and end_date must be less than 5 years when status_id is 3.');
+        }
+    }
+});
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+    $userId=Auth::id();
+  
+    $laundry =Laundry::where('admin_id',$userId)->first();
+     // التحقق من وجود المغسلة
+     if (!$laundry) {
+        return $this->sendError('Laundry not found.', ['Laundry not found for the given admin.']);
+    }
+    // الحصول على التاريخ من الطلب أو تحديد فترة افتراضية
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+    if($request->status_id ==1)
+    {
+    // جمع البيانات من قاعدة البيانات
+    $orders = Order::where('laundry_id', $laundry->id)
+    ->whereBetween('order_date', [$startDate, $endDate])
+        
+     ->selectRaw('DATE(order_date) as date, COUNT(*) as count')
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->get();
+            
+    }
+    if($request->status_id ==2)
+    {
+   
+    // جمع البيانات من قاعدة البيانات
+    $orders = Order::whereBetween('order_date', [$startDate, $endDate])
+        ->where('laundry_id', $laundry->id)
+        ->selectRaw('YEAR(order_date) as year, MONTH(order_date) as month, COUNT(*) as count')
+        ->groupBy('year', 'month')
+        ->orderBy('year', 'asc')
+        ->orderBy('month', 'asc')
+        ->get()
+        ->map(function ($order) {
+            return [
+                'year' => $order->year,
+                'month' => $order->month,
+                'count' => $order->count,
+            ];
+        });
+    }
+
+    if($request->status_id ==3)
+    {
+   
+    // جمع البيانات من قاعدة البيانات حسب السنة
+    $orders = Order::whereBetween('order_date', [$startDate, $endDate])
+        ->where('laundry_id', $laundry->id)
+        ->selectRaw('YEAR(order_date) as year, COUNT(*) as count')
+        ->groupBy('year')
+        ->orderBy('year', 'asc')
+        ->get()
+        ->map(function ($order) {
+            return [
+                'year' => $order->year,
+                'count' => $order->count,
+            ];
+        });
+    }
+    return $this->sendResponse($orders, ' orders fetched successfully.');
+
+}
+
 }
 
 
