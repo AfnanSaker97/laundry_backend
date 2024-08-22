@@ -112,6 +112,11 @@ class OrderItemController extends BaseController
                     $costDeliver += $orderType->price; // Add the specific order type's price
                 }
     
+                if ($request->order_type_id == 1) {
+                    $order->update([
+                        'status' =>'confirmed'
+                    ]);
+                }
                 $totalPrice = $cartItemsTotal + $costDeliver;
     
                 // Update order with calculated costs

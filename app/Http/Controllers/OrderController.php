@@ -102,6 +102,7 @@ class OrderController extends BaseController
             'order_id' => 'required|exists:orders,id',  
             'delivery_date'=> 'required|date',
             'car_id' => 'required|exists:cars,id', 
+            'status'=> 'required',
             ]);
            
             if ($validator->fails()) {
@@ -119,7 +120,7 @@ class OrderController extends BaseController
           $order->pickup_time= $request->delivery_date;
           $order->delivery_time=  $delivery_time;
           $order->car_id= $request->car_id;
-          $order->status='confirmed'; 
+          $order->status=$request->status; 
           $order->save();
           return $this->sendResponse($order, 'order updated successfully.');
         }
