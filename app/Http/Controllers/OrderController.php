@@ -306,8 +306,8 @@ public function getOrderStats(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'status_id' => 'required|in:1,2,3',
-        'start_date' => 'required|date|before:end_date', 
-        'end_date' => 'required|date|before_or_equal:today', 
+        'start_date' => 'nullable|date|before:end_date', 
+        'end_date' => 'nullable|date|before_or_equal:today', 
         ]);
         // Custom validation rule for status_id = 1
   // Custom validation rule based on status_id
@@ -316,6 +316,7 @@ public function getOrderStats(Request $request)
     $endDate = Carbon::parse($request->end_date);
 
     if ($request->status_id == 1) {
+       
         $dateDifference = $startDate->diffInDays($endDate);
         if ($dateDifference >= 30) {
             $validator->errors()->add('end_date', 'The difference between start_date and end_date must be less than 30 days when status_id is 1.');
@@ -351,6 +352,13 @@ public function getOrderStats(Request $request)
     $endDate = $request->input('end_date');
     if($request->status_id ==1)
     {
+        if(!$request->start_date && !$request->end_date)
+        {
+            $startDate = Carbon::now()->startOfMonth()->toDateString();
+            $endDate = Carbon::now()->endOfMonth()->toDateString();
+        
+        }
+
     // جمع البيانات من قاعدة البيانات
     $orders = Order::where('laundry_id', $laundry->id)
     ->whereBetween('order_date', [$startDate, $endDate])
