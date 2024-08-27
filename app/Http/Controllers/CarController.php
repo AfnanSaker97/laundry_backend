@@ -34,4 +34,30 @@ public function index(Request $request)
 
     return $this->sendResponse($cars,'car fetched successfully.');
 }
+
+
+
+public function sendNotification(Request $request, FirebaseService $firebaseService)
+{
+    $request->validate([
+        'device_token' => 'required',
+        'title' => 'required',
+        'body' => 'required',
+    ]);
+
+    $notification = new Notification();
+    $notification->title ='test';
+    $notification->body = 'test Body';
+    $notification->device_token = $request->device_token;
+    $notification->save();
+
+    $firebaseService->sendNotification(
+        $request->device_token,
+        $request->title,
+        $request->body
+    );
+
+    return response()->json(['success' => true]);
+}
+
 }

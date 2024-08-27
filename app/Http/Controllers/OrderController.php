@@ -306,8 +306,8 @@ public function getOrderStats(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'status_id' => 'required|in:1,2,3',
-        'start_date' => 'required|date',  
-        'end_date' => 'required|date', 
+        'start_date' => 'required|date|before:end_date', 
+        'end_date' => 'required|date|before_or_equal:today', 
         ]);
         // Custom validation rule for status_id = 1
   // Custom validation rule based on status_id
