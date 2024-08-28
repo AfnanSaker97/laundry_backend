@@ -12,6 +12,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\LaundryItemController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\OrderTypeController;
+use App\Http\Controllers\NotificationController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -23,6 +24,8 @@ Route::post('login', [RegisterController::class, 'login']);
 Route::post('verify', [RegisterController::class, 'verify']);
 
 //Route::middleware('auth:sanctum')->group( function () {
+
+
 
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
@@ -52,6 +55,14 @@ Route::post('confirm-Order', [OrderController::class, 'store']);//admin
 Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
 
 
+
+
+    //Notification
+    Route::get('markAsRead', [NotificationController::class, 'markAsRead']);
+    Route::get('getNotificationsForUser', [NotificationController::class, 'getNotificationsForUser']);
+
+    
+
 Route::get('laundryItem', [LaundryItemController::class, 'index']);
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
@@ -71,7 +82,6 @@ Route::get('order', [OrderItemController::class, 'index']);
 Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
 
 
-
 //laundry Admin
 
 Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
@@ -88,3 +98,4 @@ Route::get('order-stats', [OrderController::class, 'getOrderStats']);
 
 Route::post('sendNotification', [CarController::class,'sendNotification']);//super admin
 });
+

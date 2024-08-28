@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('titel');
             $table->text('body');
-            $table->string('device_token');
+            $table->timestamp('data');
+            $table->timestamp('read_at')->nullable();
+            $table->unsignedBigInteger('receiver_id');
+            $table->foreign('receiver_id')->references('id')->on('users')->onUpdate('cascade');
+           
             $table->timestamps();
         });
     }
