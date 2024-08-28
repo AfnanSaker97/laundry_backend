@@ -9,7 +9,6 @@ class Notification extends Model
 {
     use HasFactory;
     protected $fillable = [
-        // 'driver_id',
          'title',
          'body',
          'device_token',

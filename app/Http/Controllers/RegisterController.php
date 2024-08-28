@@ -131,6 +131,7 @@ public function verify(Request $request)
 
         // Create a new API token for the user
         $token = $user->createToken($request->email)->plainTextToken;
+        $device_token =$user->update(['device_token'=>$request->device_token]);
         // Filtered user data (excluding sensitive fields)
         $filteredUser = [
             'id' => $user->id,

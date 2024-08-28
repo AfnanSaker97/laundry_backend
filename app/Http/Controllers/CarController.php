@@ -8,10 +8,14 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Laundry;
 use App\Models\Car;
+use App\Models\Notification;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+
 use Validator;
 use Auth;
 class CarController extends BaseController
@@ -37,27 +41,47 @@ public function index(Request $request)
 
 
 
-public function sendNotification(Request $request, FirebaseService $firebaseService)
+public function sendNotification(Request $request)
 {
-    $request->validate([
-        'device_token' => 'required',
-        'title' => 'required',
-        'body' => 'required',
+
+    try{
+   // استرداد device_token من قاعدة البيانات أو من الطلب
+  //  $deviceToken = $request->device_token;
+
+  $path = storage_path('app/firebase_credentials.json');
+
+// تحقق من أن المسار صحيح وأن الملف موجود
+if (!file_exists($path)) {
+    return response()->json(['error' => 'Firebase credentials file not found'], 500);
+}
+
+    $firebase = (new Factory)->withServiceAccount($path);
+    $messaging = $firebase->createMessaging();
+
+    $message = CloudMessage::fromArray([
+        'notification' => [
+            'title' => 'test',
+            'body' => 'test',
+        ],
+        'token' =>'fkgjfdggigf',
     ]);
 
-    $notification = new Notification();
-    $notification->title ='test';
-    $notification->body = 'test Body';
-    $notification->device_token = $request->device_token;
-    $notification->save();
+    $messaging->send($message);
 
-    $firebaseService->sendNotification(
-        $request->device_token,
-        $request->title,
-        $request->body
-    );
+    return response()->json(['message' => 'Notification sent successfully']);
 
-    return response()->json(['success' => true]);
+   
+} catch (MessagingException $e) {
+    // سجلات Firebase للتفاصيل
+    \Log::error('Firebase Messaging Error: ' . $e->errors());
+
+    return response()->json(['error' => $e->getMessage()], 500);
+} catch (\Exception $e) {
+    // سجل أي أخطاء أخرى
+    \Log::error('General Error: ' . $e->getMessage());
+
+    return response()->json(['error' => $e->getMessage()], 500);
+}
 }
 
 }
