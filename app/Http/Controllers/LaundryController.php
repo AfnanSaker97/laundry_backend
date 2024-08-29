@@ -32,15 +32,15 @@ class LaundryController extends BaseController
     }
     }
 
-
     public function index()
     {
-        
         $Laundries = Cache::remember('Laundries', 60, function () {
-            return Laundry::with('LaundryItem')->get();
+            return Laundry::with('LaundryItem')->inRandomOrder()->get();
         });
-        return $this->sendResponse($Laundries,'Laundries fetched successfully.');
+    
+        return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
     }
+    
 
 
 
