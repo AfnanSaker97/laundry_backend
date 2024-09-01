@@ -11,6 +11,7 @@ class LaundryItem extends Model
     protected $fillable = [
         'item_type_en',
         'item_type_ar',
+        'url_image'
     
        
     ];

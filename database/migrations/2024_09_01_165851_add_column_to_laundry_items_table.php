@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('device_token')->nullable();
+        Schema::table('laundry_items', function (Blueprint $table) {
+            $table->string('url_image')->nullable();
         });
     }
 
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $table->string('device_token');
+        Schema::table('laundry_items', function (Blueprint $table) {
+            $table->string('url_image');
+        });
     }
 };

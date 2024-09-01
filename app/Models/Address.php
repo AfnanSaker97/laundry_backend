@@ -11,4 +11,13 @@ class Address extends Model
     protected $fillable = ['user_id', 'address_line_1','address_line_2','email','country','city',
     'postcode','contact_number','full_name','lat','lng'];
 
+
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
 }
+
+

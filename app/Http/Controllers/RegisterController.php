@@ -211,16 +211,25 @@ public function verify(Request $request)
                
      }  
 
-
-
      public function getUser(Request $request)
-{
+     {
+         try {
+        
+            $user = User::select('id', 'name', 'email') // Adjust fields as needed
+            ->find(Auth::id());
 
-    $user =Auth::user();
-    return $this->sendResponse($user, 'User fetched successfully.');
- 
+          // Load the addresses and orders relationships
+           $user->load('addresses', 'orders');
+             // Return the user with the addresses relationship loaded
+             return $this->sendResponse($user, 'User fetched successfully.');
+             
+         } catch (\Exception $e) {
+             // Handle any exceptions and return an error response
+             return response()->json(['error' => $e->getMessage()], 500);
+         }
+     }
+     
 
-}
 
 
 public function logout(Request $request)
