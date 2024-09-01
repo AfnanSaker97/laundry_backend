@@ -79,7 +79,7 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with('LaundryItem')->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem'])->findOrFail($request->id);
     return $this->sendResponse($laundry,'laundry fetched successfully.');
 }
 
