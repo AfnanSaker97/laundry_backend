@@ -28,5 +28,11 @@ class Laundry extends Model
         ->withPivot('price');
       
     }
+
+
+    public function LaundryMedia()
+    {
+        return $this->hasMany(LaundryMedia::class);
+    }
    
 }

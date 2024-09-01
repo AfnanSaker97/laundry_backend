@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Laundry;
+use App\Models\LaundryItem;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
@@ -85,32 +86,38 @@ public function show(Request $request)
 
 public function getLaundriesByProximity(Request $request)
 {
- 
     try {
-    $user = Auth::user();
-    $userLatitude =  $user ->lat;
-    $userLongitude =  $user ->lng;
+        // Get the currently authenticated user
+        $user = Auth::user();
+        $userLatitude = $user->lat;
+        $userLongitude = $user->lng;
 
-    $laundries = DB::table('laundries')
-        ->select(
-            'id',
-            'name_ar',
-            'name_en',
-            'city',
-            'lat',
-            'lng',
-            DB::raw("( 6371 * acos( cos( radians($userLatitude) ) * cos( radians(lat) ) * cos( radians(lng) - radians($userLongitude) ) + sin( radians($userLatitude) ) * sin( radians(lat) ) ) ) AS distance")
-        )
-        ->orderBy('distance')
-        ->get();
+        // Fetch laundries from the cache or database
+        $laundries = Cache::remember('laundries_by_proximity_' . $user->id, 30, function () use ($userLatitude, $userLongitude) {
+            return Laundry::select(
+                'id',
+                'name_ar',
+                'name_en',
+                'photo',
+                'phone_number',
+                'city',
+                'address_line_1',
+                'lat',
+                'lng',
+                DB::raw("( 6371 * acos( cos( radians($userLatitude) ) * cos( radians(lat) ) * cos( radians(lng) - radians($userLongitude) ) + sin( radians($userLatitude) ) * sin( radians(lat) ) ) ) AS distance")
+            )
+            ->orderBy('distance')
+            ->with('laundryItem') // Eager load the laundryItem relationship
+            ->get();
+        });
 
-   
         return $this->sendResponse($laundries, 'Laundries fetched successfully.');
-} catch (\Exception $e) {
-    DB::rollBack();
-    // Log error and return empty array
-    return response()->json(['error' =>  $e->getMessage()], 500);
-  
+        
+    } catch (\Exception $e) {
+        // Handle any exceptions and return an error response
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 }
-}
+
+        
 }
