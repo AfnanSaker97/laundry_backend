@@ -47,6 +47,9 @@ Route::middleware('auth:sanctum')->group(function() {
 
 //Address
 Route::post('Address', [AddressController::class, 'store']);
+Route::delete('Address', [AddressController::class,'destroy']);
+
+
 
 Route::get('Nearby', [LaundryController::class, 'getLaundriesByProximity']);
 Route::get('getOrderByProximity', [OrderController::class, 'getOrderByProximity']); //driver

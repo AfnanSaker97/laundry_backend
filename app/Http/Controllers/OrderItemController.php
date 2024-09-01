@@ -31,7 +31,6 @@ class OrderItemController extends BaseController
 
     public function store(Request $request)
     {
-    
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
         'address_id' => 'required|exists:addresses,id',
@@ -42,7 +41,7 @@ class OrderItemController extends BaseController
         'note' => 'nullable|string',
     ]);
        
-   
+
  
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       

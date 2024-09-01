@@ -58,4 +58,40 @@ class AddressController extends BaseController
 
 
     }
+
+
+
+    public function destroy(Request $request)
+{
+ 
+    try {
+
+        $validator =Validator::make($request->all(), [
+            'id' => 'required|exists:addresses',
+
+
+        ]); 
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+      
+        // Find the address by ID
+        $address = Address::findOrFail($request->id);
+
+        // Delete the address
+        $address->delete();
+
+        return $this->sendResponse($address,'Address deleted successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
 }
