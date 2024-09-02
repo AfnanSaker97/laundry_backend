@@ -215,9 +215,9 @@ public function verify(Request $request)
      {
          try {
         
-            $user = User::select('id', 'name', 'email') // Adjust fields as needed
+            $user = User::select('id', 'name', 'email','photo') // Adjust fields as needed
             ->find(Auth::id());
-
+return  $user ;
           // Load the addresses and orders relationships
            $user->load('addresses', 'orders');
              // Return the user with the addresses relationship loaded

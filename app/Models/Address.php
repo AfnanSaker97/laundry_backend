@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Address extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
     protected $fillable = ['user_id', 'address_line_1','address_line_2','email','country','city',
-    'postcode','contact_number','full_name','lat','lng'];
+    'postcode','contact_number','full_name','address'];
 
 
 
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
+    
 }
 
 

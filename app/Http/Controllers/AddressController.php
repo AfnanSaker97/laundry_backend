@@ -21,15 +21,16 @@ class AddressController extends BaseController
                 'country' => 'nullable|string',
                 'postcode' => 'required',
                 'contact_number'=> 'required',
-                'latitude' => 'required|between:-90,90',
-                'longitude' => 'required|between:-180,180',
-
+                'address' => 'required',
+               
             ]); 
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
         
             $user = Auth::user();
+
+         
             $address = Address::create([
                 'full_name' => $request->full_name,
                 'user_id'=> $user->id,
@@ -40,10 +41,8 @@ class AddressController extends BaseController
                 'country' => $request->country?? '0',
                 'postcode' => $request->postcode,
                 'contact_number' => $request->contact_number,
-                'postcode' => $request->postcode,
-                'lat' => $request->latitude,
-                'lng' => $request->longitude,
-
+                'address' => $request->address,
+        
            ]);
             
         return $this->sendResponse($address,'Address created successfully.');
@@ -92,6 +91,48 @@ class AddressController extends BaseController
         ], 500); 
     
     } 
+}
+
+
+
+
+public function update(Request $request)
+{
+    try {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:addresses,id', // Ensure the address exists
+
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+
+        // Find the address by ID
+        $address = Address::findOrFail($request->id);
+
+    // Update the address with the request data
+    $address->update([
+        'full_name' => $request->full_name ?? $address->full_name,
+        'address_line_1' => $request->address_line_1 ?? $address->address_line_1,
+        'address_line_2' => $request->address_line_2 ?? $address->address_line_2,
+        'city' => $request->city ?? $address->city,
+        'country' => $request->country ?? $address->country,
+        'postcode' => $request->postcode ?? $address->postcode,
+        'contact_number' => $request->contact_number ?? $address->contact_number,
+        'address' => $request->address ?? $address->address,
+    ]);
+
+        return $this->sendResponse($address, 'Address updated successfully.');
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
 }
 
 }

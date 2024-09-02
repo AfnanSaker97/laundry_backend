@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
+            $table->string('address')->default('0');
             $table->string('address_line_1')->default('0');
             $table->string('address_line_2')->default('0');
             $table->string('email')->default('0');
@@ -22,9 +23,9 @@ return new class extends Migration
             $table->string('contact_number')->default('0');
             $table->string('full_name')->default('0');
             $table->foreignId('user_id')->constrained('users');
-            $table->decimal('lat')->default('0');
-            $table->decimal('lng')->default('0');
+          
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
