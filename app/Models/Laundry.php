@@ -12,6 +12,8 @@ class Laundry extends Model
     protected $fillable = [
         'name_en',
         'name_ar',
+        'description_ar',
+        'description_en',
         'email',
         'phone_number',
         'country',

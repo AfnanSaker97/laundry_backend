@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name_ar');
             $table->string('name_en');
+            $table->string('description_ar');
+            $table->string('description_en');
             $table->string('phone_number');
             $table->string('city');
             $table->string('address_line_1')->default('0');

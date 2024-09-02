@@ -34,11 +34,16 @@ class LaundryController extends BaseController
 
     public function index()
     {
-        $Laundries = Cache::remember('Laundries', 60, function () {
-            return Laundry::with(['LaundryMedia','LaundryItem'])->inRandomOrder()->get();
-        });
+        try{
+        $Laundries =  Laundry::with(['LaundryMedia','LaundryItem'])->inRandomOrder()->get();
+    
     
         return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
+    } catch (\Exception $e) {
+        // Log error and return empty array
+        return response()->json(['error' =>  $e->getMessage()], 500);
+      
+    }
     }
     
 
@@ -85,8 +90,11 @@ public function show(Request $request)
         'id' => $laundry->id,
         'name_en' => $laundry->name_en,
         'name_ar' => $laundry->name_ar,
+        'description_ar' => $laundry->description_ar,
+        'description_en' => $laundry->description_en,
         'email' => $laundry->email,
         'phone_number' => $laundry->phone_number,
+       
         'address' => [
             'city' => $laundry->city,
             'address_line_1' => $laundry->address_line_1,
@@ -112,11 +120,12 @@ public function getLaundriesByProximity(Request $request)
         $userLongitude = $user->lng;
 
         // Fetch laundries from the cache or database
-        $laundries = Cache::remember('laundries_by_proximity_' . $user->id, 30, function () use ($userLatitude, $userLongitude) {
-            return Laundry::select(
+        $laundries =Laundry::select(
                 'id',
                 'name_ar',
                 'name_en',
+                'description_ar',
+                'description_en',
                 'phone_number',
                 'city',
                 'address_line_1',
@@ -127,7 +136,7 @@ public function getLaundriesByProximity(Request $request)
             ->orderBy('distance')
             ->with(['LaundryMedia','laundryItem']) // Eager load the laundryItem relationship
             ->get();
-        });
+    
 
         return $this->sendResponse($laundries, 'Laundries fetched successfully.');
         
