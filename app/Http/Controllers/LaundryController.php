@@ -22,9 +22,8 @@ class LaundryController extends BaseController
     {
         try{
         $user = Auth::user();
-        $Laundries = Laundry::with('LaundryItem')->where('admin_id', $user->id)->get();
-
-  
+        $Laundries = Laundry::with(['LaundryMedia','laundryItem'])->where('admin_id', $user->id)->get();
+    
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     } catch (\Exception $e) {
         // Log error and return empty array
@@ -36,7 +35,7 @@ class LaundryController extends BaseController
     public function index()
     {
         $Laundries = Cache::remember('Laundries', 60, function () {
-            return Laundry::with('LaundryItem')->inRandomOrder()->get();
+            return Laundry::with(['LaundryMedia','LaundryItem'])->inRandomOrder()->get();
         });
     
         return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
@@ -80,7 +79,27 @@ public function show(Request $request)
     }
       // Find the country by ID
     $laundry = Laundry::with(['LaundryMedia','LaundryItem'])->findOrFail($request->id);
-    return $this->sendResponse($laundry,'laundry fetched successfully.');
+
+     // Transform the result to include the address array
+     $laundryData = [
+        'id' => $laundry->id,
+        'name_en' => $laundry->name_en,
+        'name_ar' => $laundry->name_ar,
+        'email' => $laundry->email,
+        'phone_number' => $laundry->phone_number,
+        'address' => [
+            'city' => $laundry->city,
+            'address_line_1' => $laundry->address_line_1,
+            'lat' => $laundry->lat,
+            'lng' => $laundry->lng,
+        ],
+        'LaundryMedia' => $laundry->LaundryMedia,
+        'LaundryItem' => $laundry->LaundryItem,
+       
+        // Add other fields as necessary
+    ];
+
+    return $this->sendResponse($laundryData,'laundry fetched successfully.');
 }
 
 
@@ -98,7 +117,6 @@ public function getLaundriesByProximity(Request $request)
                 'id',
                 'name_ar',
                 'name_en',
-                'photo',
                 'phone_number',
                 'city',
                 'address_line_1',
@@ -107,7 +125,7 @@ public function getLaundriesByProximity(Request $request)
                 DB::raw("( 6371 * acos( cos( radians($userLatitude) ) * cos( radians(lat) ) * cos( radians(lng) - radians($userLongitude) ) + sin( radians($userLatitude) ) * sin( radians(lat) ) ) ) AS distance")
             )
             ->orderBy('distance')
-            ->with('laundryItem') // Eager load the laundryItem relationship
+            ->with(['LaundryMedia','laundryItem']) // Eager load the laundryItem relationship
             ->get();
         });
 

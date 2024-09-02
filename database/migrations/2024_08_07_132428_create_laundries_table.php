@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name_ar');
             $table->string('name_en');
-            $table->string('photo')->default('0');
             $table->string('phone_number');
             $table->string('city');
             $table->string('address_line_1')->default('0');
-            $table->decimal('lat');
-            $table->decimal('lng');
+            $table->decimal('lat', 6, 3);
+            $table->decimal('lng', 6, 3);
             $table->foreignId('admin_id')->constrained('users');
             $table->timestamps();
         });

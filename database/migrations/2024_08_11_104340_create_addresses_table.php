@@ -23,7 +23,8 @@ return new class extends Migration
             $table->string('contact_number')->default('0');
             $table->string('full_name')->default('0');
             $table->foreignId('user_id')->constrained('users');
-          
+            $table->decimal('lat', 6, 3)->default('0');
+            $table->decimal('lng', 6, 3)->default('0');
             $table->timestamps();
             $table->softDeletes();
         });

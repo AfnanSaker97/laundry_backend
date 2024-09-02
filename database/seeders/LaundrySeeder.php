@@ -16,8 +16,7 @@ $laundries = [
     [
         'name_en' => 'Pesana Laundry',
         'name_ar' => 'غسيل الملابس بيسانا',
-        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
-        'phone_number' => '0978678678567',
+       'phone_number' => '0978678678567',
         'admin_id' => '1',
         'city' => 'Abu Dabi',
         'address_line_1' => '123 Main St',
@@ -27,7 +26,6 @@ $laundries = [
     [
         'name_en' => 'Sunshine Laundry',
         'name_ar' => 'غسيل الملابس في صن شاين',
-        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0987654321',
         'city' => 'Dubi',
         'address_line_1' => '456 Elm St',
@@ -38,7 +36,6 @@ $laundries = [
     [
         'name_en' => 'Quick Clean Laundry',
         'name_ar' => 'غسيل سريع التنظيف',
-        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0123456789',
         'city' => 'Amman',
         'address_line_1' => '789 Oak St',
@@ -49,7 +46,6 @@ $laundries = [
     [
         'name_en' => 'Fresh Start Laundry',
         'name_ar' =>'بداية جديدة للغسيل',
-        'photo' => 'https://laundry-backend.tecrek.com/public/Laundry/engin-akyurt-yCYVV8-kQNM-unsplash.jpg',
         'phone_number' => '0234567890',
         'city' => 'Dubi',
         'address_line_1' => '101 Palm St',
