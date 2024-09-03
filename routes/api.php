@@ -93,6 +93,10 @@ Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 Route::get('MyOrders', [OrderController::class, 'MyOrder']);
 Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
 
+Route::get('filterMyOrderUser', [OrderController::class, 'filterMyOrderUser']);
+
+
+
 Route::post('update-Laundryprice', [LaundryItemController::class,'update']);
 
 Route::get('getTotal', [OrderController::class, 'getTotal']);

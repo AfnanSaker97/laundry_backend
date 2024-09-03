@@ -410,6 +410,31 @@ public function getOrderStats(Request $request)
 
 }
 
+
+
+
+public function filterMyOrderUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status_id' => 'required|in:1,2,3,4', // Add validation for allowed status_id values
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        
+        $status = [
+            1 => 'pending',
+            2 => 'request',
+            3 => 'confirmed',
+            4 => 'cancelled',
+        ];
+        $orders = Order::with(['user','address','Laundry','OrderItems.LaundryItem'])
+        ->where('status', $status[$request->status_id])
+        ->get();
+
+        return $this->sendResponse($orders, 'orders fetched successfully.');
+    }
+
 }
 
 
