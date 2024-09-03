@@ -220,8 +220,16 @@ public function verify(Request $request)
 
           // Load the addresses and orders relationships
            $user->load('addresses', 'orders');
+           $totalPoints = $user->orders->sum('point');
+        
+             // Hide the unwanted fields from the addresses and orders
+        $user->addresses->makeHidden(['deleted_at', 'created_at', 'updated_at']);
+        $user->orders->makeHidden([ 'created_at', 'updated_at']);
+
              // Return the user with the addresses relationship loaded
-             return $this->sendResponse($user, 'User fetched successfully.');
+             $userData = $user;
+             $userData['total_points'] = $totalPoints;
+             return $this->sendResponse($userData, 'User fetched successfully.');
              
          } catch (\Exception $e) {
              // Handle any exceptions and return an error response

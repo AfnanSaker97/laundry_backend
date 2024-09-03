@@ -15,7 +15,7 @@ class ServiceSeeder extends Seeder
     {
         
      
-       /* $services = [
+        $services = [
             [ 'name_en' => 'Washing', 'name_ar' => 'غسيل'],
             [ 'name_en' => 'Ironing', 'name_ar' => 'كوي'],
             [ 'name_en' => 'Drying', 'name_ar' => 'تجفيف'],
@@ -23,7 +23,7 @@ class ServiceSeeder extends Seeder
 
     foreach ($services as $service) {
         Service::create($service); // تمرير كل عنصر بشكل فردي
-    }*/
+    }
 
 
     $laundryServices = [
@@ -37,7 +37,7 @@ class ServiceSeeder extends Seeder
         ['laundry_id' => 4, 'service_id' => 1],
         ['laundry_id' => 4, 'service_id' => 2],
         ['laundry_id' => 4, 'service_id' => 3],
-        // أضف المزيد من البيانات حسب الحاجة
+      
     ];
 
     foreach ($laundryServices as $laundryService) {

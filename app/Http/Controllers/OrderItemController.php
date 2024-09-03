@@ -113,7 +113,8 @@ class OrderItemController extends BaseController
     
                 if ($request->order_type_id == 1) {
                     $order->update([
-                        'status' =>'confirmed'
+                        'status' =>'confirmed',
+                        'point' =>$laundry->point,
                     ]);
                 }
                 $totalPrice = $cartItemsTotal + $costDeliver;

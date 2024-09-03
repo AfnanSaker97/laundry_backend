@@ -23,7 +23,8 @@ class LaundrySeeder extends Seeder
                 'city' => 'Abu Dabi',
                 'address_line_1' => '123 Main St',
                 'lat' => '33.5138',
-                'lng' => '36.2765'
+                'lng' => '36.2765',
+                'point' =>'50'
             ],
             [
                 'name_en' => 'Sunshine Laundry',
@@ -35,7 +36,8 @@ class LaundrySeeder extends Seeder
                 'address_line_1' => '456 Elm St',
                 'lat' => '33.8886',
                 'lng' => '35.4955',
-                'admin_id' => '2'
+                'admin_id' => '2',
+                'point' =>'50'
             ],
             [
                 'name_en' => 'Quick Clean Laundry',
@@ -47,7 +49,8 @@ class LaundrySeeder extends Seeder
                 'address_line_1' => '789 Oak St',
                 'lat' => '31.9539',
                 'lng' => '35.9106',
-                'admin_id' => '3'
+                'admin_id' => '3',
+                'point' =>'50'
             ],
             [
                 'name_en' => 'Fresh Start Laundry',
@@ -59,7 +62,8 @@ class LaundrySeeder extends Seeder
                 'address_line_1' => '101 Palm St',
                 'lat' => '30.0444',
                 'lng' => '31.2357',
-                'admin_id' => '4'
+                'admin_id' => '4',
+                'point' =>'50'
             ]
         ];
         

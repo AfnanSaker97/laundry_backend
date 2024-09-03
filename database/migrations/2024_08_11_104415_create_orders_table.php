@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('total_price')->default('0');
             $table->decimal('distance'); // -- المسافة بالكيلومترات
             $table->string('note')->default('0');
+            $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('order_type_id')->constrained('order_types');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses');

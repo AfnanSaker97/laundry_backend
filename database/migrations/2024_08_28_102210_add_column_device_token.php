@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('device_token')->nullable();
+            $table->string('device_token')->default('0');
+    
         });
     }
 
@@ -22,5 +23,6 @@ return new class extends Migration
     public function down(): void
     {
         $table->string('device_token');
+    
     }
 };

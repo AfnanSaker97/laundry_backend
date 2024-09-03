@@ -21,7 +21,8 @@ class Laundry extends Model
         'address_line_1',
         'lat',
         'lng',
-        'admin_id'
+        'admin_id',
+        'point'
     ];
    public function LaundryItem()
     {
