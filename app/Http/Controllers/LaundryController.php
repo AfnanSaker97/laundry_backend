@@ -74,6 +74,7 @@ class LaundryController extends BaseController
 
 public function show(Request $request)
 {
+    try{
     $validator =Validator::make($request->all(), [
         'id' => 'required|exists:laundries',
     
@@ -83,7 +84,7 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem'])->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services'])->findOrFail($request->id);
 
      // Transform the result to include the address array
      $laundryData = [
@@ -101,6 +102,7 @@ public function show(Request $request)
             'lat' => $laundry->lat,
             'lng' => $laundry->lng,
         ],
+        'services' => $laundry->services,
         'LaundryMedia' => $laundry->LaundryMedia,
         'LaundryItem' => $laundry->LaundryItem,
        
@@ -108,6 +110,10 @@ public function show(Request $request)
     ];
 
     return $this->sendResponse($laundryData,'laundry fetched successfully.');
+} catch (\Exception $e) {
+    // Handle any exceptions and return an error response
+    return response()->json(['error' => $e->getMessage()], 500);
+}
 }
 
 

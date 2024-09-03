@@ -37,4 +37,13 @@ class Laundry extends Model
         return $this->hasMany(LaundryMedia::class);
     }
    
+
+
+
+    public function services()
+    {
+      
+        return $this->belongsToMany(Service::class, 'laundry_service');
+      
+    }
 }

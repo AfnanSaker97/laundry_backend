@@ -25,7 +25,7 @@ class LaundryMediaSeeder extends Seeder
             [ 'laundry_id' => '3', 'url_image' => 'https://laundry-backend.tecrek.com/public/Laundry/4.png'],
            
             [ 'laundry_id' => '3', 'url_image' => 'https://laundry-backend.tecrek.com/public/Laundry/6.png'],
-            [ 'laundry_id' => '4', 'url_image' => ' https://laundry-backend.tecrek.com/public/Laundry/1.png'],
+            [ 'laundry_id' => '4', 'url_image' => 'https://laundry-backend.tecrek.com/public/Laundry/1.png'],
             [ 'laundry_id' => '4', 'url_image' => 'https://laundry-backend.tecrek.com/public/Laundry/9.png'],
             
         ];
