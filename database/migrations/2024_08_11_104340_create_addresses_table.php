@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->decimal('lat', 6, 3)->default('0');
             $table->decimal('lng', 6, 3)->default('0');
+            $table->boolean('isActive')->default('0');
             $table->timestamps();
             $table->softDeletes();
         });

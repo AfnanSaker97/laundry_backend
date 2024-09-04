@@ -11,7 +11,6 @@ class LaundryMedia extends Model
     protected $fillable = [
        
         'url_image'
-    
-       
+ 
     ];
 }

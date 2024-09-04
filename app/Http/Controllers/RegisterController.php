@@ -39,6 +39,7 @@ class RegisterController extends BaseController
                 'email' =>  $email,
                 'verification_code' => $email_verification_code ,
                 'user_type_id' =>  2,
+            
             ]);
 
             MySession::create([

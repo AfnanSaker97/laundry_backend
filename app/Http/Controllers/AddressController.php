@@ -22,6 +22,8 @@ class AddressController extends BaseController
                 'postcode' => 'required',
                 'contact_number'=> 'required',
                 'address' => 'required',
+                'lat' => 'required',
+                'lng' => 'required',
                
             ]); 
             if ($validator->fails()) {
@@ -42,6 +44,8 @@ class AddressController extends BaseController
                 'postcode' => $request->postcode,
                 'contact_number' => $request->contact_number,
                 'address' => $request->address,
+                'lat' => $request->lat,
+                'lng' => $request->lng,
         
            ]);
             

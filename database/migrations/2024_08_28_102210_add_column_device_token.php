@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('device_token')->default('0');
-    
+            $table->softDeletes();
         });
     }
 
@@ -23,6 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         $table->string('device_token');
-    
+        $table->softDeletes();
     }
+
 };

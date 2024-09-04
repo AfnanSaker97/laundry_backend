@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('verification_code')->default('0');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default('0');
-            $table->string('photo')->default('0');
+            $table->string('photo')->default('https://laundry-backend.tecrek.com/public/');
             $table->decimal('lat')->default('0');
             $table->decimal('lng')->default('0');
             $table->string('driver_id')->default('0');
