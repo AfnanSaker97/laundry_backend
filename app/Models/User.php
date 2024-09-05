@@ -43,6 +43,14 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+
+    public function advertisements()
+{
+    return $this->belongsToMany(Advertisement::class, 'user_advertisement_points')
+                ->withPivot('points')
+                ->withTimestamps();
+}
+
     /**
      * The attributes that should be hidden for serialization.
      *

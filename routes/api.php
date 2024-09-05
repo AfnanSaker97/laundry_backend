@@ -72,7 +72,7 @@ Route::get('laundryItem', [LaundryItemController::class, 'index']);
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 
 Route::get('Advertisement', [AdvertisementController::class,'index']);
-
+Route::post('clickAdvertisement', [AdvertisementController::class,'clickAdvertisement']);
 
 
 Route::get('logout', [RegisterController::class, 'logout']);

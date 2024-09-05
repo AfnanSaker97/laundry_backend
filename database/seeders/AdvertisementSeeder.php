@@ -13,9 +13,9 @@ class AdvertisementSeeder extends Seeder
     public function run(): void
     {
         $Advertisements = [
-            ['name_ar' => 'خصم 50% على أول عملية غسيل', 'name_en' => '50% Off on Your First Wash', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/1.jpeg'],
-            ['name_ar' => 'توصيل مجاني لمدة شهر', 'name_en' => 'Free Delivery for a Month', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/2.jpeg'],
-            ['name_ar' => 'غسيل 5 قطع وواحدة مجانية', 'name_en' => 'Wash 5 Items, Get 1 Free', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/3.jpeg'],
+            ['name_ar' => 'خصم 50% على أول عملية غسيل', 'name_en' => '50% Off on Your First Wash', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/1.jpeg','points'=>30],
+            ['name_ar' => 'توصيل مجاني لمدة شهر', 'name_en' => 'Free Delivery for a Month', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/2.jpeg','points'=>40],
+            ['name_ar' => 'غسيل 5 قطع وواحدة مجانية', 'name_en' => 'Wash 5 Items, Get 1 Free', 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/3.jpeg','points'=>50],
         ];
 
         foreach ($Advertisements as $Advertisement) {
