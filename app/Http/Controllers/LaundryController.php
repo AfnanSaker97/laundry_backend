@@ -18,6 +18,59 @@ use Auth;
 class LaundryController extends BaseController
 {
 
+
+
+    public function store(Request $request)
+    {
+        try {
+            $validator =Validator::make($request->all(), [
+                'name_en'=> 'required',
+                'name_ar' => 'required',
+                'description_ar' => 'required',
+                'description_en'=> 'required|string',
+                'phone_number' => 'required|string',
+                'city' => 'required',
+                'address_line_1'=> 'required',
+                'address' => 'required',
+                'lat' => 'required',
+                'lng' => 'required',
+                'point' => 'required',
+                'admin_id'=>'required|exists:users,id',
+            ]); 
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors()->all());       
+            }
+        
+            $laundry = Laundry::create([
+                'name_en' => $request->name_en,
+                'name_ar'=> $request->name_ar,
+                'description_ar' => $request->description_ar,
+                'description_en' => $request->description_en,
+                'phone_number' => $request->phone_number,
+                'city' => $request->city,
+                'address_line_1' => $request->address_line_1,
+                'address' => $request->address,
+                'point' => $request->point,
+                'admin_id'=> $request->admin_id,
+                'lat' => $request->lat,
+                'lng' => $request->lng,
+
+           ]);
+            
+        return $this->sendResponse($laundry,'laundry created successfully.');
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+
+
+    }
+
+
  public function LaundryByAdmin()
     {
         try{

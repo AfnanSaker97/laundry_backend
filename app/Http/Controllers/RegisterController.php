@@ -39,7 +39,7 @@ class RegisterController extends BaseController
                 'email' =>  $email,
                 'verification_code' => $email_verification_code ,
                 'user_type_id' =>  2,
-            
+                 'photo' =>  'https://laundry-backend.tecrek.com/public/User/11.jpg',
             ]);
 
             MySession::create([
@@ -263,18 +263,15 @@ public function update(Request $request)
 
     try {
     $user =Auth::user();
-    if ($request->filled('first_name')) {
-        $user->update(['first_name' => $request->first_name]);
-    }
-    if ($request->filled('last_name')) {
-        $user->update(['last_name' => $request->last_name]);
+    if ($request->filled('name')) {
+        $user->update(['name' => $request->name]);
     }
  
     if ($request->photo) {
     
         $imageName = time() . '.' . $request->photo->extension();
-        $request->photo->move(public_path('driver'), $imageName);
-        $url = url('driver/' . $imageName);
+        $request->photo->move(public_path('User'), $imageName);
+        $url = url('User/' . $imageName);
         $user->photo = $url;
         return $user;
         $user->save();
