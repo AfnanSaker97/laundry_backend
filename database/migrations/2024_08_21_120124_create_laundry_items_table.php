@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('item_type_en');
             $table->string('item_type_ar');
+            $table->string('url_image')->default('0');
             $table->timestamps();
         });
     }

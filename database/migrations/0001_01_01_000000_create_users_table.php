@@ -18,13 +18,17 @@ return new class extends Migration
             $table->string('verification_code')->default('0');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default('0');
-            $table->string('photo')->default('https://laundry-backend.tecrek.com/public/');
+            $table->string('photo')->default('0');
+           
             $table->decimal('lat')->default('0');
             $table->decimal('lng')->default('0');
             $table->string('driver_id')->default('0');
-            $table->foreignId('user_type_id')->constrained('user_types');     
+            $table->foreignId('user_type_id')->constrained('user_types');  
+            $table->string('device_token')->default('0');  
+            $table->decimal('points_wallet', 8, 1)->default(0); 
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -216,7 +216,7 @@ public function verify(Request $request)
      {
          try {
         
-            $user = User::select('id', 'name', 'email','photo') // Adjust fields as needed
+            $user = User::select('id', 'name', 'email','photo','points_wallet') // Adjust fields as needed
             ->find(Auth::id());
 
           // Load the addresses and orders relationships
@@ -228,9 +228,9 @@ public function verify(Request $request)
         $user->orders->makeHidden([ 'created_at', 'updated_at']);
 
              // Return the user with the addresses relationship loaded
-             $userData = $user;
-             $userData['total_points'] = $totalPoints;
-             return $this->sendResponse($userData, 'User fetched successfully.');
+        //  $userData = $user;
+            // $userData['total_points'] = $totalPoints;
+             return $this->sendResponse($user, 'User fetched successfully.');
              
          } catch (\Exception $e) {
              // Handle any exceptions and return an error response
@@ -273,7 +273,6 @@ public function update(Request $request)
         $request->photo->move(public_path('User'), $imageName);
         $url = url('User/' . $imageName);
         $user->photo = $url;
-        return $user;
         $user->save();
     }
  

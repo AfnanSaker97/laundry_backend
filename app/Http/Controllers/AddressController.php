@@ -31,7 +31,9 @@ class AddressController extends BaseController
             }
         
             $user = Auth::user();
-
+          // Check if it's the first address
+           $isFirstAddress = Address::where('user_id', $user->id)->count() == 0;
+ 
          
             $address = Address::create([
                 'full_name' => $request->full_name,
@@ -46,7 +48,8 @@ class AddressController extends BaseController
                 'address' => $request->address,
                 'lat' => $request->lat,
                 'lng' => $request->lng,
-        
+                'isActive' => $isFirstAddress ? 1 : 0,
+
            ]);
             
         return $this->sendResponse($address,'Address created successfully.');

@@ -88,7 +88,11 @@ class LaundryController extends BaseController
     public function index()
     {
         try{
-        $Laundries =  Laundry::with(['LaundryMedia','LaundryItem'])->inRandomOrder()->get();
+        $Laundries =  Laundry::with(['LaundryMedia','LaundryItem'])
+                           ->where('isActive', 1)
+                            ->inRandomOrder()
+                            ->get()
+                            ->makeHidden(['isActive']);
     
     
         return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
@@ -107,10 +111,10 @@ class LaundryController extends BaseController
     try{
     $query = $request->input('name');
     $results = $query 
-    ? Laundry::where(function($queryBuilder) use ($query) {
+    ? Laundry::where('isActive',1)->where(function($queryBuilder) use ($query) {
         $queryBuilder->where('name_en', 'LIKE', '%' . $query . '%')
                      ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
-    })->get()
+    })->get()->makeHidden('isActive')
     : [];
 
     return $this->sendResponse($results, 'Laundries fetched successfully.');
@@ -193,6 +197,7 @@ public function getLaundriesByProximity(Request $request)
                 DB::raw("( 6371 * acos( cos( radians($userLatitude) ) * cos( radians(lat) ) * cos( radians(lng) - radians($userLongitude) ) + sin( radians($userLatitude) ) * sin( radians(lat) ) ) ) AS distance")
             )
             ->orderBy('distance')
+            ->where('isActive',1)
             ->with(['LaundryMedia','laundryItem']) // Eager load the laundryItem relationship
             ->get();
     

@@ -53,6 +53,9 @@ class AdvertisementController extends BaseController
     $existingClick = $user->advertisements()->where('advertisement_id', $request->advertisement_id)->exists();
     
     if (!$existingClick) {
+       // إضافة نقاط الإعلان إلى محفظة المستخدم
+    $user->points_wallet += $advertisement->points;
+    $user->save();
         // إذا لم يضغط المستخدم من قبل، أكسبه نقاط الإعلان
         $user->advertisements()->attach($request->advertisement_id, ['points' => $advertisement->points]);
         return $this->sendResponse($advertisement,'You have earned points for this advertisement');

@@ -13,9 +13,11 @@ class UserTypeSeeder extends Seeder
     public function run(): void
     {
         $user_types = [
+ 
             [ 'type' => 'admin'],
             [ 'type' => 'User'],
             [ 'type' => 'driver'],
+            [ 'type' => 'super admin'],
            ];
           foreach ($user_types as $user_type) {
             UserType::create($user_type);

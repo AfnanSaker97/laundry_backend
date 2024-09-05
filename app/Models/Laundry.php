@@ -22,7 +22,8 @@ class Laundry extends Model
         'lat',
         'lng',
         'admin_id',
-        'point'
+        'point',
+        'isActive'
     ];
    public function LaundryItem()
     {

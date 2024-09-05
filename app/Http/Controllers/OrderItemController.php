@@ -31,6 +31,7 @@ class OrderItemController extends BaseController
 
     public function store(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'required|exists:laundries,id',
         'address_id' => 'required|exists:addresses,id',
@@ -58,7 +59,7 @@ class OrderItemController extends BaseController
               
                 $address = Address::findOrFail($request->address_id);
                 $orderType = OrderType::findOrFail($request->order_type_id);
-                $userId = Auth::id();
+                $user = Auth::user();
     
                 // Calculate distance
                 $distance = round($this->calculateDistance($laundry->lat, $laundry->lng, $address->lat, $address->lng), 1);
@@ -66,7 +67,7 @@ class OrderItemController extends BaseController
                 // Create the order
                 $order = Order::create([
                     'laundry_id' => $request->laundry_id,
-                    'user_id' => $userId,
+                    'user_id' => $user->id,
                     'address_id' => $request->address_id,
                     'order_date' => $now,
                     'pickup_time' => $pickupTime,
@@ -88,7 +89,7 @@ class OrderItemController extends BaseController
                     // Create order item
                     OrderItem::create([
                         'quantity' => $item['quantity'],
-                        'user_id' => $userId,
+                        'user_id' => $user->id,
                         'laundry_item_id' => $item['item_id'],
                         'price' => $price,
                         'sub_total_price' => $subTotalPrice,
@@ -99,7 +100,7 @@ class OrderItemController extends BaseController
     
                 // Calculate cart total
                 $cartItemsTotal = OrderItem::where('order_id', $order->id)
-                                           ->where('user_id', $userId)
+                                           ->where('user_id', $user->id)
                                            ->sum('sub_total_price');
     
                 // Calculate delivery cost and total price
@@ -116,6 +117,8 @@ class OrderItemController extends BaseController
                         'status' =>'confirmed',
                         'point' =>$laundry->point,
                     ]);
+                    $user->points_wallet += $order->point;
+                    $user->save();
                 }
                 $totalPrice = $cartItemsTotal + $costDeliver;
     
