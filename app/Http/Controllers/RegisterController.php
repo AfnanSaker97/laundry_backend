@@ -237,14 +237,14 @@ public function verify(Request $request)
             $user = Auth::user();
           // جلب فقط الحقول المطلوبة
         $userData = $user->only(['id', 'name', 'email', 'photo', 'points_wallet']);
-
-
-          // Load the addresses and orders relationships
-      //     $user->load('addresses', 'orders');
-          
-            // Return the user with the addresses relationship loaded
-        //  $userData = $user;
-            // $userData['total_points'] = $totalPoints;
+           // جلب العنوان النشط للمستخدم عندما يكون isActive = 1
+        $activeAddress = $user->addresses()->where('isActive', 1)->first();
+        if ($activeAddress) {
+            $userData['contact_number'] = $activeAddress->contact_number;
+        } else {
+            // إذا لم يكن هناك عنوان نشط، يتم إرجاع '0' كقيمة افتراضية
+            $userData['contact_number'] = '0';
+        }
              return $this->sendResponse($userData, 'User fetched successfully.');
              
          } catch (\Exception $e) {

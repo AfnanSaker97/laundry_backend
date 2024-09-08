@@ -40,6 +40,7 @@ class OrderItemController extends BaseController
         'ids.*.quantity' => 'required|integer|min:1',
         'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
+        'pickup_time'=> 'nullable|date',
     ]);
        
 
@@ -50,13 +51,27 @@ class OrderItemController extends BaseController
         $order = null; 
         try {
             DB::transaction(function () use ($request, &$order){
-                $now = Carbon::now('Etc/GMT-3');
-                $pickupTime = $now->copy()->addHour();
-                $deliveryTime = $pickupTime->copy()->addDay();
+                $now = Carbon::now('Asia/Dubai');
+                  // تحقق من قيمة order_type_id
+        if ($request->order_type_id == 2) {
+            // تحويل pickup_time إلى كائن Carbon إذا كان order_type_id = 2
+            $pickupTime = Carbon::parse($request->pickup_time);
+            // إنشاء delivery_time بناءً على pickup_time
+            $deliveryTime = $pickupTime->copy()->addDay();
+
+        }
+
+              
+        if ($request->order_type_id == 1) {
+            // تحويل pickup_time إلى كائن Carbon إذا كان order_type_id = 2
+            $pickupTime =  $now->copy()->addDay();
+            // إنشاء delivery_time بناءً على pickup_time
+            $deliveryTime = $pickupTime->copy()->addDay();
+
+        }
+
 
                 $laundry = Laundry::findOrFail($request->laundry_id);
-              
-              
                 $address = Address::findOrFail($request->address_id);
                 $orderType = OrderType::findOrFail($request->order_type_id);
                 $user = Auth::user();
