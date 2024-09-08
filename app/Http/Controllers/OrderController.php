@@ -435,6 +435,32 @@ public function filterMyOrderUser(Request $request)
         return $this->sendResponse($orders, 'orders fetched successfully.');
     }
 
+
+
+
+    
+public function ordersUser(Request $request)
+{
+    try {
+        $user = Auth::user();
+        // Find the address by ID
+        $orders = Order::where('user_id',$user->id)->get();
+
+    
+        return $this->sendResponse($orders,'orders fetched successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
+
 }
 
 

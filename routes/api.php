@@ -88,6 +88,8 @@ Route::post('Driver-update', [RegisterController::class, 'update']);
 Route::post('order', [OrderItemController::class, 'store']);
 Route::get('order', [OrderItemController::class, 'index']);
 Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
+Route::get('ordersUser', [OrderController::class, 'ordersUser']);
+
 
 
 //laundry Admin

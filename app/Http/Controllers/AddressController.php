@@ -106,7 +106,7 @@ public function addressUser(Request $request)
     try {
         $user = Auth::user();
         // Find the address by ID
-        $address = Address::where($user->address_id)->get();
+        $address = Address::where('user_id',$user->id)->get();
 
     
         return $this->sendResponse($address,'Address fetched successfully.');
