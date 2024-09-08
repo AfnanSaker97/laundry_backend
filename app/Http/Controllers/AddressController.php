@@ -67,6 +67,39 @@ class AddressController extends BaseController
 
 
 
+    
+
+    public function show(Request $request)
+{
+ 
+    try {
+        $validator =Validator::make($request->all(), [
+            'id' => 'required|exists:addresses',
+
+
+        ]); 
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+      
+        // Find the address by ID
+        $address = Address::findOrFail($request->id);
+
+    
+        return $this->sendResponse($address,'Address fetched successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
     public function destroy(Request $request)
 {
  

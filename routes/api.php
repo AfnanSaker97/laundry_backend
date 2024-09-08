@@ -49,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function() {
 Route::post('Address', [AddressController::class, 'store']);
 Route::delete('Address-delete', [AddressController::class,'destroy']);
 Route::post('Address-update', [AddressController::class,'update']);
+Route::get('AddressById', [AddressController::class,'show']);
+
 
 
 
