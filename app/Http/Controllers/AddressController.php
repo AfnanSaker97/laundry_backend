@@ -100,10 +100,32 @@ class AddressController extends BaseController
 }
 
 
+
+public function addressUser(Request $request)
+{
+    try {
+        $user = Auth::user();
+        // Find the address by ID
+        $address = Address::where($user->address_id)->get();
+
+    
+        return $this->sendResponse($address,'Address fetched successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
+
     public function destroy(Request $request)
 {
- 
-    try {
+  try {
 
         $validator =Validator::make($request->all(), [
             'id' => 'required|exists:addresses',
