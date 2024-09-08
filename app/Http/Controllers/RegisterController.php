@@ -234,9 +234,10 @@ public function verify(Request $request)
      public function getUser(Request $request)
      {
          try {
-        
-            $user = User::select('id', 'name', 'email','photo','points_wallet') // Adjust fields as needed
-            ->find(Auth::id());
+            $user = Auth::user();
+          // جلب فقط الحقول المطلوبة
+        $userData = $user->only(['id', 'name', 'email', 'photo', 'points_wallet']);
+
 
           // Load the addresses and orders relationships
       //     $user->load('addresses', 'orders');
@@ -244,7 +245,7 @@ public function verify(Request $request)
             // Return the user with the addresses relationship loaded
         //  $userData = $user;
             // $userData['total_points'] = $totalPoints;
-             return $this->sendResponse($user, 'User fetched successfully.');
+             return $this->sendResponse($userData, 'User fetched successfully.');
              
          } catch (\Exception $e) {
              // Handle any exceptions and return an error response

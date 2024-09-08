@@ -21,7 +21,7 @@ class OrderController extends BaseController
         $userId = Auth::id();
         // Adjust the pagination size as needed      
         $Orders= Order::with(['user','OrderItems.LaundryItem','address'])
-         ->orderByDesc('created_at')->get();
+         ->orderByDesc('created_at')->paginate(10);
        
        return $this->sendResponse($Orders, 'order fetched successfully.');
     }
@@ -52,7 +52,7 @@ class OrderController extends BaseController
                 $query->where('admin_id', $userId); // Filter by Laundry's admin_id
             })
             ->orderByDesc('order_date')
-            ->get();
+            ->paginate(10);
 
          }
          //غير مباشر
@@ -67,7 +67,7 @@ class OrderController extends BaseController
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
          })
          ->orderByDesc('order_date')
-         ->get();
+         ->paginate(10);
       }
       //مباشر
       if($request->status_id ==3)
@@ -81,7 +81,7 @@ class OrderController extends BaseController
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
          })
          ->orderByDesc('order_date')
-         ->get();
+         ->paginate(10);
       }
        
        return $this->sendResponse($orders, 'order fetched successfully.');
@@ -149,7 +149,7 @@ class OrderController extends BaseController
                 $query->where('admin_id', $userId); // Filter by Laundry's admin_id
             })
             ->orderByDesc('order_date')
-            ->get();
+            ->paginate(10);
 
          }
          //غير مباشر
@@ -163,7 +163,7 @@ class OrderController extends BaseController
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
          })
          ->orderByDesc('order_date')
-         ->get();
+         ->paginate(10);
       }
       //مباشر
       if($request->status_id ==3)
@@ -175,7 +175,7 @@ class OrderController extends BaseController
              $query->where('admin_id', $userId); // Filter by Laundry's admin_id
          })
          ->orderByDesc('order_date')
-         ->get();
+         ->paginate(10);
       }
        
        return $this->sendResponse($orders, 'order fetched successfully.');
