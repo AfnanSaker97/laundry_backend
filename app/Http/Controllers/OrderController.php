@@ -444,8 +444,26 @@ public function ordersUser(Request $request)
     try {
         $user = Auth::user();
         // Find the address by ID
-        $orders = Order::where('user_id',$user->id)->get();
-
+        $orders = Order::with('Laundry','OrderType','OrderItems')->where('user_id',$user->id)->get();
+  // Format the categories data if needed
+  return $orders->map(function ($order) {
+    return [
+        'id' => $order->id,
+        'pickup_time' =>$order->pickup_time,
+        'delivery_time' => $order->delivery_time ,
+        'order_date' => $order->order_date ,
+        'status' => $order->status ,
+        'base_cost' => $order->base_cost ,
+        'total_price' => $order->total_price ,
+        'note' => $order->note ,
+        'point' => $order->point ,
+        'laundry_name_ar' => $order->laundry->name_ar ,
+        'laundry_name_en' => $order->laundry->name_en ,
+        'order_type' => $order->OrderType->type ,
+        'order_type_price' => $order->OrderType->price ,
+        'order_items' => $order->OrderItems,
+    ];
+});
     
         return $this->sendResponse($orders,'orders fetched successfully.');
 
