@@ -17,6 +17,19 @@ use Validator;
 use Auth;
 class RegisterController extends BaseController
 {
+
+    // Create a session for the user
+private function createUserSession($userId, $request)
+{
+    MySession::create([
+        'user_id' => $userId,
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->header('User-Agent'),
+        'payload' => base64_encode($request->getContent()),
+        'last_activity' => time(),
+    ]);
+}
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -32,37 +45,43 @@ class RegisterController extends BaseController
             $email_verification_code = random_int(1000, 9999); 
             $existingUser = User::where('email', $request->email)->first();
             if(!$existingUser)
-            {
-            // Create a new user
-            $user = User::create([
-                'name' =>  $request->name,
-                'email' =>  $email,
-                'verification_code' => $email_verification_code ,
-                'user_type_id' =>  2,
-                 'photo' =>  'https://laundry-backend.tecrek.com/public/User/11.jpg',
-            ]);
+            { 
+                $user = User::withTrashed()->where('email', $email)->first();
+                if ($user) {
+                    $user->restore();
+                      // Update user details
+               $user->update([
+                'name' => $request->name,
+                'verification_code' => $email_verification_code,
+                'photo' => 'https://laundry-backend.tecrek.com/public/User/11.jpg',
+                'points_wallet' => '0.0',
+                'lat' => '0.0',
+                'lng' => '0.0',
+                'device_token' => '0.0',
+              ]);
 
-            MySession::create([
-                'user_id' => $user->id,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->header('User-Agent'),
-                'payload' => base64_encode($request->getContent()), 
-                'last_activity' => time(),
-            ]);
-            $success['user'] =  $user;
-            Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
-  
-    }
+                    // Create session for the user
+                   
+    }else{
+ // Create a new user
+ $user = User::create([
+    'name' =>  $request->name,
+    'email' =>  $email,
+    'verification_code' => $email_verification_code ,
+    'user_type_id' =>  2,
+     'photo' =>  'https://laundry-backend.tecrek.com/public/User/11.jpg',
+   ]);
+   }
+        $this->createUserSession($user->id, $request);
+        $success['user'] =  $user;
+        Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
+            }
+        
     else{
         $existingUser->verification_code =$email_verification_code;
         $existingUser->save();
-        MySession::create([
-            'user_id' => $existingUser->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent'),
-            'payload' => base64_encode($request->getContent()), 
-            'last_activity' => time(),
-        ]);
+         // Create session for the user
+         $this->createUserSession($existingUser->id, $request);
       //  $success['user'] =  $existingUser;
         Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code)); 
        
@@ -280,4 +299,25 @@ public function update(Request $request)
 }
 }
 
+
+
+
+public function destroy(Request $request)
+{
+  try {
+        $user = Auth::user();
+        $user->addresses()->delete();
+        $user->orders()->delete();
+        $user->advertisements()->delete();
+        $user->delete();
+
+        return $this->sendResponse($user,'user deleted successfully.');
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
 }

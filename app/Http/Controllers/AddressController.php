@@ -129,8 +129,6 @@ public function addressUser(Request $request)
 
         $validator =Validator::make($request->all(), [
             'id' => 'required|exists:addresses',
-
-
         ]); 
        
         if ($validator->fails()) {

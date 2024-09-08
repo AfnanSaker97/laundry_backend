@@ -83,6 +83,8 @@ Route::get('logout', [RegisterController::class, 'logout']);
 
 Route::get('User', [RegisterController::class, 'getUser']);
 Route::post('User-update', [RegisterController::class, 'update']);
+Route::delete('user-delete', [RegisterController::class, 'destroy']);
+
 Route::post('Driver-update', [RegisterController::class, 'update']);
 
 Route::post('order', [OrderItemController::class, 'store']);
