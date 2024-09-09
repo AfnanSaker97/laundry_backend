@@ -32,11 +32,6 @@ Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
 Route::get('Filter-users', [AdminController::class,'index']);//super admin
 
-Route::get('launderies', [LaundryController::class, 'index']);//super admin
-Route::get('search-launderies', [LaundryController::class, 'search']); //users
-Route::get('laundry', [LaundryController::class, 'show']);
-
-
 Route::get('order-admin', [OrderController::class, 'index']);
 Route::post('createDriver', [AdminController::class, 'createDriver']); 
 
@@ -51,7 +46,12 @@ Route::delete('Address-delete', [AddressController::class,'destroy']);
 Route::post('Address-update', [AddressController::class,'update']);
 Route::get('AddressById', [AddressController::class,'show']);
 Route::get('addressUser', [AddressController::class,'addressUser']);
+Route::post('UpdateStatusAddress', [AddressController::class,'UpdateStatusAddress']);
 
+
+Route::get('launderies', [LaundryController::class, 'index']);//super admin
+Route::get('search-launderies', [LaundryController::class, 'search']); //users
+Route::get('laundry', [LaundryController::class, 'show']);
 
 
 

@@ -101,6 +101,49 @@ class AddressController extends BaseController
 
 
 
+public function UpdateStatusAddress(Request $request)
+{
+    try {
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:addresses,id', 
+        ]);
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+    
+        $addressId = $request->id;
+        $user = Auth::user();
+
+        // تحديث جميع العناوين الأخرى للمستخدم إلى isActive = 0
+        Address::where('user_id', $user->id)
+               ->where('id', '!=', $addressId) // استثناء العنوان المحدد
+               ->update(['isActive' => 0]);
+
+        // تحديث العنوان المحدد إلى isActive = 1
+        $address = Address::where('id', $addressId)
+                          ->where('user_id', $user->id) // تأكد من أن العنوان ينتمي للمستخدم
+                          ->first();
+        
+        if ($address) {
+            $address->isActive = 1;
+            $address->save();
+        }
+        return $this->sendResponse($address,'Address updated successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
+
 public function addressUser(Request $request)
 {
     try {
@@ -142,8 +185,6 @@ public function addressUser(Request $request)
         $address->delete();
 
         return $this->sendResponse($address,'Address deleted successfully.');
-
-    
     } catch (\Throwable $th) {
         return response()->json([
             'status' => false,

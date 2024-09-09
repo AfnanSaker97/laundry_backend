@@ -110,13 +110,29 @@ class LaundryController extends BaseController
 {
     try{
     $query = $request->input('name');
-    $results = $query 
-    ? Laundry::where('isActive',1)->where(function($queryBuilder) use ($query) {
-        $queryBuilder->where('name_en', 'LIKE', '%' . $query . '%')
-                     ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
-    })->get()->makeHidden('isActive')
-    : [];
 
+     $user = Auth::user();
+     $latitude = $user->lat;  
+     $longitude = $user->lng;
+
+    // البحث عن المغاسل مع حساب المسافة
+    $results = Laundry::where('isActive', 1)
+    ->when($query, function ($queryBuilder) use ($query) {
+        $queryBuilder->where(function ($q) use ($query) {
+            $q->where('name_en', 'LIKE', '%' . $query . '%')
+                ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
+        });
+    })
+    // حساب المسافة باستخدام صيغة Haversine
+    ->selectRaw(
+        "*, ( 6371 * acos( cos( radians(?) ) * cos( radians( lat ) ) 
+        * cos( radians( lng ) - radians(?) ) + sin( radians(?) ) 
+        * sin( radians( lat ) ) ) ) AS distance",
+        [$latitude, $longitude, $latitude] // تمرير إحداثيات المستخدم إلى الصيغة
+    )
+    ->orderBy('distance', 'asc') // ترتيب النتائج بناءً على المسافة
+    ->get()
+    ->makeHidden('isActive');
     return $this->sendResponse($results, 'Laundries fetched successfully.');
 } catch (\Exception $e) {
     // Log error and return empty array
@@ -176,9 +192,11 @@ public function show(Request $request)
 
 public function getLaundriesByProximity(Request $request)
 {
+    
     try {
         // Get the currently authenticated user
         $user = Auth::user();
+    
         $userLatitude = $user->lat;
         $userLongitude = $user->lng;
 
