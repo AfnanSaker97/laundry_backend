@@ -109,6 +109,10 @@ Route::get('laundries-super', [LaundryController::class, 'LaundrySuperAdmin']);
 
 Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 Route::post('Laundry', [LaundryController::class, 'store']);
+Route::post('Laundry-update', [LaundryController::class, 'update']);
+Route::post('UpdateStatusLaundery', [LaundryController::class, 'UpdateStatusLaundery']);
+
+
 //MyOrder
 Route::get('MyOrders', [OrderController::class, 'MyOrder']);
 Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);

@@ -96,6 +96,50 @@ class LaundryController extends BaseController
     }
     }
 
+
+
+
+    
+public function update(Request $request)
+{
+    try {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundries', // Ensure the address exists
+
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+
+        // Find the address by ID
+        $laundry = Laundry::findOrFail($request->id);
+
+    // Update the address with the request data
+    $laundry->update([
+        'name_en' => $request->name_en ?? $laundry->name_en,
+        'name_ar' => $request->name_ar ?? $laundry->name_ar,
+        'description_ar' => $request->description_ar ?? $laundry->description_ar,
+        'description_en' => $request->description_en ?? $laundry->description_en,
+        'phone_number' => $request->phone_number ?? $laundry->phone_number,
+        'city' => $request->city ?? $laundry->city,
+        'address_line_1' => $request->address_line_1 ?? $laundry->address_line_1,
+        'point' => $request->point ?? $laundry->point,
+    ]);
+
+        return $this->sendResponse($laundry, 'Laundry updated successfully.');
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+}
+
+
     public function index()
     {
         try{
@@ -198,6 +242,40 @@ public function show(Request $request)
     // Handle any exceptions and return an error response
     return response()->json(['error' => $e->getMessage()], 500);
 }
+}
+
+
+public function UpdateStatusLaundery(Request $request)
+{
+    
+    try {
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundries', 
+        ]);
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+        // Fetch the laundry belonging to the authenticated user
+        $laundry = Laundry::findOrFail($request->id);
+
+
+
+// Toggle the isActive field
+$laundry->isActive = !$laundry->isActive;  // If 1, it becomes 0, and vice versa
+$laundry->save();
+
+        return $this->sendResponse($laundry,'laundry updated successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
 }
 
 
