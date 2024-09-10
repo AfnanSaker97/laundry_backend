@@ -13,6 +13,7 @@ use App\Http\Controllers\LaundryItemController;
 use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Auth\GoogleController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -23,8 +24,15 @@ Route::post('register-Password', [RegisterController::class, 'registerPassword']
 Route::post('login', [RegisterController::class, 'login']);
 Route::post('verify', [RegisterController::class, 'verify']);
 
-//Route::middleware('auth:sanctum')->group( function () {
 
+Route::post('auth/google', [GoogleController::class, 'handleGoogleCallback']);
+
+//Route::middleware('auth:sanctum')->group( function () {
+ 
+
+  //  Route::get('auth/google', [GoogleController::class, 'redirectToGoogle']);
+    //Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+    
 
 
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
@@ -93,6 +101,9 @@ Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
 Route::get('ordersUser', [OrderController::class, 'ordersUser']);
 
 
+
+//LaundrySuperAdmin
+Route::get('laundries-super', [LaundryController::class, 'LaundrySuperAdmin']);
 
 //laundry Admin
 

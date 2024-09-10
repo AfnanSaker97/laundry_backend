@@ -71,12 +71,23 @@ class LaundryController extends BaseController
     }
 
 
+   
+
+
  public function LaundryByAdmin()
     {
         try{
         $user = Auth::user();
-        $Laundries = Laundry::with(['LaundryMedia','laundryItem'])->where('admin_id', $user->id)->get();
-    
+        $Laundries = [];
+
+        if ($user->user_type_id == 1) {
+            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
+                ->where('admin_id', $user->id)
+                ->get();
+        } elseif ($user->user_type_id == 4) {
+            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
+                ->get();
+        }
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     } catch (\Exception $e) {
         // Log error and return empty array
