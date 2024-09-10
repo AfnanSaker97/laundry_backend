@@ -83,10 +83,10 @@ class LaundryController extends BaseController
         if ($user->user_type_id == 1) {
             $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
                 ->where('admin_id', $user->id)
-                ->get();
+                ->paginate(10);
         } elseif ($user->user_type_id == 4) {
             $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
-                ->get();
+                ->paginate(10);
         }
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
     } catch (\Exception $e) {
