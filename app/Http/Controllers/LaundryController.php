@@ -9,6 +9,8 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Laundry;
 use App\Models\LaundryItem;
+use App\Models\LaundryMedia;
+use App\Models\Price;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
@@ -36,11 +38,14 @@ class LaundryController extends BaseController
                 'lng' => 'required',
                 'point' => 'required',
                 'admin_id'=>'required|exists:users,id',
+                "array_url.*.url_image" => 'required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
+                'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
+                'array_ids.*.price' => 'required|numeric',
             ]); 
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-        
+    
             $laundry = Laundry::create([
                 'name_en' => $request->name_en,
                 'name_ar'=> $request->name_ar,
@@ -56,6 +61,26 @@ class LaundryController extends BaseController
                 'lng' => $request->lng,
 
            ]);
+
+           foreach ($request->file('array_url.*.url_image') as $index => $image) {
+            // $folder = 'Picture';
+             $imageName = time() . '.' . $image->extension();
+             $image->move(public_path('Laundry'), $imageName);
+             $url = url('Laundry/' . $imageName);
+             $LaundryImage =  LaundryMedia::create(['laundry_id' => $laundry->id,
+             'url_image' => $url,
+              ]);
+                 }
+
+  // Store Laundry Items with prices
+  foreach ($request->array_ids as $item) {
+    Price::create([
+        'laundry_id' => $laundry->id,
+        'laundry_item_id' => $item['laundry_item_id'],
+        'price' => $item['price'],
+    ]);
+}
+
             
         return $this->sendResponse($laundry,'laundry created successfully.');
     

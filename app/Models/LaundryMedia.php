@@ -9,7 +9,7 @@ class LaundryMedia extends Model
 {
     use HasFactory;
     protected $fillable = [
-       
+       'laundry_id',
         'url_image'
  
     ];
