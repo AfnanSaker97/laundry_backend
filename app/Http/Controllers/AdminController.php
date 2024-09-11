@@ -29,9 +29,7 @@ class AdminController extends BaseController
     // استرجاع المستخدمين بناءً على نوع المستخدم
     $users = User::where('user_type_id', $userTypeId)->get();
 
-        $message =  'Users fetched successfully.' ;
-        
-        return $this->sendResponse($users, $message);
+        return $this->sendResponse($users, 'Users fetched successfully.');
     }
 
 

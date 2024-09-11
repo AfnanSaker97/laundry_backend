@@ -41,11 +41,13 @@ class LaundryController extends BaseController
                 "array_url.*.url_image" => 'required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
                 'array_ids.*.price' => 'required|numeric',
-            ]); 
+                'array_service' => 'required|array',
+                'array_service.*.service_id' => 'required|exists:services,id',
+             ]); 
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-    
+          
             $laundry = Laundry::create([
                 'name_en' => $request->name_en,
                 'name_ar'=> $request->name_ar,
@@ -81,7 +83,10 @@ class LaundryController extends BaseController
     ]);
 }
 
-            
+foreach ($request->array_service as $service) {
+    $laundry->services()->attach($service['service_id']);
+}
+          
         return $this->sendResponse($laundry,'laundry created successfully.');
     
     } catch (\Throwable $th) {
@@ -232,7 +237,7 @@ public function show(Request $request)
         'id' => 'required|exists:laundries',
     
     ]);
-   
+    $user = Auth::user();
     if($validator->fails()){
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
@@ -261,6 +266,11 @@ public function show(Request $request)
        
         // Add other fields as necessary
     ];
+
+       // إذا كان المستخدم Admin، أضف poin إلى البيانات
+       if ($user->user_type_id === 4) { // أو أي حقل آخر يعبر عن دور المستخدم كـ Admin
+        $laundryData['point'] = $laundry->point; // تأكد من أن الحقل poin موجود في جدول المغاسل
+    }
 
     return $this->sendResponse($laundryData,'laundry fetched successfully.');
 } catch (\Exception $e) {

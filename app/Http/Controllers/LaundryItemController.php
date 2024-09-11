@@ -40,6 +40,24 @@ class LaundryItemController extends BaseController
     }
 
 
+    public function getLaundryItem(Request $request)
+    {
+      
+        try {
+        // Retrieve the laundry items with their prices from the pivot table
+        $laundryItems = Cache::remember('laundryItems', 60, function() {
+            return LaundryItem::all();
+        });
+
+        return $this->sendResponse($laundryItems,'laundryItems fetched successfully.');
+    } catch (\Exception $e) {
+        // Log error and return empty array
+        return response()->json(['error' =>  $e->getMessage()], 500);
+      
+    }
+    }
+
+
     public function show(Request $request)
 {
     $validator = Validator::make($request->all(), [

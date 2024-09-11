@@ -33,6 +33,8 @@ class Laundry extends Model
       
     }
 
+   
+
 
     public function LaundryMedia()
     {
