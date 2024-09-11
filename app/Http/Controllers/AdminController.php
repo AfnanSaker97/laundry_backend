@@ -17,7 +17,7 @@ class AdminController extends BaseController
     public function index(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:2,3',  // Corrected the validation rule
+            'status_id' => 'required|in:1,2,3',  // Corrected the validation rule
         ]);
     
         if ($validator->fails()) {
@@ -25,9 +25,11 @@ class AdminController extends BaseController
         }
     
         $userTypeId = $request->status_id;
-        $users = User::where('user_type_id', $userTypeId)->get();
-        
-        $message = $userTypeId == 2 ? 'Users fetched successfully.' : 'Drivers fetched successfully.';
+         
+    // استرجاع المستخدمين بناءً على نوع المستخدم
+    $users = User::where('user_type_id', $userTypeId)->get();
+
+        $message =  'Users fetched successfully.' ;
         
         return $this->sendResponse($users, $message);
     }
