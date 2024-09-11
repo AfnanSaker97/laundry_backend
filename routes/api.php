@@ -80,6 +80,8 @@ Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
     
 
 Route::get('laundryItem', [LaundryItemController::class, 'index']);
+Route::get('laundryItemById', [LaundryItemController::class, 'show']);
+
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 

@@ -13,19 +13,65 @@ use Validator;
 use Auth;
 class LaundryItemController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
+        $validator =Validator::make($request->all(), [
+
+            'laundry_id' => 'required|exists:laundries,id',
+        ]);
+       
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        $laundry = Laundry::findOrFail($request->laundry_id);
+
         try {
-        $LaundryItem = Cache::remember('LaundryItem', 60, function () {
-            return LaundryItem::all();
+        // Retrieve the laundry items with their prices from the pivot table
+        $laundryItems = Cache::remember('laundryItems_'.$request->laundry_id, 60, function () use ($laundry) {
+            return $laundry->LaundryItem()->withPivot('price')->get();
         });
-        return $this->sendResponse($LaundryItem,'LaundryItem fetched successfully.');
+
+        return $this->sendResponse($laundryItems,'LaundryItem fetched successfully.');
     } catch (\Exception $e) {
         // Log error and return empty array
         return response()->json(['error' =>  $e->getMessage()], 500);
       
     }
     }
+
+
+    public function show(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'laundry_id' => 'required|exists:laundries,id',
+        'item_id' => 'required|exists:laundry_items,id',  
+    ]);
+
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors()->all());
+    }
+
+    try {
+        // Find the laundry
+        $laundry = Laundry::findOrFail($request->laundry_id);
+
+        $laundryItem = Cache::remember('laundryItem_'.$request->laundry_id.'_'.$request->item_id, 60, function () use ($laundry, $request) {
+            return $laundry->LaundryItem()
+                ->where('laundry_items.id', $request->item_id)  // تحديد مصدر id لتجنب الغموض
+                ->withPivot('price')
+                ->first();
+        });
+        if (!$laundryItem) {
+            return $this->sendError('Item not found.');
+        }
+
+        return $this->sendResponse($laundryItem, 'Laundry item fetched successfully.');
+    } catch (\Exception $e) {
+        // Log error and return empty array
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
 
 
     public function update(Request $request)
@@ -45,6 +91,8 @@ class LaundryItemController extends BaseController
 
            // Update the price in the pivot table
           $laundry->LaundryItem()->updateExistingPivot($request->id, ['price' => $request->price]);
+          // حذف الكاش المرتبط بالعناصر المغسلة
+         Cache::forget('laundryItems_' . $request->laundry_id);
 
    
   

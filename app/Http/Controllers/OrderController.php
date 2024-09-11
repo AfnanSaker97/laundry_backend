@@ -274,19 +274,28 @@ public function getOrderByProximity(Request $request)
     public function getTotal()
 {
     try {
-        $userId = Auth::id();
-        $laundry =Laundry::where('admin_id',$userId)->first();
-     
-        // Define the start and end of the current day
-        $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
-        $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
+        $user = Auth::user();
+    // Define the start and end of the current day
+       $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
+       $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
+       if ($user->user_type_id == 1) {
 
+        $laundry =Laundry::where('admin_id',$user->id)->first();
         // حساب المجموع الكلي للطلبات
         $totalOrdersToday = Order::where('laundry_id',$laundry->id)->whereBetween('order_date', [$startOfDay, $endOfDay])->count();
         $totalOrders = Order::where('laundry_id',$laundry->id)->count();
         $pendingOrders = Order::where('laundry_id',$laundry->id)->where('status','pending')->count();
         $carservice = Car::where('laundry_id',$laundry->id)->where('status','1')->count();
-        
+       
+    } elseif ($user->user_type_id == 4) {
+
+          $totalOrdersToday = Order::whereBetween('order_date', [$startOfDay, $endOfDay])->count();
+          $totalOrders = Order::count();
+          $pendingOrders = Order::where('status','pending')->count();
+          $carservice = Car::where('status','1')->count();
+         
+    }
+
         $data = [
             'orders_for_today' => $totalOrdersToday,
             'totalOrders' => $totalOrders,
