@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('titel');
-            $table->text('body');
-            $table->timestamp('data');
+            $table->string('type');
+            $table->unsignedBigInteger('notifiable_id');
+            $table->json('data')->nullable(); // assuming 'data' might be stored as JSON
             $table->timestamp('read_at')->nullable();
-            $table->unsignedBigInteger('receiver_id');
-            $table->foreign('receiver_id')->references('id')->on('users')->onUpdate('cascade');
-           
             $table->timestamps();
         });
     }

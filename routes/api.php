@@ -14,6 +14,7 @@ use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\ServiceController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -55,6 +56,9 @@ Route::post('Address-update', [AddressController::class,'update']);
 Route::get('AddressById', [AddressController::class,'show']);
 Route::get('addressUser', [AddressController::class,'addressUser']);
 Route::post('UpdateStatusAddress', [AddressController::class,'UpdateStatusAddress']);
+
+
+Route::get('Service', [ServiceController::class, 'index']);
 
 
 Route::get('launderies', [LaundryController::class, 'index']);//super admin
