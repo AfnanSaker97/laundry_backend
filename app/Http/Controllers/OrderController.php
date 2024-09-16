@@ -122,6 +122,16 @@ class OrderController extends BaseController
           $order->car_id= $request->car_id;
           $order->status=$request->status; 
           $order->save();
+
+         // Define notification content
+     $notificationContent = [
+        'title' => 'A response to your request has been sent.',
+        'body' => 'Your order #' . $order->id . ' has been updated successfully.',
+        'order_id' => $order->id,
+    ];
+        $user = $order->user; 
+        $this->sendNotification($request, $user, $notificationContent);
+
           return $this->sendResponse($order, 'order updated successfully.');
         }
     
@@ -453,7 +463,7 @@ public function ordersUser(Request $request)
     try {
         $user = Auth::user();
         // Find the address by ID
-        $orders = Order::with('Laundry','OrderType','OrderItems')->where('user_id',$user->id)->get();
+        $orders = Order::with('Laundry','OrderType','OrderItems')->where('user_id',$user->id)->orderBy('order_date', 'desc')->get();
   // Format the categories data if needed
   return $orders->map(function ($order) {
     return [

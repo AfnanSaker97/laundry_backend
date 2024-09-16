@@ -15,9 +15,25 @@ use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ServiceController;
+use App\Events\TestingEvent;
+use Illuminate\Support\Facades\Log;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+
+
+Route::post('trigger-event', function (Request $request) {
+    
+    // Trigger the event with any necessary data
+    $orderId = $request->input('order_id');
+   
+    event(new TestingEvent($orderId));
+    Log::info('Order shipped with ID: ' . $orderId);
+
+    return response()->json(['status' => 'Event triggered']);
+});
+
 
 
 Route::post('register', [RegisterController::class, 'register']);

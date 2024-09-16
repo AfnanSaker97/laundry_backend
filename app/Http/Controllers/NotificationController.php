@@ -29,7 +29,8 @@ class NotificationController extends BaseController
     
         if ($notification) {
             // تحديث حالة القراءة
-            $notification->update(['read_at' => now()]);
+            $notification->read_at = now();
+            $notification->save();
             return $this->sendResponse($notification,'Notification marked as read successfully.');
 
         }
@@ -44,9 +45,20 @@ class NotificationController extends BaseController
     try {
     $userId = Auth::id();
   
-    $notifications = Notification::where('receiver_id', $userId)->orderBy('created_at', 'desc')->get();
- 
-    return $this->sendResponse($notifications,'notification fetched successfully.');
+    $notifications = Notification::where('notifiable_id', $userId)->orderBy('created_at', 'desc')->get();
+   
+      // Decode the JSON data field for each notification
+      $notifications = $notifications->map(function ($notification) {
+        $notification->data = json_decode($notification->data, true);  // Decode JSON data
+        return $notification;
+    });
+
+    $response = [
+        'count' => $notifications->count(),
+        'notifications' => $notifications,
+    
+    ];
+    return $this->sendResponse($response,'notification fetched successfully.');
 } catch (\Throwable $th) {
     return response()->json([
         'status' => false,
