@@ -36,54 +36,36 @@ class OrderController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
         try {
-        $userId = Auth::id();
+        $user = Auth::user();
 
         // Define the start and end of the current day
         $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
         $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
 
-         if($request->status_id ==1)
-         {
-  // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-        $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
+        // Initialize the query builder for orders
+        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
             ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-         //   ->where('status','pending')
-            ->whereHas('Laundry', function ($query) use ($userId) {
-                $query->where('admin_id', $userId); // Filter by Laundry's admin_id
-            })
-            ->orderByDesc('order_date')
-            ->paginate(10);
+            ->orderByDesc('order_date');
+            
+ // Apply filters based on status_id
+ if ($request->status_id == 1) {
+    // Status ID 1: No additional filters
+} elseif ($request->status_id == 2) {
+    $query->where('order_type_id', '1'); // Filter by order_type_id for غير مباشر
+} elseif ($request->status_id == 3) {
+    $query->where('order_type_id', '2'); // Filter by order_type_id for مباشر
+}
 
-         }
-         //غير مباشر
-      if($request->status_id ==2)
-      {
-         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
-         ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-       //  ->where('status','pending')
-         ->where('order_type_id','1')
-         ->whereHas('Laundry', function ($query) use ($userId) {
-             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
-         })
-         ->orderByDesc('order_date')
-         ->paginate(10);
-      }
-      //مباشر
-      if($request->status_id ==3)
-      {
-         // Fetch orders created today for the authenticated user where Laundry.admin_id matches
-         $orders = Order::with(['user', 'OrderItems.LaundryItem', 'address','Laundry','OrderType'])
-         ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
-       //  ->where('status','pending')
-         ->where('order_type_id','2')
-         ->whereHas('Laundry', function ($query) use ($userId) {
-             $query->where('admin_id', $userId); // Filter by Laundry's admin_id
-         })
-         ->orderByDesc('order_date')
-         ->paginate(10);
-      }
-       
+ // Apply user_type_id specific conditions
+ if ($user->user_type_id == 1) {
+    $query->whereHas('Laundry', function ($query) use ($user) {
+        $query->where('admin_id', $user->id); // Filter by Laundry's admin_id
+    });
+}
+
+// Fetch orders with pagination
+$orders = $query->paginate(10);
+
        return $this->sendResponse($orders, 'order fetched successfully.');
     }catch (\Throwable $th) {
         return response()->json([
