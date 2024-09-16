@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\DriverController;
 use App\Events\TestingEvent;
 use Illuminate\Support\Facades\Log;
 Route::get('/user', function (Request $request) {
@@ -58,7 +59,11 @@ Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 Route::get('Filter-users', [AdminController::class,'index']);//super admin
 
 Route::get('order-admin', [OrderController::class, 'index']);
-Route::post('createDriver', [AdminController::class, 'createDriver']); 
+Route::post('createDriver', [DriverController::class, 'createDriver']); 
+Route::delete('deleteDriver', [DriverController::class, 'destroy']); 
+Route::get('DriverById', [DriverController::class, 'show']); 
+Route::post('updateDriver', [DriverController::class, 'update']); 
+
 
 
 //Car
