@@ -53,7 +53,6 @@ public function store(Request $request)
             'laundry_id'=> 'required|exists:laundries,id',
             'driver_id' => 'required|exists:users,id',
             'number_car' => 'required',
-            
            
         ]); 
         if ($validator->fails()) {
@@ -80,7 +79,67 @@ public function store(Request $request)
 
 }
 
+public function update(Request $request)
+{
+    try {
+        $validator =Validator::make($request->all(), [
+            'id'=> 'nullable|exists:cars',
+            'laundry_id'=> 'nullable|exists:laundries,id',
+            'driver_id' => 'nullable|exists:users,id',
+            'number_car' => 'nullable',
+                
+        ]); 
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+       $car =Car::findOrFail($request->id);
+          $car->update([
+            'laundry_id' => $request->laundry_id ?? $car->laundry_id,
+            'driver_id' => $request->driver_id ?? $car->driver_id,
+            'number_car' =>$request->number_car ?? $car->number_car,
+        ]);
     
+    return $this->sendResponse($car,'Car updated successfully.');
+
+} catch (\Throwable $th) {
+    return response()->json([
+        'status' => false,
+        'message' => $th->getMessage()
+    ], 500); 
+
+} 
+}
+
+
+
+public function UpdateStatusCar(Request $request)
+{
+   
+    try {
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:cars', 
+        ]);
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+        $car = Car::findOrFail($request->id);
+      
+        $car->status = !$car->status;  // If 1, it becomes 0, and vice versa
+        $car->save();
+        return $this->sendResponse($car,'car updated successfully.');
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
+
 public function getCars()
 {
       $cars = Car::with('driver','Laundry')

@@ -71,7 +71,11 @@ Route::get('CarByLaundry', [CarController::class, 'index']);
 Route::get('Cars', [CarController::class, 'getCars']);
 Route::get('CarById', [CarController::class, 'show']);
 Route::post('Car', [CarController::class, 'store']);
- 
+Route::post('updateCar', [CarController::class, 'update']);
+Route::post('UpdateStatusCar', [CarController::class, 'UpdateStatusCar']);
+
+
+
 
 
 //Address
