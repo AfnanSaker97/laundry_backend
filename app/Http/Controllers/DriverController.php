@@ -55,6 +55,9 @@ class DriverController extends BaseController
              'id' => 'required|exists:users',
          ]); 
      
+         if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
            $user =User::findOrFail($request->id);
              return $this->sendResponse($user,'Driver updated successfully.');
          } catch (\Throwable $th) {

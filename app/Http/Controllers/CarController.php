@@ -21,6 +21,8 @@ use Validator;
 use Auth;
 class CarController extends BaseController
 {
+
+
     
 public function index(Request $request)
 {
@@ -42,6 +44,42 @@ public function index(Request $request)
 }
 
 
+
+
+public function store(Request $request)
+{
+    try {
+        $validator =Validator::make($request->all(), [
+            'laundry_id'=> 'required|exists:laundries,id',
+            'driver_id' => 'required|exists:users,id',
+            'number_car' => 'required',
+            
+           
+        ]); 
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+    
+        $car = Car::create([
+            'laundry_id' => $request->laundry_id,
+            'driver_id'=> $request->driver_id,
+            'number_car' => $request->number_car,
+          
+       ]);
+        
+    return $this->sendResponse($car,'Car created successfully.');
+
+} catch (\Throwable $th) {
+    return response()->json([
+        'status' => false,
+        'message' => $th->getMessage()
+    ], 500); 
+
+} 
+
+
+}
+
     
 public function getCars()
 {
@@ -53,6 +91,7 @@ public function getCars()
             'id' => $car->id,
           //  'driver_phone' => $car->driver->phone, // تأكد أن عمود الهاتف موجود في جدول السائق
             'status' => $car->status,
+            'number_car'=> $car->number_car,
             'lat' => $car->lat,
             'lng' => $car->lng,
             'driver_name' => $car->driver->name,
@@ -80,10 +119,11 @@ public function show(Request $request)
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
            $car =Car::with('driver','Laundry')->findOrFail($request->id);
-           // تجميع البيانات في مصفوفة
+         
     $filteredCar = [
         'id' => $car->id,
         'status' => $car->status,
+        'number_car'=> $car->number_car,
         'lat' => $car->lat,
         'lng' => $car->lng,
         'driver_name' => $car->driver->name,

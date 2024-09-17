@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
             $table->foreignId('driver_id')->constrained('users');
-          //  $table->string('driver_phone')->default('0');
+            $table->string('number_car')->default('0');
             $table->boolean('status')->default(0);
             $table->decimal('lat', 6, 3)->default('0');
             $table->decimal('lng', 6, 3)->default('0');
