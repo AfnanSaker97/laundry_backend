@@ -65,10 +65,13 @@ Route::get('DriverById', [DriverController::class, 'show']);
 Route::post('updateDriver', [DriverController::class, 'update']); 
 
 
-
+Route::middleware('auth:sanctum')->group(function() {
 //Car
 Route::get('CarByLaundry', [CarController::class, 'index']);
-Route::middleware('auth:sanctum')->group(function() {
+Route::get('Cars', [CarController::class, 'getCars']);
+Route::get('CarById', [CarController::class, 'show']);
+ 
+
 
 //Address
 Route::post('Address', [AddressController::class, 'store']);

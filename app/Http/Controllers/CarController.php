@@ -37,11 +37,70 @@ public function index(Request $request)
       ->where('laundry_id', $request->laundry_id)
       ->get();
 
+  
     return $this->sendResponse($cars,'car fetched successfully.');
 }
 
 
+    
+public function getCars()
+{
+      $cars = Car::with('driver','Laundry')
+      ->paginate(10);
+
+      $filteredCars = $cars->map(function($car) {
+        return [
+            'id' => $car->id,
+          //  'driver_phone' => $car->driver->phone, // تأكد أن عمود الهاتف موجود في جدول السائق
+            'status' => $car->status,
+            'lat' => $car->lat,
+            'lng' => $car->lng,
+            'driver_name' => $car->driver->name,
+            'driver_id' => $car->driver->id,
+            'laundry_name_ar' => $car->Laundry->name_ar,
+            'laundry_name_en' => $car->Laundry->name_en,
+            'laundry_phone_number' => $car->Laundry->phone_number,
+            'laundry_name_ar' => $car->Laundry->name_ar,
+        ];
+    });
+
+    return $this->sendResponse($filteredCars,'car fetched successfully.');
+}
 
 
+
+public function show(Request $request)
+     {
+       try {
+         $validator =Validator::make($request->all(), [
+             'id' => 'required|exists:cars',
+         ]); 
+     
+         if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+           $car =Car::with('driver','Laundry')->findOrFail($request->id);
+           // تجميع البيانات في مصفوفة
+    $filteredCar = [
+        'id' => $car->id,
+        'status' => $car->status,
+        'lat' => $car->lat,
+        'lng' => $car->lng,
+        'driver_name' => $car->driver->name,
+        'driver_id' => $car->driver->id,
+        'laundry_name_ar' => $car->Laundry->name_ar,
+        'laundry_name_en' => $car->Laundry->name_en,
+        'laundry_phone_number' => $car->Laundry->phone_number,
+    ];
+
+             return $this->sendResponse($filteredCar,'Car updated successfully.');
+         } catch (\Throwable $th) {
+             return response()->json([
+                 'status' => false,
+                 'message' => $th->getMessage()
+             ], 500); 
+         
+         } 
+     }
     
 }

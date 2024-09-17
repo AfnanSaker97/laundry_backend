@@ -23,4 +23,10 @@ class Car extends Model
          
         return $this->belongsTo(User::class,'driver_id');
     }
+
+    public function Laundry()
+    {
+         
+        return $this->belongsTo(Laundry::class,'laundry_id');
+    }
 }
