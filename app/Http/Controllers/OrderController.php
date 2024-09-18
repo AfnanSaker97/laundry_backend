@@ -469,6 +469,29 @@ public function ordersUser(Request $request)
 
 
 
+public function search(Request $request)
+{
+   
+    $validator = Validator::make($request->all(), [
+        'number' => 'nullable|string', 
+    ]);
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors()->all());
+    }
+  
+    $query = Order::query();
+ 
+    if ($request->has('number')) {
+        $query->where('order_number', 'like', '%' . $request->number . '%');
+    }
+ 
+   
+    // Fetch the users with pagination (optional)
+    $orders = $query->paginate(10);
+    return $this->sendResponse($orders, 'Orders fetched successfully.');
+
+}
+
 }
 
 

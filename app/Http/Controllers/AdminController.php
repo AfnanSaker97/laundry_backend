@@ -14,23 +14,6 @@ class AdminController extends BaseController
 {
 
        
-    public function index(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:1,2,3',  // Corrected the validation rule
-        ]);
-    
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors()->all());
-        }
-    
-        $userTypeId = $request->status_id;
-         
-    // استرجاع المستخدمين بناءً على نوع المستخدم
-    $users = User::where('user_type_id', $userTypeId)->get();
-
-        return $this->sendResponse($users, 'Users fetched successfully.');
-    }
 
 
    
@@ -100,24 +83,7 @@ class AdminController extends BaseController
 
 
 
-             public function search(Request $request)
-             {
-                 // Validate the request input
-                 $request->validate([
-                     'name' => 'nullable|string',
-                 ]);
-         
-                 // Build the query based on the request input
-                 $query = User::query();
-         
-                 if ($request->has('name')) {
-                     $query->where('name', 'like', '%' . $request->name . '%');
-                 }
-         
-                 // Fetch the users with pagination (optional)
-                 $users = $query->paginate(10);
-            
-             }
+           
 
 
 

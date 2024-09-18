@@ -50,8 +50,7 @@ class UserController extends BaseController
         if ($request->has('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
-    
-         
+     
        
         // Fetch the users with pagination (optional)
         $users = $query->paginate(10);

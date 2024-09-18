@@ -58,12 +58,6 @@ Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
 
-Route::get('order-admin', [OrderController::class, 'index']);
-Route::post('createDriver', [DriverController::class, 'createDriver']); 
-Route::delete('deleteDriver', [DriverController::class, 'destroy']); 
-Route::get('DriverById', [DriverController::class, 'show']); 
-Route::post('updateDriver', [DriverController::class, 'update']); 
-
 
 Route::middleware('auth:sanctum')->group(function() {
 //Car
@@ -74,6 +68,14 @@ Route::post('Car', [CarController::class, 'store']);
 Route::post('updateCar', [CarController::class, 'update']);
 Route::post('UpdateStatusCar', [CarController::class, 'UpdateStatusCar']);
 
+
+Route::get('order-admin', [OrderController::class, 'index']);
+Route::get('search-orders', [OrderController::class, 'search']);
+
+Route::post('createDriver', [DriverController::class, 'createDriver']); 
+Route::delete('deleteDriver', [DriverController::class, 'destroy']); 
+Route::get('DriverById', [DriverController::class, 'show']); 
+Route::post('updateDriver', [DriverController::class, 'update']); 
 
 
 
