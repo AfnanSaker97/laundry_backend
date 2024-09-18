@@ -59,14 +59,23 @@ class OrderController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'nullable|exists:laundries,id', // Add validation for allowed status_id values
-            'status_id' => 'required|in:1,2,3,4,5,6', 
+            'status_id' => 'nullable|in:1,2,3,4', 
             'order_type_id' => 'nullable|exists:order_types,id',
+            'type_order' => 'nullable|in:app,web',
+            'from_date' => 'nullable|date', 
+            'to_date' => 'nullable|date|after_or_equal:from_date',       
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
         try {
-      
+            $status = [
+                1 => 'pending',
+                2 => 'Request',
+                3 => 'Confirmed',
+                4 => 'Cancelled',
+            ];
+
         // Initialize the query builder for orders
         $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
           ->orderByDesc('order_date');
@@ -74,19 +83,29 @@ class OrderController extends BaseController
              $query->when($request->laundry_id, function ($q) use ($request) {
                 $q->where('laundry_id', $request->laundry_id);
             });
-    
-            $query->when($request->status_id, function ($q) use ($request) {
-                if ($request->status_id == 1) {
-                    $q->where('type_order', 'app');
-                } elseif ($request->status_id == 2) {
-                    $q->where('type_order', 'web');
-                }
-            });
+       // Filter orders by type_order (app/web) if provided
+        $query->when($request->type_order, function ($q) use ($request) {
+        $q->where('type_order', $request->type_order);
+      });
     
             $query->when($request->order_type_id, function ($q) use ($request) {
                 $q->where('order_type_id', $request->order_type_id);
             });
+
+              // الفلترة حسب status_id (الحالة مثل pending, confirmed, cancelled)
+        $query->when($request->status_id, function ($q) use ($request, $status) {
+            $q->where('status', $status[$request->status_id]);
+        });
       
+         // الفلترة حسب التاريخ
+         $query->when($request->from_date, function ($q) use ($request) {
+            $q->whereDate('order_date', '>=', $request->from_date);
+        });
+
+        $query->when($request->to_date, function ($q) use ($request) {
+            $q->whereDate('order_date', '<=', $request->to_date);
+        });
+        
      // Fetch orders with pagination
         $orders = $query->paginate(10);
        return $this->sendResponse($orders, 'order fetched successfully.');
@@ -114,6 +133,8 @@ class OrderController extends BaseController
         // Define the start and end of the current day
         $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
         $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
+
+
 
         // Initialize the query builder for orders
         $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
