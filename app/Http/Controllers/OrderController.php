@@ -551,13 +551,12 @@ public function search(Request $request)
     if ($validator->fails()) {
         return $this->sendError('Validation Error.', $validator->errors()->all());
     }
-  
-    $query = Order::query();
- 
+    $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+    ->orderByDesc('order_date');
+
     if ($request->has('number')) {
-        $query->where('order_number', 'like', '%' . $request->number . '%');
-    }
- 
+     $query->where('order_number', 'like', '%' . $request->number . '%');
+     }
    
     // Fetch the users with pagination (optional)
     $orders = $query->paginate(10);
