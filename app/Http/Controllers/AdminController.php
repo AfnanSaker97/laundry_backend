@@ -100,7 +100,24 @@ class AdminController extends BaseController
 
 
 
-     
+             public function search(Request $request)
+             {
+                 // Validate the request input
+                 $request->validate([
+                     'name' => 'nullable|string',
+                 ]);
+         
+                 // Build the query based on the request input
+                 $query = User::query();
+         
+                 if ($request->has('name')) {
+                     $query->where('name', 'like', '%' . $request->name . '%');
+                 }
+         
+                 // Fetch the users with pagination (optional)
+                 $users = $query->paginate(10);
+            
+             }
 
 
 

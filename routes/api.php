@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\UserController;
 use App\Events\TestingEvent;
 use Illuminate\Support\Facades\Log;
 Route::get('/user', function (Request $request) {
@@ -56,7 +57,6 @@ Route::post('auth/google', [GoogleController::class, 'handleGoogleCallback']);
 Route::post('register-admin', [AdminController::class, 'registerAdmin']);
 Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
-Route::get('Filter-users', [AdminController::class,'index']);//super admin
 
 Route::get('order-admin', [OrderController::class, 'index']);
 Route::post('createDriver', [DriverController::class, 'createDriver']); 
@@ -140,6 +140,11 @@ Route::get('ordersUser', [OrderController::class, 'ordersUser']);
 
 //LaundrySuperAdmin
 Route::get('laundries-super', [LaundryController::class, 'LaundrySuperAdmin']);
+
+//SuperAdmin
+Route::get('search-users', [UserController::class, 'search']);
+Route::get('Filter-users', [UserController::class,'index']);//super admin
+
 
 //laundry Admin
 
