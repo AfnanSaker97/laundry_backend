@@ -90,6 +90,7 @@ class OrderItemController extends BaseController
                     'note' => $request->note ?? '0',
                     'order_type_id' => $request->order_type_id,
                     'distance' => $distance,
+                    'order_number'  =>  $this->generateOrderId(),
                 ]);
                 foreach ($request->ids as $item) {
                     $laundryItem = $laundry->LaundryItem()->where('laundry_items.id', $item['item_id'])->first();
@@ -219,6 +220,15 @@ public function calculateDistance($lat1, $lon1, $lat2, $lon2)
     $distance = $earthRadius * $c;
 
     return $distance;
+}
+
+private function generateOrderId()
+{
+ // Generate a random 5-digit number
+ $randomNumber = random_int(10000, 99999);
+    
+ // Return the order ID with 'O-' prefix
+ return 'O-' . $randomNumber;
 }
 
 }

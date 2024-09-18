@@ -23,7 +23,9 @@ class Order extends Model
         'address_id',
           'car_id',
           'order_type_id',
-          'point'
+          'point',
+          'order_number',
+          'type_order'
       
     ];
 

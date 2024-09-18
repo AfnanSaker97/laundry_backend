@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-                    // Custom columns for date and time
+            $table->string('order_number')->default('0');
+            $table->string('type_order')->default('app');
             $table->timestamp('pickup_time')->nullable(); 
             $table->timestamp('delivery_time')->nullable();
             $table->timestamp('order_date')->nullable(); 
