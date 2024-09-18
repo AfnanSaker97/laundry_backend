@@ -71,6 +71,8 @@ Route::post('UpdateStatusCar', [CarController::class, 'UpdateStatusCar']);
 
 Route::get('order-admin', [OrderController::class, 'index']);
 Route::get('search-orders', [OrderController::class, 'search']);
+Route::get('OrderByLaundryId', [OrderController::class, 'OrderByLaundryId']);
+Route::get('filter-orders', [OrderController::class, 'FilterOrder']);
 
 Route::post('createDriver', [DriverController::class, 'createDriver']); 
 Route::delete('deleteDriver', [DriverController::class, 'destroy']); 

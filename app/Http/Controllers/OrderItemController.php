@@ -228,7 +228,7 @@ private function generateOrderId()
  $randomNumber = random_int(10000, 99999);
     
  // Return the order ID with 'O-' prefix
- return 'O-' . $randomNumber;
+ return 'Order-' . $randomNumber;
 }
 
 }

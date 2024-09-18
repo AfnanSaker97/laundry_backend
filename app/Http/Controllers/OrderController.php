@@ -27,6 +27,79 @@ class OrderController extends BaseController
     }
 
 
+    
+    public function OrderByLaundryId(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'laundry_id' => 'required|exists:laundries,id', // Add validation for allowed status_id values
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        try {
+      
+        // Initialize the query builder for orders
+        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+          ->where('laundry_id',$request->laundry_id)->orderByDesc('order_date');
+
+
+     // Fetch orders with pagination
+        $orders = $query->paginate(10);
+       return $this->sendResponse($orders, 'order fetched successfully.');
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+    }
+
+
+    public function FilterOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'laundry_id' => 'nullable|exists:laundries,id', // Add validation for allowed status_id values
+            'status_id' => 'required|in:1,2,3,4,5,6', 
+            'order_type_id' => 'nullable|exists:order_types,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        try {
+      
+        // Initialize the query builder for orders
+        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+          ->orderByDesc('order_date');
+             // Apply filters conditionally
+             $query->when($request->laundry_id, function ($q) use ($request) {
+                $q->where('laundry_id', $request->laundry_id);
+            });
+    
+            $query->when($request->status_id, function ($q) use ($request) {
+                if ($request->status_id == 1) {
+                    $q->where('type_order', 'app');
+                } elseif ($request->status_id == 2) {
+                    $q->where('type_order', 'web');
+                }
+            });
+    
+            $query->when($request->order_type_id, function ($q) use ($request) {
+                $q->where('order_type_id', $request->order_type_id);
+            });
+      
+     // Fetch orders with pagination
+        $orders = $query->paginate(10);
+       return $this->sendResponse($orders, 'order fetched successfully.');
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
+    }
+    
+    
+
     public function MyOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -89,7 +162,7 @@ $orders = $query->paginate(10);
            
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
-            }
+            } 
             $pickup_time = Carbon::parse($request->delivery_date);
 
             // Add 24 hours to the pickup time
@@ -168,7 +241,7 @@ $orders = $query->paginate(10);
     }  }
 
 
-    public function filterOrder(Request $request)
+   /* public function filterOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'status_id' => 'required|in:1,2,3,4,5,6', // Add validation for allowed status_id values
@@ -191,7 +264,7 @@ $orders = $query->paginate(10);
 
         return $this->sendResponse($orders, 'orders fetched successfully.');
     }
-
+*/
     
     public function OrderDetails(Request $request)
     {   
