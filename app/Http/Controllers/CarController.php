@@ -197,8 +197,7 @@ public function search(Request $request)
         $filteredCars = $cars->map(function($car) {
             return [
                 'id' => $car->id,
-              //  'driver_phone' => $car->driver->phone, // تأكد أن عمود الهاتف موجود في جدول السائق
-                'status' => $car->status,
+               'status' => $car->status,
                 'number_car'=> $car->number_car,
                 'lat' => $car->lat,
                 'lng' => $car->lng,
@@ -249,6 +248,7 @@ public function show(Request $request)
         'lng' => $car->lng,
         'driver_name' => $car->driver->name,
         'driver_id' => $car->driver->id,
+        'laundry_id' => $car->Laundry->id,
         'laundry_name_ar' => $car->Laundry->name_ar,
         'laundry_name_en' => $car->Laundry->name_en,
         'laundry_phone_number' => $car->Laundry->phone_number,
