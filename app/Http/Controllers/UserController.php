@@ -26,7 +26,7 @@ class UserController extends BaseController
         $userTypeId = $request->status_id;
          
     // استرجاع المستخدمين بناءً على نوع المستخدم
-    $query = User::where('user_type_id', $userTypeId)->get();
+    $query = User::where('user_type_id', $userTypeId);
     $users = $query->paginate(10);
         return $this->sendResponse($users, 'Users fetched successfully.');
     }
