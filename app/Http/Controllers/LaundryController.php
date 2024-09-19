@@ -132,11 +132,18 @@ foreach ($request->array_service as $service) {
     
 public function update(Request $request)
 {
+    
     try {
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:laundries', // Ensure the address exists
-
+            'array_url.*.url_image' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
+            'array_ids.*.laundry_item_id' => 'nullable|exists:laundry_items,id',
+            'array_ids.*.price' => 'nullable|numeric',
+            'array_service' => 'nullable|array',
+            'array_service.*.service_id' => 'nullable|exists:services,id',
+            'array_url.*.image_ids' => 'nullable|exists:laundry_media,id', // الصورة التي سيتم تعديلها
+       
         ]);
 
         // Return validation errors if any
@@ -146,7 +153,7 @@ public function update(Request $request)
 
         // Find the address by ID
         $laundry = Laundry::findOrFail($request->id);
-
+ 
     // Update the address with the request data
     $laundry->update([
         'name_en' => $request->name_en ?? $laundry->name_en,
@@ -158,6 +165,56 @@ public function update(Request $request)
         'address_line_1' => $request->address_line_1 ?? $laundry->address_line_1,
         'point' => $request->point ?? $laundry->point,
     ]);
+
+        $imageFiles = $request->file('array_url.*.url_image');
+        $imageIds = $request->input('array_url.*.image_ids'); // Retrieve the image IDs
+        if ($imageFiles && $imageIds) {
+        // Loop through each image file and its corresponding image ID
+        foreach ($imageFiles as $index => $newImageFile) {
+            // Find the corresponding image record by ID
+            $image = LaundryMedia::findOrFail($imageIds[$index]);
+    
+            // Delete old image from storage
+            $oldImagePath = public_path(parse_url($image->url_image, PHP_URL_PATH));
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+
+            // Upload new image
+            $imageName = time() . $index . '.' . $newImageFile->extension();
+            $newImageFile->move(public_path('Laundry'), $imageName);
+            $url = url('Laundry/' . $imageName);
+
+            // Update image record in the database
+            $image->update([
+                'url_image' => $url,
+            ]);
+        }
+    }
+    $itemIds = $request->input('array_ids.*.laundry_item_id'); 
+    $prices = $request->input('array_ids.*.price'); 
+      
+    if ($prices && $itemIds) {
+        foreach ($prices as $index => $newPrice) {
+            // Find the corresponding price record by laundry item and laundry ID
+            $price = Price::where('laundry_item_id', $itemIds[$index])
+                ->where('laundry_id', $laundry->id)
+                ->firstOrFail();
+
+            // Update the price
+            $price->update([
+                'price' => $newPrice,
+            ]);
+        }
+
+}
+ // Handle service updates
+ $serviceIds = $request->input('array_service.*.service_id');
+
+ if ($serviceIds) {
+     // Detach any existing services
+     $laundry->services()->sync($serviceIds); // Sync with the new set of service IDs
+ }
 
         return $this->sendResponse($laundry, 'Laundry updated successfully.');
 

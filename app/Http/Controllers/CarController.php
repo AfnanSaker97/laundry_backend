@@ -162,7 +162,17 @@ public function getCars()
         ];
     });
 
-    return $this->sendResponse($filteredCars,'car fetched successfully.');
+    $response = [
+        'cars' => $filteredCars,
+        'pagination' => [
+            'current_page' => $cars->currentPage(),
+            'per_page' => $cars->perPage(),
+            'total' => $cars->total(),
+            'last_page' => $cars->lastPage(),
+            'has_more_pages' => $cars->hasMorePages(),
+        ]
+    ];
+    return $this->sendResponse($response,'car fetched successfully.');
 }
 
 
