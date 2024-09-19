@@ -50,4 +50,12 @@ class Laundry extends Model
         return $this->belongsToMany(Service::class, 'laundry_service');
       
     }
+
+
+
+    public function drivers()
+    {
+        // علاقة المغسلة مع السائقين (واحد إلى عدة)
+        return $this->hasMany(Driver::class);
+    }
 }

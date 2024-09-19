@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Driver;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
@@ -21,6 +22,8 @@ class DriverController extends BaseController
            'name'=>'required|min:3',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'laundry_id' => 'required|exists:laundries,id', // التحقق من أن المغسلة موجودة
+      
         ]);
  
         if ($validator->fails()) {
@@ -37,6 +40,10 @@ class DriverController extends BaseController
                 
        ]);  
      
+            $driver = Driver::create([
+            'user_id' => $user->id, // ربط السائق بالمستخدم
+            'laundry_id' => $request->laundry_id, // ربط السائق بالمغسلة
+        ]);
                 $data['token'] = $user->createToken($request->email)->plainTextToken;
                 $data['user'] = $user;
                 return $this->sendResponse($data,'Driver is created successfully');
@@ -47,6 +54,56 @@ class DriverController extends BaseController
      } 
 
      
+     public function getDriversByLaundryId(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+             'laundry_id' => 'required|exists:laundries,id', // التحقق من أن المغسلة موجودة
+       
+         ]);
+  
+         if ($validator->fails()) {
+             return $this->sendError('Validation Error.', $validator->errors()->all());
+         }
+
+      //  $laundry = Laundry::findOrFail($request->laundry_id);
+
+        
+        $drivers = Driver::where('laundry_id', $request->laundry_id)
+           ->with('user') 
+          ->paginate(10);
+
+        $filteredDrivers = $drivers->map(function($driver) {
+            return [
+                'id' => $driver->user_id,
+                'name' => $driver->user->name,
+                'email' => $driver->user->email,
+                'photo' => $driver->user->photo,
+                'driver_id' => $driver->user->driver_id,
+                'laundry_id' => $driver->laundry_id,
+                //'user_id' => $driver->user_id,
+            ];
+        });
+        $response = [
+            'driver' => $filteredDrivers,
+            'pagination' => [
+                'current_page' => $drivers->currentPage(),
+                'per_page' => $drivers->perPage(),
+                'total' => $drivers->total(),
+                'last_page' => $drivers->lastPage(),
+                'has_more_pages' => $drivers->hasMorePages(),
+                'from' => $drivers->firstItem(), // First item number on the current page
+                'to' => $drivers->lastItem(),   // Last item number on the current page
+           
+            ]
+        ];
+
+        return $this->sendResponse($response, 'Drivers fetched successfully.');
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
 
      public function show(Request $request)
      {

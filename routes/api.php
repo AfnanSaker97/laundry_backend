@@ -79,6 +79,7 @@ Route::post('createDriver', [DriverController::class, 'createDriver']);
 Route::delete('deleteDriver', [DriverController::class, 'destroy']); 
 Route::get('DriverById', [DriverController::class, 'show']); 
 Route::post('updateDriver', [DriverController::class, 'update']); 
+Route::get('getDriversByLaundryId', [DriverController::class, 'getDriversByLaundryId']); 
 
 
 
