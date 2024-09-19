@@ -170,12 +170,64 @@ public function getCars()
             'total' => $cars->total(),
             'last_page' => $cars->lastPage(),
             'has_more_pages' => $cars->hasMorePages(),
+            'from' => $cars->firstItem(), // First item number on the current page
+            'to' => $cars->lastItem(),   // Last item number on the current page
+       
         ]
     ];
     return $this->sendResponse($response,'car fetched successfully.');
 }
 
 
+
+public function search(Request $request)
+{
+   
+    $validator = Validator::make($request->all(), [
+        'number' => 'nullable|string', 
+    ]);
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors()->all());
+    }
+    $query = Car::with('driver','Laundry');
+    if ($request->has('number')) {
+        $query->where('number_car', 'like', '%' . $request->number . '%');
+        }
+        $cars = $query->paginate(10);
+        $filteredCars = $cars->map(function($car) {
+            return [
+                'id' => $car->id,
+              //  'driver_phone' => $car->driver->phone, // تأكد أن عمود الهاتف موجود في جدول السائق
+                'status' => $car->status,
+                'number_car'=> $car->number_car,
+                'lat' => $car->lat,
+                'lng' => $car->lng,
+                'driver_name' => $car->driver->name,
+                'driver_id' => $car->driver->id,
+                'laundry_name_ar' => $car->Laundry->name_ar,
+                'laundry_name_en' => $car->Laundry->name_en,
+                'laundry_phone_number' => $car->Laundry->phone_number,
+                'laundry_name_ar' => $car->Laundry->name_ar,
+            ];
+        });
+    
+        $response = [
+            'cars' => $filteredCars,
+            'pagination' => [
+                'current_page' => $cars->currentPage(),
+                'per_page' => $cars->perPage(),
+                'total' => $cars->total(),
+                'last_page' => $cars->lastPage(),
+                'has_more_pages' => $cars->hasMorePages(),
+                'from' => $cars->firstItem(), // First item number on the current page
+                'to' => $cars->lastItem(),   // Last item number on the current page
+           
+            ]
+        ];
+        return $this->sendResponse($response,'car fetched successfully.');
+ 
+    
+}
 
 public function show(Request $request)
      {

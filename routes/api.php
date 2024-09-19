@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function() {
 //Car
 Route::get('CarByLaundry', [CarController::class, 'index']);
 Route::get('Cars', [CarController::class, 'getCars']);
+Route::get('search-cars', [CarController::class, 'search']);
 Route::get('CarById', [CarController::class, 'show']);
 Route::post('Car', [CarController::class, 'store']);
 Route::post('updateCar', [CarController::class, 'update']);
