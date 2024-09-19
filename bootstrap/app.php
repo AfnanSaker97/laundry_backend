@@ -13,18 +13,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-       
-        $exceptions->render(function (RouteNotFoundException $e, Request $request) {
-
+        $exceptions->render(function (RouteNotFoundException $e, $request) {
             $response = [
                 'success' => false,
-                'errors' => 'invalid token',
+                'errors' => 'Invalid token',
                 'status' => 400,
             ];
             return response()->json($response, 400);
-        
-    });
+        });
+    
     })->create();
