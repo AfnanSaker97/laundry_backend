@@ -18,11 +18,13 @@ class TestingEvent implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public $order;
+  //  public $orderId;
+    public $userId;
 
-    public function __construct($order)
+    public function __construct( $userId)
     {
-        $this->order = $order;
+        //$this->orderId = $orderId;
+        $this->userId = $userId;
     }
 
     /**
@@ -30,10 +32,15 @@ class TestingEvent implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
     {
-        return [
-            new Channel('testChannel'),
-        ];
+        // البث على قناة خاصة بالمستخدم
+        return new PrivateChannel('user.' . $this->userId);
     }
+
+   /* public function broadcastWith()
+    {
+        return ['orderId' => $this->orderId];
+    }*/
+    
 }

@@ -37,7 +37,7 @@ public function index(Request $request)
       // استخدام Eager Loading لتحميل العلاقة مع السائق
       $cars = Car::with('driver') // تحميل السائق مع كل سيارة
       ->where('laundry_id', $request->laundry_id)
-      ->get();
+      ->paginate(10);
 
   
     return $this->sendResponse($cars,'car fetched successfully.');

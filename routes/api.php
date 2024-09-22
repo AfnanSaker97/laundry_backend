@@ -19,19 +19,21 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\UserController;
 use App\Events\TestingEvent;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Broadcast;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
 
+Broadcast::routes();
 
 Route::post('trigger-event', function (Request $request) {
     
     // Trigger the event with any necessary data
-    $orderId = $request->input('order_id');
-   
-    event(new TestingEvent($orderId));
-    Log::info('Order shipped with ID: ' . $orderId);
+  //  $orderId = $request->input('order_id');
+    $userId = $request->input('user_id');
+    event(new TestingEvent($userId));
+    Log::info('for User ID: ' . $userId);
 
     return response()->json(['status' => 'Event triggered']);
 });
