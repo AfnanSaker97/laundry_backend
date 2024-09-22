@@ -27,16 +27,8 @@ Route::get('/user', function (Request $request) {
 
 Broadcast::routes();
 
-Route::post('trigger-event', function (Request $request) {
-    
-    // Trigger the event with any necessary data
-  //  $orderId = $request->input('order_id');
-    $userId = $request->input('user_id');
-    event(new TestingEvent($userId));
-    Log::info('for User ID: ' . $userId);
 
-    return response()->json(['status' => 'Event triggered']);
-});
+Route::post('trigger-event', [CarController::class, 'updateCoordinates']);
 
 
 

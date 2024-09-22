@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Laundry;
+use App\Models\Order;
 use App\Models\Car;
+use App\Models\CarTracking;
 use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
@@ -19,6 +21,7 @@ use App\Models\Notification; // النموذج المستخدم لتخزين ا�
 use Illuminate\Support\Facades\Log;
 use Validator;
 use Auth;
+use App\Events\TestingEvent;
 class CarController extends BaseController
 {
 
@@ -262,6 +265,61 @@ public function show(Request $request)
              ], 500); 
          
          } 
+     }
+
+
+     public function updateCoordinates(Request $request)
+     {
+        $validator =Validator::make($request->all(), [
+             'car_id' => 'required|exists:cars,id',
+             'latitude' => 'required|numeric',
+             'longitude' => 'required|numeric',
+         ]);
+ 
+         if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+         try {
+             $carId = $request->input('car_id');
+             $latitude = $request->input('latitude');
+             $longitude = $request->input('longitude');
+
+              // البحث عن إحداثيات السيارة في قاعدة البيانات
+        $carCoordinate = CarTracking::where('car_id', $carId)->first();
+
+        if ($carCoordinate) {
+            // إذا كانت الإحداثيات موجودة، يتم تحديثها
+            $carCoordinate->update([
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ]);
+        } else {
+   
+            CarTracking::create([
+                'car_id' => $carId,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ]);
+        }
+            $orders =Order::where('car_id',$request->car_id)->where('status','Confirmed')->get();
+        
+      
+        foreach($orders as $order)
+        {
+            event(new TestingEvent($order->user_id, $carId, $latitude, $longitude));
+        }
+             // Optionally, log the update
+             Log::info("Car {$carId} coordinates updated to Latitude: {$latitude}, Longitude: {$longitude}");
+ 
+             return response()->json(['status' => 'Coordinates updated successfully'], 200);
+         } catch (\Exception $e) {
+             Log::error('Failed to update car coordinates: ' . $e->getMessage());
+ 
+             return response()->json([
+                 'status' => 'Error occurred',
+                 'message' => $e->getMessage()
+             ], 500);
+         }
      }
     
 }

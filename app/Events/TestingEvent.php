@@ -9,23 +9,34 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-
+use Illuminate\Support\Facades\Log;
 class TestingEvent implements ShouldBroadcast
 
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+{    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-  //  public $orderId;
-    public $userId;
 
-    public function __construct( $userId)
-    {
-        //$this->orderId = $orderId;
-        $this->userId = $userId;
-    }
+     public $userId;
+     public $carId;
+     public $latitude;
+     public $longitude;
+
+     public function __construct($userId, $carId, $latitude, $longitude)
+     {
+        Log::info('TestingEvent Constructor', [
+            'userId' => $userId,
+            'carId' => $carId,
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ]);
+
+         $this->userId = $userId;
+         $this->carId = $carId;
+         $this->latitude = $latitude;
+         $this->longitude = $longitude;
+     }
 
     /**
      * Get the channels the event should broadcast on.
@@ -34,13 +45,22 @@ class TestingEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        // البث على قناة خاصة بالمستخدم
-        return new PrivateChannel('user.' . $this->userId);
+        try {
+            return new PrivateChannel('user.' . $this->userId);
+        } catch (\Exception $e) {
+            Log::error('BroadcastOn failed: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
-   /* public function broadcastWith()
+    public function broadcastWith()
     {
-        return ['orderId' => $this->orderId];
-    }*/
+        return [
+            'car_id' => $this->carId,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'timestamp' => now()->toDateTimeString(),
+        ];
+    }
     
 }

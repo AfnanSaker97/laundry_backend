@@ -130,8 +130,9 @@ class OrderItemController extends BaseController
     
                 if ($request->order_type_id == 1) {
                     $order->update([
-                        'status' =>'confirmed',
+                        'status' =>'Confirmed',
                         'point' =>$laundry->point,
+                         'car_id'=>1,
                     ]);
                     $user->points_wallet += $order->point;
                     $user->save();
