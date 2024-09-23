@@ -304,10 +304,9 @@ public function show(Request $request)
             $orders =Order::where('car_id',$request->car_id)->where('status','Confirmed')->get();
         
       
-        foreach($orders as $order)
-        {
-            event(new TestingEvent($order->user_id, $carId, $latitude, $longitude));
-        }
+      
+            event(new TestingEvent($carId, $latitude, $longitude));
+        
              // Optionally, log the update
              Log::info("Car {$carId} coordinates updated to Latitude: {$latitude}, Longitude: {$longitude}");
  

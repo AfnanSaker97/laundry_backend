@@ -17,7 +17,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\UserController;
-use App\Events\TestingEvent;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Broadcast;
 Route::get('/user', function (Request $request) {

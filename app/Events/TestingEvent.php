@@ -18,21 +18,15 @@ class TestingEvent implements ShouldBroadcast
      * Create a new event instance.
      */
 
-     public $userId;
+   //  public $userId;
      public $carId;
      public $latitude;
      public $longitude;
 
-     public function __construct($userId, $carId, $latitude, $longitude)
+     public function __construct($carId, $latitude, $longitude)
      {
-        Log::info('TestingEvent Constructor', [
-            'userId' => $userId,
-            'carId' => $carId,
-            'latitude' => $latitude,
-            'longitude' => $longitude
-        ]);
-
-         $this->userId = $userId;
+     
+        // $this->userId = $userId;
          $this->carId = $carId;
          $this->latitude = $latitude;
          $this->longitude = $longitude;
@@ -46,7 +40,7 @@ class TestingEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         try {
-            return new PrivateChannel('user.' . $this->userId);
+            return new Channel('user');
         } catch (\Exception $e) {
             Log::error('BroadcastOn failed: ' . $e->getMessage());
             throw $e;
