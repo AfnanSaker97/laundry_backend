@@ -14,22 +14,7 @@ class AdvertisementController extends BaseController
 {
     
 
-    public function index()
-    {
-        try {
-        $Advertisement = Cache::remember('advertisement', 60, function () {
-            return Advertisement::all();
-        });
-        return $this->sendResponse($Advertisement,'Advertisement fetched successfully.');
-  
-    } catch (\Throwable $th) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $th->getMessage()
-        ], 500);
-    }
-  }
-    
+
     public function store(Request $request)
     {
         try{
