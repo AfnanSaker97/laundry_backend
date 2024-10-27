@@ -28,7 +28,7 @@ Route::get('/user', function (Request $request) {
 Broadcast::routes();
 
 
-Route::post('trigger-event', [CarController::class, 'updateCoordinates']);
+Route::post('send-location', [CarController::class, 'updateCoordinates']);
 
 
 

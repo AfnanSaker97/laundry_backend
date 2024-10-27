@@ -56,5 +56,11 @@ class TestingEvent implements ShouldBroadcast
             'timestamp' => now()->toDateTimeString(),
         ];
     }
+
+    
+    public function broadcastAs()
+    {
+        return 'TestingEvent'; // هذا هو اسم الحدث الذي تبحث عنه
+    }
     
 }

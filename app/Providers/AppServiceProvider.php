@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Providers;
-
+use App\Domain\Orders\Events\TestingEvent;
+use App\Domain\Orders\Listeners\LocationUpdateListener;
 use Illuminate\Support\ServiceProvider;
-
+use Illuminate\Support\Facades\Event;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(
+            TestingEvent::class,
+            LocationUpdateListener::class,
+        );
     }
 }
