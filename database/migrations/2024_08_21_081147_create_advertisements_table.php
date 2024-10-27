@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('name_ar');
             $table->string('name_en');
             $table->string('url_media');
+            $table->boolean('isActive')->default('0');
             $table->decimal('points', 8, 1)->default(0);
+            $table->date('end_date');
             $table->timestamps();
         });
     }

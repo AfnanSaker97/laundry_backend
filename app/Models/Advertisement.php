@@ -12,7 +12,9 @@ class Advertisement extends Model
         'name_en',
         'name_ar',
         'url_media',
-        'points'
+        'points',
+        'isActive',
+        'end_date',
     ];
 
     public function users()
