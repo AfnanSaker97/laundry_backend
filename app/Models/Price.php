@@ -11,6 +11,7 @@ class Price extends Model
     protected $fillable = [
         'laundry_item_id',
         'laundry_id',
+        'service_id',
         'price',
        
     ];

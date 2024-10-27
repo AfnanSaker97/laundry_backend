@@ -58,4 +58,9 @@ class Laundry extends Model
         // علاقة المغسلة مع السائقين (واحد إلى عدة)
         return $this->hasMany(Driver::class);
     }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
 }

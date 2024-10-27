@@ -52,6 +52,10 @@ class User extends Authenticatable
                 ->withPivot('points')
                 ->withTimestamps();
 }
+public function laundry()
+{
+    return $this->hasOne(Laundry::class, 'admin_id');
+}
 
     /**
      * The attributes that should be hidden for serialization.
