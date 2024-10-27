@@ -120,6 +120,7 @@ Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 
 Route::get('Advertisement', [AdvertisementController::class,'index']);
+Route::post('Advertisement', [AdvertisementController::class,'store']); // admin
 Route::post('clickAdvertisement', [AdvertisementController::class,'clickAdvertisement']);
 
 

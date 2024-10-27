@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('isActive')->default('0');
             $table->decimal('points', 8, 1)->default(0);
             $table->date('end_date');
+            $table->foreignId('laundry_id')->constrained('laundries');  
             $table->timestamps();
         });
     }
