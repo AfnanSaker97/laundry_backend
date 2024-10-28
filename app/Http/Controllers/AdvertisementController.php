@@ -20,17 +20,22 @@ class AdvertisementController extends BaseController
         $validator = Validator::make($request->all(), [
             'laundry_id' => 'nullable|exists:laundries,id',
             'name' => 'nullable|string|max:255',
-            'status_id' => 'nullable|in:1,0',
+            'status_id' => 'nullable|in:0,1,2',
             ]);
 
     if ($validator->fails()) {
         return response()->json(['error' => $validator->errors()], 422);
     }
+    $status = [
+        0 => 'pending',
+        1 => 'confirmed',
+        2 => 'cancelled',
+    ];
         try {
         $user = Auth::user();
         $query = Advertisement::query();
         if ($request->filled('status_id')) {
-            $query->where('isActive', $request->status_id);
+            $query->where('status', $status);
         }
 
         if ($request->filled('laundry_id')) {
@@ -131,7 +136,7 @@ class AdvertisementController extends BaseController
             $endDate = now()->format('Y-m-d');
 
             // Fetch advertisements with conditions
-            $advertisements = Advertisement::where('isActive', 1)
+            $advertisements = Advertisement::where('status', 'confirmed')
                 ->where('end_date', '>', $endDate)
                  ->where('laundry_id', $request->laundry_id)->with('Media')
                 ->get();
@@ -155,15 +160,23 @@ class AdvertisementController extends BaseController
             // Validate input data
             $validator = Validator::make($request->all(), [
                 'advertisement_id' => 'required|exists:advertisements,id',
+                'status_id' => 'nullable|in:0,1,2',
             ]);
     
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 422);
             }
     
+            $status = [
+                0 => 'pending',
+                1 => 'confirmed',
+                2 => 'cancelled',
+            ];
             // Fetch advertisements with conditions
             $advertisement = Advertisement::findOrFail($request->advertisement_id);
-            $advertisement->update(['isActive' => 1]);
+            if ($request->filled('status_id') && isset($status[$request->status_id])) {
+                $advertisement->update(['status' => $status[$request->status_id]]);
+            }
             // Return a successful response with fetched advertisements
             return $this->sendResponse($advertisement, 'Advertisements fetched successfully.');
     

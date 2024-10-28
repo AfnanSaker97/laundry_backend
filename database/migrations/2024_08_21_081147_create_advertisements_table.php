@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name_ar');
             $table->string('name_en');
-            $table->boolean('isActive')->default('0');
+            $table->string('status')->default('pending');
             $table->decimal('points', 8, 1)->default(0);
             $table->date('end_date');
             $table->foreignId('laundry_id')->constrained('laundries');  

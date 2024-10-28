@@ -12,7 +12,7 @@ class Advertisement extends Model
         'name_en',
         'name_ar',
         'points',
-        'isActive',
+        'status',
         'end_date',
         'laundry_id'
     ];
