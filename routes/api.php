@@ -129,6 +129,7 @@ Route::post('Advertisement-update', [AdvertisementController::class,'update']);/
 
 //AdvertisementMedia
 Route::post('AdvertisementMedia', [AdvertisementMediaController::class,'store']);//admin
+Route::delete('AdvertisementMedia', [AdvertisementMediaController::class, 'destroy']);
 
 
 

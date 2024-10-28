@@ -54,4 +54,37 @@ class AdvertisementMediaController extends BaseController
     
     } 
     }
+
+
+
+    public function destroy(Request $request)
+{
+    try {
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'advertisement_media_id' => 'required|exists:advertisement_media,id', // Ensure the ID exists
+        ]);
+
+        // Handle validation failures
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        // Find the advertisement media entry
+        $advertisementMedia = AdvertisementMedia::find($request->advertisement_media_id);
+
+        // Delete the entry
+        $advertisementMedia->delete();
+
+        return $this->sendResponse($advertisementMedia,'Advertisement Media deleted successfully');
+    
+    } catch (\Throwable $th) {
+        // Handle any unexpected errors
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage(),
+        ], 500);
+    }
+}
+
 }
