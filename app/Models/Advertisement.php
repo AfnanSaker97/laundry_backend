@@ -30,5 +30,11 @@ public function Media()
     return $this->hasMany(AdvertisementMedia::class);
 }
 
+
+  public function laundry()
+  {
+      return $this->belongsTo(Laundry::class);
+  }
+
 }
 

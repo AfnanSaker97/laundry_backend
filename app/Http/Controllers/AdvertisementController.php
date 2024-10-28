@@ -44,10 +44,10 @@ class AdvertisementController extends BaseController
             });
         }
         if ($user->user_type_id == 4) {
-            $advertisements = $query->with('Media')->get();
+            $advertisements = $query->with('laundry:id,name_en,description_en','Media')->get();
         } elseif ($user->user_type_id == 1) {
             $advertisements = $query->where('laundry_id', $user->laundry->id)
-                                     ->with('Media')
+                                     ->with('laundry:id,name_en,description_en','Media')
                                      ->get();
         } else {
             return $this->sendError('Access Denied. User type not authorized to access advertisements.', [], 403);
