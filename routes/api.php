@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\LaundryItemController;
 use App\Http\Controllers\AdvertisementController;
+use App\Http\Controllers\AdvertisementMediaController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\GoogleController;
@@ -118,13 +119,16 @@ Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
 
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
-
+//Advertisement
 Route::get('Advertisement', [AdvertisementController::class,'index']);
 Route::post('Advertisement', [AdvertisementController::class,'store']); // admin
 Route::get('getAdvertisement', [AdvertisementController::class,'getAdvertisement']);//admin
 Route::get('confirmAdvertisement', [AdvertisementController::class,'confirmAdvertisement']);//super admin
 Route::get('AdvertisementById', [AdvertisementController::class,'show']);
 Route::post('Advertisement-update', [AdvertisementController::class,'update']);//admin
+
+//AdvertisementMedia
+Route::post('AdvertisementMedia', [AdvertisementMediaController::class,'store']);//admin
 
 
 
