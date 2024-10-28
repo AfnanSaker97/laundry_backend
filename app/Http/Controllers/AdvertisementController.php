@@ -81,23 +81,92 @@ class AdvertisementController extends BaseController
     } 
     }
 
-
-    public function index()
+    public function index(Request $request)
     {
         try {
-        $Advertisement = Cache::remember('advertisement', 60, function () {
-            return Advertisement::all();
-        });
-        return $this->sendResponse($Advertisement,'Advertisement fetched successfully.');
-  
-    } catch (\Throwable $th) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $th->getMessage()
-        ], 500);
-    }
-  }
+            // Validate input data
+            $validator = Validator::make($request->all(), [
+                'laundry_id' => 'required|exists:laundries,id',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+    
+            // Set the current date
+            $endDate = now()->format('Y-m-d');
 
+            // Fetch advertisements with conditions
+            $advertisements = Advertisement::where('isActive', 1)
+                ->where('end_date', '>', $endDate)
+                 ->where('laundry_id', $request->laundry_id)
+                ->get();
+    
+            // Return a successful response with fetched advertisements
+            return $this->sendResponse($advertisements, 'Advertisements fetched successfully.');
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching advertisements: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+    
+
+
+    public function confirmAdvertisement(Request $request)
+    {
+        try {
+            // Validate input data
+            $validator = Validator::make($request->all(), [
+                'advertisement_id' => 'required|exists:advertisements,id',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+    
+            // Fetch advertisements with conditions
+            $advertisement = Advertisement::findOrFail($request->advertisement_id);
+            $advertisement->update(['isActive' => 1]);
+            // Return a successful response with fetched advertisements
+            return $this->sendResponse($advertisement, 'Advertisements fetched successfully.');
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching advertisements: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+    
+
+
+    public function show(Request $request)
+    {
+    
+        try {
+            // Validate input data
+            $validator = Validator::make($request->all(), [
+                'advertisement_id' => 'required|exists:advertisements,id',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+            // Fetch advertisements with conditions
+            $advertisement = Advertisement::findOrFail($request->advertisement_id);
+            // Return a successful response with fetched advertisements
+            return $this->sendResponse($advertisement, 'Advertisements fetched successfully.');
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while fetching advertisements: ' . $th->getMessage()
+            ], 500);
+        }
+    }
 
 
   public function clickAdvertisement(Request $request)
