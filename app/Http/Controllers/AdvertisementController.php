@@ -44,11 +44,11 @@ class AdvertisementController extends BaseController
             });
         }
         if ($user->user_type_id == 4) {
-            $advertisements = $query->with('laundry:id,name_en,description_en','Media')->get();
+            $advertisements = $query->with('laundry:id,name_en,description_en','Media')->paginate(5);
         } elseif ($user->user_type_id == 1) {
             $advertisements = $query->where('laundry_id', $user->laundry->id)
                                      ->with('laundry:id,name_en,description_en','Media')
-                                     ->get();
+                                     ->paginate(5);
         } else {
             return $this->sendError('Access Denied. User type not authorized to access advertisements.', [], 403);
         }
@@ -75,7 +75,8 @@ class AdvertisementController extends BaseController
             'laundry_id' => 'nullable|exists:laundries,id',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'url_media' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'url_media' => 'required|array', // Ensure url_media is an array
+            'url_media.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate each image
             'points' => 'nullable|numeric|min:1|max:99999999.9',
             'NumberDays' => 'required|numeric|min:1', ]);
 
@@ -84,20 +85,25 @@ class AdvertisementController extends BaseController
     }
     $numberDays = (int) $request->NumberDays;
     $endDate = now()->addDays($numberDays);
-    $image = $request->file('url_media'); // Get the file from the request
-    $imageName = time() . '.' . $image->extension(); // Create a unique file name
-    $image->move(public_path('Advertisement'), $imageName); // Move the file to the specified directory
-    $url = url('Advertisement/' . $imageName); // Create the URL for the uploaded image
-
 
     $advertisement = Advertisement::create([
         'laundry_id' => $request->laundry_id,
         'name_ar' => $request->name_ar,
         'name_en' => $request->name_en,
-        'url_media' => $url,
         'points' => $request->points ?? 0,
         'end_date' => $endDate,
     ]);
+    foreach ($request->file('url_media') as $image) {
+        $imageName = time() . '_' . uniqid() . '.' . $image->extension(); // Create a unique file name
+        $image->move(public_path('Advertisement'), $imageName); // Move the file to the specified directory
+        $url = url('Advertisement/' . $imageName); // Create the URL for the uploaded image
+
+        // Store media related to the advertisement
+        $advertisement->media()->create([
+            'url_image' => $url,
+            'advertisement_id' => $advertisement->id,
+        ]);
+    }
 
         return $this->sendResponse($advertisement,'Advertisement added successfully but requires confirmation from the super admin.');
     } catch (\Throwable $th) {
