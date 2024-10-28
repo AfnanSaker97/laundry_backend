@@ -35,7 +35,7 @@ class AdvertisementController extends BaseController
         $user = Auth::user();
         $query = Advertisement::query();
         if ($request->filled('status_id')) {
-            $query->where('status', $status);
+            $query->where('status', $status[$request->status_id]);
         }
 
         if ($request->filled('laundry_id')) {
