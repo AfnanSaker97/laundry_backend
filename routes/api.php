@@ -124,6 +124,7 @@ Route::post('Advertisement', [AdvertisementController::class,'store']); // admin
 Route::get('getAdvertisement', [AdvertisementController::class,'getAdvertisement']);//admin
 Route::get('confirmAdvertisement', [AdvertisementController::class,'confirmAdvertisement']);//super admin
 Route::get('AdvertisementById', [AdvertisementController::class,'show']);
+Route::post('Advertisement-update', [AdvertisementController::class,'update']);//admin
 
 
 

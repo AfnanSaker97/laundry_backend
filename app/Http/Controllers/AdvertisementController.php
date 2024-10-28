@@ -203,6 +203,56 @@ class AdvertisementController extends BaseController
     }
 
 
+    public function update(Request $request)
+    {
+        try {
+            // Validate the incoming request
+            $validator = Validator::make($request->all(), [
+                'advertisement_id' => 'required|exists:advertisements,id',
+                'name_ar' => 'nullable|string|max:255',
+                'name_en' => 'nullable|string|max:255',
+                'points' => 'nullable|numeric|min:1|max:99999999.9',
+                'NumberDays' => 'nullable|numeric|min:1',
+            ]);
+    
+            // Handle validation failures
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 422);
+            }
+    
+            // Find the advertisement
+            $advertisement = Advertisement::findOrFail($request->advertisement_id);
+    
+            // Prepare update data
+            $updateData = [
+                'name_ar' => $request->name_ar ?? $advertisement->name_ar,
+                'name_en' => $request->name_en ?? $advertisement->name_en,
+                'points' => $request->points ?? $advertisement->points,
+            ];
+    
+            // Update end_date if NumberDays is provided
+            if ($request->has('NumberDays')) {
+                $numberDays = (int)$request->NumberDays;
+                $updateData['end_date'] = now()->addDays($numberDays);
+            }
+    
+            // Update the advertisement
+            $advertisement->update($updateData);
+    
+            // Return a success response
+            return $this->sendResponse($advertisement, 'Advertisement updated successfully.');
+        } catch (\Throwable $th) {
+            // Handle any unexpected errors
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ], 500);
+        }
+    }
+    
+
+
+
   public function clickAdvertisement(Request $request)
 {
     
