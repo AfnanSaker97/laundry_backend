@@ -19,7 +19,7 @@ class AdvertisementSeeder extends Seeder
                 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/1.jpeg',
                 'points' => 30,
                 'end_date' => now()->addDays(30), // تحديد تاريخ الانتهاء (مثلاً، بعد 30 يوماً)
-                'laundry_id' => 1 // تعيين معرف المغسلة المناسب
+                'laundry_id' => 2 // تعيين معرف المغسلة المناسب
             ],
             [
                 'name_ar' => 'توصيل مجاني لمدة شهر', 
@@ -27,7 +27,7 @@ class AdvertisementSeeder extends Seeder
                 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/2.jpeg',
                 'points' => 40,
                 'end_date' => now()->addDays(30), // تاريخ انتهاء
-                'laundry_id' => 1 // تعيين معرف المغسلة المناسب
+                'laundry_id' => 2 // تعيين معرف المغسلة المناسب
             ],
             [
                 'name_ar' => 'غسيل 5 قطع وواحدة مجانية', 
@@ -35,7 +35,7 @@ class AdvertisementSeeder extends Seeder
                 'url_media' => 'https://laundry-backend.tecrek.com/public/Advertisement/3.jpeg',
                 'points' => 50,
                 'end_date' => now()->addDays(30), // تاريخ انتهاء
-                'laundry_id' => 1 // تعيين معرف المغسلة المناسب
+                'laundry_id' => 2 // تعيين معرف المغسلة المناسب
             ],
         ];
 

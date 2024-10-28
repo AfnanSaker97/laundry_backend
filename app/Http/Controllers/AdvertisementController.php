@@ -14,6 +14,30 @@ class AdvertisementController extends BaseController
 {
     
 
+    
+    public function getAdvertisement()
+    {
+        try {
+        $user = Auth::user();
+        if ($user->user_type_id == 4) {
+        $Advertisement =  Advertisement::all();
+    } elseif ($user->user_type_id == 1) { 
+    
+        $Advertisement =  Advertisement::where('laundry_id',$user->laundry->id)->get();
+        }
+        
+        return $this->sendResponse($Advertisement,'Advertisement fetched successfully.');
+  
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $th->getMessage()
+        ], 500);
+    }
+  }
+
+
+
 
     public function store(Request $request)
     {

@@ -121,6 +121,8 @@ Route::get('OrderType', [OrderTypeController::class, 'index']);
 
 Route::get('Advertisement', [AdvertisementController::class,'index']);
 Route::post('Advertisement', [AdvertisementController::class,'store']); // admin
+Route::get('getAdvertisement', [AdvertisementController::class,'getAdvertisement']);//admin
+
 Route::post('clickAdvertisement', [AdvertisementController::class,'clickAdvertisement']);
 
 

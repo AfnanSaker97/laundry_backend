@@ -59,7 +59,7 @@ class UserController extends BaseController
         // انضمام إلى جدول الأوامر للتحقق من ارتباط الزبائن بالمغسلة
         $query->where('user_type_id', $userTypeId)
               ->whereHas('orders', function ($q) use ($user) {
-                  $q->where('laundry_id', $user->laundry->laundry_id);
+                  $q->where('laundry_id', $user->laundry->id);
               });
 
         if ($request->has('name')) {
