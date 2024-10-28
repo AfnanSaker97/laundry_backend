@@ -11,7 +11,6 @@ class Advertisement extends Model
     protected $fillable = [
         'name_en',
         'name_ar',
-        'url_media',
         'points',
         'isActive',
         'end_date',
@@ -24,5 +23,12 @@ class Advertisement extends Model
                 ->withPivot('points')
                 ->withTimestamps();
 }
+
+
+public function Media()
+{
+    return $this->hasMany(AdvertisementMedia::class);
+}
+
 }
 

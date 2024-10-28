@@ -44,12 +44,15 @@ class AdvertisementController extends BaseController
             });
         }
         if ($user->user_type_id == 4) {
-            $advertisements = $query->get();
-       } elseif ($user->user_type_id == 1) {
-        $advertisements = $query->where('laundry_id', $user->laundry->id)->get();
-    } else {
-        return $this->sendError('Access Denied. User type not authorized to access advertisements.', [], 403);
-    }
+            $advertisements = $query->with('Media')->get();
+        } elseif ($user->user_type_id == 1) {
+            $advertisements = $query->where('laundry_id', $user->laundry->id)
+                                     ->with('Media')
+                                     ->get();
+        } else {
+            return $this->sendError('Access Denied. User type not authorized to access advertisements.', [], 403);
+        }
+
         
         return $this->sendResponse($advertisements,'Advertisement fetched successfully.');
   
@@ -124,7 +127,7 @@ class AdvertisementController extends BaseController
             // Fetch advertisements with conditions
             $advertisements = Advertisement::where('isActive', 1)
                 ->where('end_date', '>', $endDate)
-                 ->where('laundry_id', $request->laundry_id)
+                 ->where('laundry_id', $request->laundry_id)->with('Media')
                 ->get();
     
             // Return a successful response with fetched advertisements
@@ -181,7 +184,7 @@ class AdvertisementController extends BaseController
                 return response()->json(['error' => $validator->errors()], 422);
             }
             // Fetch advertisements with conditions
-            $advertisement = Advertisement::findOrFail($request->advertisement_id);
+            $advertisement = Advertisement::with('Media')->findOrFail($request->advertisement_id);
             // Return a successful response with fetched advertisements
             return $this->sendResponse($advertisement, 'Advertisements fetched successfully.');
     
