@@ -15,18 +15,43 @@ class AdvertisementController extends BaseController
     
 
     
-    public function getAdvertisement()
+    public function getAdvertisement(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'laundry_id' => 'nullable|exists:laundries,id',
+            'name' => 'nullable|string|max:255',
+            'status_id' => 'nullable|in:1,0',
+            ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
         try {
         $user = Auth::user();
-        if ($user->user_type_id == 4) {
-        $Advertisement =  Advertisement::all();
-    } elseif ($user->user_type_id == 1) { 
-    
-        $Advertisement =  Advertisement::where('laundry_id',$user->laundry->id)->get();
+        $query = Advertisement::query();
+        if ($request->filled('status_id')) {
+            $query->where('isActive', $request->status_id);
         }
+
+        if ($request->filled('laundry_id')) {
+            $query->where('laundry_id', $request->laundry_id);
+        }
+
+        if ($request->filled('name')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name_en', 'like', '%' . $request->name . '%')
+                  ->orWhere('name_ar', 'like', '%' . $request->name . '%');
+            });
+        }
+        if ($user->user_type_id == 4) {
+            $advertisements = $query->get();
+       } elseif ($user->user_type_id == 1) {
+        $advertisements = $query->where('laundry_id', $user->laundry->id)->get();
+    } else {
+        return $this->sendError('Access Denied. User type not authorized to access advertisements.', [], 403);
+    }
         
-        return $this->sendResponse($Advertisement,'Advertisement fetched successfully.');
+        return $this->sendResponse($advertisements,'Advertisement fetched successfully.');
   
     } catch (\Throwable $th) {
         return response()->json([
