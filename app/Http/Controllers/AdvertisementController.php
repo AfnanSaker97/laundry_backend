@@ -97,6 +97,7 @@ class AdvertisementController extends BaseController
         'name_en' => $request->name_en,
         'points' => $request->points ?? 0,
         'end_date' => $endDate,
+        'number_days'=> $request->NumberDays,
     ]);
     foreach ($request->file('url_media') as $image) {
         $imageName = time() . '_' . uniqid() . '.' . $image->extension(); // Create a unique file name
@@ -241,6 +242,7 @@ class AdvertisementController extends BaseController
                 'name_ar' => $request->name_ar ?? $advertisement->name_ar,
                 'name_en' => $request->name_en ?? $advertisement->name_en,
                 'points' => $request->points ?? $advertisement->points,
+                'number_days' => $request->NumberDays ?? $advertisement->number_days,
             ];
     
             // Update end_date if NumberDays is provided

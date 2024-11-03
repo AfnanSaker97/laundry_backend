@@ -14,7 +14,8 @@ class Advertisement extends Model
         'points',
         'status',
         'end_date',
-        'laundry_id'
+        'laundry_id',
+        'number_days'
     ];
 
     public function users()

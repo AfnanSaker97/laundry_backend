@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\MySession;
 use App\Models\OrderType;
 use App\Models\Address;
+use App\Models\Price;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +38,7 @@ class OrderItemController extends BaseController
         'address_id' => 'required|exists:addresses,id',
         'ids' => 'required|array',
         'ids.*.item_id' => 'required|exists:laundry_items,id',
+        'ids.*.service_id' => 'required|exists:service_id,id',
         'ids.*.quantity' => 'required|integer|min:1',
         'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
@@ -94,11 +96,13 @@ class OrderItemController extends BaseController
                 ]);
                 foreach ($request->ids as $item) {
                     $laundryItem = $laundry->LaundryItem()->where('laundry_items.id', $item['item_id'])->first();
+                    $servies = $laundry->services()->where('services.id', $item['service_id'])->first();
                     
                     if (!$laundryItem) {
                         throw new \Exception('Item not found for this laundry.');
                     }
-                    $price = $laundryItem->pivot->price;
+                    $price =Price::where('laundry_item_id',$laundryItem->id)->where('laundry_id',$laundry->id)
+                    ->where('service_id',$servies)->first();
                     // Calculate subtotal
                     $subTotalPrice = $price * $item['quantity'];
 
@@ -107,6 +111,7 @@ class OrderItemController extends BaseController
                         'quantity' => $item['quantity'],
                         'user_id' => $user->id,
                         'laundry_item_id' => $item['item_id'],
+                        'service_id' => $item['service_id'],
                         'price' => $price,
                         'sub_total_price' => $subTotalPrice,
                         'order_id' => $order->id,

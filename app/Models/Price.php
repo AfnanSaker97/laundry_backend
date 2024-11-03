@@ -15,5 +15,20 @@ class Price extends Model
         'price',
        
     ];
+
+    public function laundry()
+    {
+        return $this->belongsTo(Laundry::class);
+    }
+
+    public function laundryItem()
+    {
+        return $this->belongsTo(LaundryItem::class);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
    
 }
