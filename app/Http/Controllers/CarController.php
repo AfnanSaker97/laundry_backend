@@ -31,18 +31,22 @@ public function index(Request $request)
 {
     $validator =Validator::make($request->all(), [
         'laundry_id' => 'required|exists:laundries,id',
+        'page' => 'nullable|boolean' 
     
     ]);
    
     if($validator->fails()){
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
-      // استخدام Eager Loading لتحميل العلاقة مع السائق
-      $cars = Car::with('driver') // تحميل السائق مع كل سيارة
-      ->where('laundry_id', $request->laundry_id)
-      ->paginate(10);
+ 
+      $query = Car::with('driver')
+      ->where('laundry_id', $request->laundry_id);
 
-  
+      if ($request->has('page') && $request->page == 0) {
+        $cars = $query->get(); 
+    } else {
+        $cars = $query->paginate(10);
+    }
     return $this->sendResponse($cars,'car fetched successfully.');
 }
 

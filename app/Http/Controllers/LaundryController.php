@@ -101,21 +101,34 @@ class LaundryController extends BaseController
    
 
 
- public function LaundryByAdmin()
+ public function LaundryByAdmin(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+           'page' => 'nullable|boolean' 
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
         try{
         $user = Auth::user();
         $Laundries = [];
 
         if ($user->user_type_id == 1) {
-            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
-                ->where('admin_id', $user->id)
-                ->paginate(10);
+            $query = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
+                ->where('admin_id', $user->id);
         } elseif ($user->user_type_id == 4) {
-            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
-                ->paginate(10);
+            $query = Laundry::with(['LaundryMedia', 'LaundryItem','addresses']);
+        }
+
+        if ($request->has('page') && $request->page == 0) {
+            $Laundries = $query->get(); 
+        } else {
+            $Laundries = $query->paginate(10);
         }
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
+        
+    
     } catch (\Exception $e) {
         // Log error and return empty array
         return response()->json(['error' =>  $e->getMessage()], 500);
