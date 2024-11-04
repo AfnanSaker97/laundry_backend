@@ -48,10 +48,13 @@ class Laundry extends Model
 }
 
 
+  
+
     public function services()
     {
       
-        return $this->belongsToMany(Service::class, 'laundry_service');
+        return $this->belongsToMany(Service::class, 'prices')
+        ->withPivot('price');
       
     }
 

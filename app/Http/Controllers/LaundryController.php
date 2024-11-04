@@ -126,103 +126,96 @@ class LaundryController extends BaseController
 
 
 
+    public function update(Request $request)
+    {
+        try {
+            // Validate the incoming request
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:laundries,id',
+                'name_en' => 'required',
+                'name_ar' => 'required',
+                'description_ar' => 'required',
+                'description_en' => 'required|string',
+                'phone_number' => 'required|string',
+             //   'admin_id' => 'required|exists:users,id',
+                "array_url.*.url_image" => 'sometimes|required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
+                'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
+                'array_ids.*.price' => 'required|numeric',
+                'array_ids' => 'required|array',
+                'array_ids.*.service_id' => 'required|exists:services,id',
+                'addresses' => 'required|array',
+                'addresses.*.city' => 'required|string',
+                'addresses.*.address_line_1' => 'required|string',
+                'addresses.*.lat' => 'required|numeric',
+                'addresses.*.lng' => 'required|numeric',
+            ]);
     
-public function update(Request $request)
-{
-    
-    try {
-        // Validate the request data
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:laundries', // Ensure the address exists
-            'array_url.*.url_image' => 'nullable|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
-            'array_ids.*.laundry_item_id' => 'nullable|exists:laundry_items,id',
-            'array_ids.*.price' => 'nullable|numeric',
-            'array_service' => 'nullable|array',
-            'array_service.*.service_id' => 'nullable|exists:services,id',
-            'array_url.*.image_ids' => 'nullable|exists:laundry_media,id', // الصورة التي سيتم تعديلها
-       
-        ]);
-
-        // Return validation errors if any
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors()->all());
-        }
-
-        // Find the address by ID
-        $laundry = Laundry::findOrFail($request->id);
- 
-    // Update the address with the request data
-    $laundry->update([
-        'name_en' => $request->name_en ?? $laundry->name_en,
-        'name_ar' => $request->name_ar ?? $laundry->name_ar,
-        'description_ar' => $request->description_ar ?? $laundry->description_ar,
-        'description_en' => $request->description_en ?? $laundry->description_en,
-        'phone_number' => $request->phone_number ?? $laundry->phone_number,
-        'city' => $request->city ?? $laundry->city,
-        'address_line_1' => $request->address_line_1 ?? $laundry->address_line_1,
-        'point' => $request->point ?? $laundry->point,
-    ]);
-
-        $imageFiles = $request->file('array_url.*.url_image');
-        $imageIds = $request->input('array_url.*.image_ids'); // Retrieve the image IDs
-        if ($imageFiles && $imageIds) {
-        // Loop through each image file and its corresponding image ID
-        foreach ($imageFiles as $index => $newImageFile) {
-            // Find the corresponding image record by ID
-            $image = LaundryMedia::findOrFail($imageIds[$index]);
-    
-            // Delete old image from storage
-            $oldImagePath = public_path(parse_url($image->url_image, PHP_URL_PATH));
-            if (file_exists($oldImagePath)) {
-                unlink($oldImagePath);
+            // Check for validation errors
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors()->all());
             }
-
-            // Upload new image
-            $imageName = time() . $index . '.' . $newImageFile->extension();
-            $newImageFile->move(public_path('Laundry'), $imageName);
-            $url = url('Laundry/' . $imageName);
-
-            // Update image record in the database
-            $image->update([
-                'url_image' => $url,
-            ]);
+    
+            // Find the existing laundry record
+            $laundry = Laundry::findOrFail($request->id);
+    
+            // Update the laundry data
+            $laundryData = $request->only(['name_en', 'name_ar', 'description_ar', 'description_en', 'phone_number']);
+            $laundry->update($laundryData);
+    
+            // Handle image uploads
+            if ($request->hasFile('array_url')) {
+                // Remove existing images if needed (optional)
+                LaundryMedia::where('laundry_id', $laundry->id)->delete();
+    
+                $imagesData = [];
+                foreach ($request->file('array_url') as $image) {
+                    $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+                    $image->move(public_path('Laundry'), $imageName);
+                    $imagesData[] = [
+                        'laundry_id' => $laundry->id,
+                        'url_image' => url('Laundry/' . $imageName),
+                    ];
+                }
+                LaundryMedia::insert($imagesData);
+            }
+    
+            // Update prices
+            Price::where('laundry_id', $laundry->id)->delete(); // Remove old prices
+            $pricesData = array_map(function ($item) use ($laundry) {
+                return [
+                    'laundry_id' => $laundry->id,
+                    'laundry_item_id' => $item['laundry_item_id'],
+                    'service_id' => $item['service_id'],
+                    'price' => $item['price'],
+                ];
+            }, $request->array_ids);
+            Price::insert($pricesData);
+    
+            // Update addresses
+            AddressLaundry::where('laundry_id', $laundry->id)->delete(); // Remove old addresses
+            $addressesData = array_map(function ($address) use ($laundry) {
+                return [
+                    'laundry_id' => $laundry->id,
+                    'city' => $address['city'],
+                    'address_line_1' => $address['address_line_1'],
+                    'lat' => $address['lat'],
+                    'lng' => $address['lng'],
+                ];
+            }, $request->addresses);
+            AddressLaundry::insert($addressesData);
+    
+            // Return a success response
+            return $this->sendResponse($laundry, 'Laundry updated successfully.');
+    
+        } catch (\Throwable $th) {
+            // Handle exceptions and return a response
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
-    $itemIds = $request->input('array_ids.*.laundry_item_id'); 
-    $prices = $request->input('array_ids.*.price'); 
-      
-    if ($prices && $itemIds) {
-        foreach ($prices as $index => $newPrice) {
-            // Find the corresponding price record by laundry item and laundry ID
-            $price = Price::where('laundry_item_id', $itemIds[$index])
-                ->where('laundry_id', $laundry->id)
-                ->firstOrFail();
-
-            // Update the price
-            $price->update([
-                'price' => $newPrice,
-            ]);
-        }
-
-}
- // Handle service updates
- $serviceIds = $request->input('array_service.*.service_id');
-
- if ($serviceIds) {
-     // Detach any existing services
-     $laundry->services()->sync($serviceIds); // Sync with the new set of service IDs
- }
-
-        return $this->sendResponse($laundry, 'Laundry updated successfully.');
-
-    } catch (\Throwable $th) {
-        return response()->json([
-            'status' => false,
-            'message' => $th->getMessage()
-        ], 500);
-    }
-}
-
+    
 
     public function index()
     {
@@ -298,35 +291,28 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services'])->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses'])->findOrFail($request->id);
 
-     // Transform the result to include the address array
-     $laundryData = [
-        'id' => $laundry->id,
-        'name_en' => $laundry->name_en,
-        'name_ar' => $laundry->name_ar,
-        'description_ar' => $laundry->description_ar,
-        'description_en' => $laundry->description_en,
-        'email' => $laundry->email,
-        'phone_number' => $laundry->phone_number,
-       
-        'address' => [
-            'city' => $laundry->city,
-            'address_line_1' => $laundry->address_line_1,
-            'lat' => $laundry->lat,
-            'lng' => $laundry->lng,
-        ],
-        'services' => $laundry->services,
-        'LaundryMedia' => $laundry->LaundryMedia,
-        'LaundryItem' => $laundry->LaundryItem,
-       
-        // Add other fields as necessary
-    ];
+  
+    $laundryData = $laundry->only([
+        'id', 'name_en', 'name_ar', 'description_ar', 'description_en', 'email', 'phone_number'
+    ]);
+    $laundryData['addresses'] = $laundry->addresses;
+    $laundryData['services'] = $laundry->services->groupBy('id')->map(function ($serviceGroup) {
+        $service = $serviceGroup->first();
+        $service->prices = $serviceGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل خدمة
+        return $service;
+    })->values();
 
-       // إذا كان المستخدم Admin، أضف poin إلى البيانات
-       if ($user->user_type_id === 4) { // أو أي حقل آخر يعبر عن دور المستخدم كـ Admin
-        $laundryData['point'] = $laundry->point; // تأكد من أن الحقل poin موجود في جدول المغاسل
-    }
+    // معالجة العناصر لتجنب التكرار
+    $laundryData['LaundryItem'] = $laundry->LaundryItem->groupBy('id')->map(function ($itemGroup) {
+        $item = $itemGroup->first();
+        $item->prices = $itemGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل عنصر
+        return $item;
+    })->values();
+
+    // إضافة الوسائط
+    $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
 
     return $this->sendResponse($laundryData,'laundry fetched successfully.');
 } catch (\Exception $e) {
