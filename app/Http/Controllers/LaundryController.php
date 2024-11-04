@@ -258,7 +258,7 @@ public function update(Request $request)
      $longitude = $user->lng;
 
     // البحث عن المغاسل مع حساب المسافة
-    $results = Laundry::where('isActive', 1)
+    $results = Laundry::with('LaundryMedia')->where('isActive', 1)
     ->when($query, function ($queryBuilder) use ($query) {
         $queryBuilder->where(function ($q) use ($query) {
             $q->where('name_en', 'LIKE', '%' . $query . '%')
