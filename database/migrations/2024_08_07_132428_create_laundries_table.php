@@ -21,6 +21,9 @@ return new class extends Migration
             $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('admin_id')->constrained('users');
             $table->boolean('isActive')->default(1);
+            $table->boolean('urgent')->default(0);
+
+            
             $table->timestamps();
         });
     }

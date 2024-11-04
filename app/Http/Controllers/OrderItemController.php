@@ -67,6 +67,7 @@ class OrderItemController extends BaseController
             $address = Address::findOrFail($request->address_id);
             $orderType = OrderType::findOrFail($request->order_type_id);
             $user = Auth::user();
+            $order_type = ($user->user_type_id == '4' || $user->user_type_id == '1') ? 'web' : 'app';
 
             $distance = round($this->calculateDistance($laundry->lat, $laundry->lng, $address->lat, $address->lng), 1);
             $order = Order::create([
@@ -77,6 +78,7 @@ class OrderItemController extends BaseController
                 'pickup_time' => $pickupTime,
                 'delivery_time' => $deliveryTime,
                 'note' => $request->note ?? '0',
+                'type_order' => $order_type,
                 'order_type_id' => $request->order_type_id,
                 'distance' => $distance,
                 'order_number' => $this->generateOrderId(),

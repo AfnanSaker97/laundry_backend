@@ -23,7 +23,8 @@ class Laundry extends Model
         'lng',
         'admin_id',
         'point',
-        'isActive'
+        'isActive',
+        'urgent'
     ];
    public function LaundryItem()
     {
