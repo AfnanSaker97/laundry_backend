@@ -18,6 +18,7 @@ class UserController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'status_id' => 'required|in:1,2,3',  // Corrected the validation rule
+            'page' => 'nullable|boolean' 
         ]);
     
         if ($validator->fails()) {
@@ -28,7 +29,11 @@ class UserController extends BaseController
          
     // استرجاع المستخدمين بناءً على نوع المستخدم
     $query = User::where('user_type_id', $userTypeId);
-    $users = $query->paginate(10);
+    if ($request->has('page') && $request->page == 0) {
+        $users = $query->get(); 
+    } else {
+        $users = $query->paginate(10);
+    }
         return $this->sendResponse($users, 'Users fetched successfully.');
     }
 
