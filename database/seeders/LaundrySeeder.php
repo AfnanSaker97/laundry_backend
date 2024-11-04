@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Laundry;
+use App\Models\AddressLaundry;
 class LaundrySeeder extends Seeder
 {
     /**
@@ -12,7 +13,42 @@ class LaundrySeeder extends Seeder
      */
     public function run(): void
     {
-        $laundries = [
+        $laundry_addresses = [
+            [ 
+                'city' => 'Abu Dabi',
+                'address_line_1' => '123 Main St',
+                'lat' => 33.5138,
+                'lng' => 36.2765,
+                'laundry_id' => 1,      
+            ],
+            [
+                'city' => 'Dubi', 
+                'address_line_1' => '456 Elm St', 
+                'lat' => 33.8886, 
+                'lng' => 35.4955,
+                'laundry_id' => 1,
+            ],
+            [
+                'city' => 'Amman',
+                'address_line_1' => '789 Oak St',
+                'lat' => 31.9539,
+                'lng' => 35.9106,
+                'laundry_id' => 2,
+            ],
+            [
+                'city' => 'Dubi',
+                'address_line_1' => '101 Palm St',
+                'lat' => 30.0444,
+                'lng' => 31.2357,
+                'laundry_id' => 3,
+            ],
+        ];
+        
+        foreach ($laundry_addresses as $address) {
+            AddressLaundry::create($address); // تأكد من استخدام النموذج الصحيح هنا
+        }
+
+     /*   $laundries = [
             [
                 'name_en' => 'Pesana Laundry',
                 'name_ar' => 'غسيل الملابس بيسانا',
@@ -69,6 +105,7 @@ class LaundrySeeder extends Seeder
         
           foreach ($laundries as $laundry) {
             Laundry::create($laundry);
-        } 
+        } */
+
     }
 }

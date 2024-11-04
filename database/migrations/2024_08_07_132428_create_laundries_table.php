@@ -18,10 +18,6 @@ return new class extends Migration
             $table->string('description_ar');
             $table->string('description_en');
             $table->string('phone_number');
-            $table->string('city');
-            $table->string('address_line_1')->default('0');
-            $table->decimal('lat', 6, 3);
-            $table->decimal('lng', 6, 3);
             $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('admin_id')->constrained('users');
             $table->boolean('isActive')->default(1);

@@ -42,6 +42,10 @@ class Laundry extends Model
     }
    
 
+    public function addresses()
+{
+    return $this->hasMany(AddressLaundry::class);
+}
 
 
     public function services()

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Laundry;
 use App\Models\LaundryItem;
 use App\Models\LaundryMedia;
+use App\Models\AddressLaundry;
 use App\Models\Price;
 use App\Models\MySession;
 use Carbon\Carbon;
@@ -31,61 +32,57 @@ class LaundryController extends BaseController
                 'description_ar' => 'required',
                 'description_en'=> 'required|string',
                 'phone_number' => 'required|string',
-                'city' => 'required',
-                'address_line_1'=> 'required',
-                //'address' => 'required',
-                'lat' => 'required',
-                'lng' => 'required',
-                'point' => 'required',
+               // 'point' => 'required',
                 'admin_id'=>'required|exists:users,id',
                 "array_url.*.url_image" => 'required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
                 'array_ids.*.price' => 'required|numeric',
-                'array_service' => 'required|array',
-                'array_service.*.service_id' => 'required|exists:services,id',
+                'array_ids' => 'required|array',
+                'array_ids.*.service_id' => 'required|exists:services,id',
+                'addresses' => 'required|array', 
+                'addresses.*.city' => 'required|string',
+                'addresses.*.address_line_1' => 'required|string',
+                'addresses.*.lat' => 'required|numeric',
+                'addresses.*.lng' => 'required|numeric',
              ]); 
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
           
-            $laundry = Laundry::create([
-                'name_en' => $request->name_en,
-                'name_ar'=> $request->name_ar,
-                'description_ar' => $request->description_ar,
-                'description_en' => $request->description_en,
-                'phone_number' => $request->phone_number,
-                'city' => $request->city,
-                'address_line_1' => $request->address_line_1,
-               // 'address' => $request->address,
-                'point' => $request->point,
-                'admin_id'=> $request->admin_id,
-                'lat' => $request->lat,
-                'lng' => $request->lng,
+            $laundryData = $request->only(['name_en', 'name_ar', 'description_ar', 'description_en', 'phone_number', 'admin_id']);
+            $laundry = Laundry::create($laundryData);
+    
+            $imagesData = [];
+            foreach ($request->file('array_url.*.url_image') as $image) {
+                $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+                $image->move(public_path('Laundry'), $imageName);
+                $imagesData[] = [
+                    'laundry_id' => $laundry->id,
+                    'url_image' => url('Laundry/' . $imageName),
+                ];
+            }
+            LaundryMedia::insert($imagesData);
 
-           ]);
+            $pricesData = array_map(function ($item) use ($laundry) {
+                return [
+                    'laundry_id' => $laundry->id,
+                    'laundry_item_id' => $item['laundry_item_id'],
+                    'service_id' => $item['service_id'],
+                    'price' => $item['price'],
+                ];
+            }, $request->array_ids);
+            Price::insert($pricesData);
 
-           foreach ($request->file('array_url.*.url_image') as $index => $image) {
-            // $folder = 'Picture';
-             $imageName = time() . '.' . $image->extension();
-             $image->move(public_path('Laundry'), $imageName);
-             $url = url('Laundry/' . $imageName);
-             $LaundryImage =  LaundryMedia::create(['laundry_id' => $laundry->id,
-             'url_image' => $url,
-              ]);
-                 }
-
-  // Store Laundry Items with prices
-  foreach ($request->array_ids as $item) {
-    Price::create([
-        'laundry_id' => $laundry->id,
-        'laundry_item_id' => $item['laundry_item_id'],
-        'price' => $item['price'],
-    ]);
-}
-
-foreach ($request->array_service as $service) {
-    $laundry->services()->attach($service['service_id']);
-}
+            $addressesData = array_map(function ($address) use ($laundry) {
+                return [
+                    'laundry_id' => $laundry->id,
+                    'city' => $address['city'],
+                    'address_line_1' => $address['address_line_1'],
+                    'lat' => $address['lat'],
+                    'lng' => $address['lng'],
+                ];
+            }, $request->addresses);
+            AddressLaundry::insert($addressesData);
           
         return $this->sendResponse($laundry,'laundry created successfully.');
     
@@ -111,11 +108,11 @@ foreach ($request->array_service as $service) {
         $Laundries = [];
 
         if ($user->user_type_id == 1) {
-            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
+            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
                 ->where('admin_id', $user->id)
                 ->paginate(10);
         } elseif ($user->user_type_id == 4) {
-            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem'])
+            $Laundries = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
                 ->paginate(10);
         }
         return $this->sendResponse($Laundries,'Laundries fetched successfully.');
@@ -249,39 +246,41 @@ public function update(Request $request)
 
 
     public function search(Request $request)
-{
-    try{
-    $query = $request->input('name');
-
-     $user = Auth::user();
-     $latitude = $user->lat;  
-     $longitude = $user->lng;
-
-    // البحث عن المغاسل مع حساب المسافة
-    $results = Laundry::with('LaundryMedia')->where('isActive', 1)
-    ->when($query, function ($queryBuilder) use ($query) {
-        $queryBuilder->where(function ($q) use ($query) {
-            $q->where('name_en', 'LIKE', '%' . $query . '%')
-                ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
-        });
-    })
-    // حساب المسافة باستخدام صيغة Haversine
-    ->selectRaw(
-        "*, ( 6371 * acos( cos( radians(?) ) * cos( radians( lat ) ) 
-        * cos( radians( lng ) - radians(?) ) + sin( radians(?) ) 
-        * sin( radians( lat ) ) ) ) AS distance",
-        [$latitude, $longitude, $latitude] // تمرير إحداثيات المستخدم إلى الصيغة
-    )
-    ->orderBy('distance', 'asc') // ترتيب النتائج بناءً على المسافة
-    ->get()
-    ->makeHidden('isActive');
-    return $this->sendResponse($results, 'Laundries fetched successfully.');
-} catch (\Exception $e) {
-    // Log error and return empty array
-    return response()->json(['error' =>  $e->getMessage()], 500);
-  
-}
-}
+    {
+        try {
+            $query = $request->input('name');
+            $user = Auth::user();
+            $latitude = $user->lat;
+            $longitude = $user->lng;
+    
+            $results = Laundry::with(['addresses' => function ($query) use ($latitude, $longitude) {
+                // حساب المسافة لكل عنوان باستخدام صيغة Haversine
+                $query->selectRaw(
+                    "*, ( 6371 * acos( cos( radians(?) ) * cos( radians( lat ) ) 
+                    * cos( radians( lng ) - radians(?) ) + sin( radians(?) ) 
+                    * sin( radians( lat ) ) ) ) AS distance",
+                    [$latitude, $longitude, $latitude]
+                )->orderBy('distance', 'asc'); // ترتيب العناوين بناءً على المسافة
+            }, 'LaundryMedia'])
+            ->where('isActive', 1)
+            ->when($query, function ($queryBuilder) use ($query) {
+                $queryBuilder->where(function ($q) use ($query) {
+                    $q->where('name_en', 'LIKE', '%' . $query . '%')
+                      ->orWhere('name_ar', 'LIKE', '%' . $query . '%');
+                });
+            })
+            ->get();
+    
+            $results = $results->sortBy(function ($laundry) {
+                return $laundry->addresses->first()->distance ?? INF;
+            })->values();
+    
+            return $this->sendResponse($results, 'Laundries fetched successfully.');
+        } catch (\Exception $e) {
+            return response()->json(['error' =>  $e->getMessage()], 500);
+        }
+    }
+    
 
 
 
