@@ -90,34 +90,16 @@ class DriverController extends BaseController
             }
         }
 
-       
-        $drivers = $query->paginate(10);
-        $filteredDrivers = $drivers->map(function($driver) {
-            return [
-                'id' => $driver->user_id,
-                'name' => $driver->user->name,
-                'email' => $driver->user->email,
-                'photo' => $driver->user->photo,
-                'driver_id' => $driver->user->driver_id,
-                'laundry_id' => $driver->laundry_id,
-                //'user_id' => $driver->user_id,
-            ];
-        });
-        $response = [
-            'driver' => $filteredDrivers,
-            'pagination' => [
-                'current_page' => $drivers->currentPage(),
-                'per_page' => $drivers->perPage(),
-                'total' => $drivers->total(),
-                'last_page' => $drivers->lastPage(),
-                'has_more_pages' => $drivers->hasMorePages(),
-                'from' => $drivers->firstItem(), // First item number on the current page
-                'to' => $drivers->lastItem(),   // Last item number on the current page
-           
-            ]
-        ];
+        if ($request->has('page') && $request->page == 0) {
+            $drivers = $query->get(); 
+        } else {
+            $drivers = $query->paginate(10);
+        }
 
-        return $this->sendResponse($response, 'Drivers fetched successfully.');
+      
+       
+
+        return $this->sendResponse($drivers, 'Drivers fetched successfully.');
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
