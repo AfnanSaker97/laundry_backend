@@ -22,7 +22,7 @@ class DriverController extends BaseController
            'name'=>'required|min:3',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'laundry_id' => 'required|exists:laundries,id', // التحقق من أن المغسلة موجودة
+            'laundry_id' => 'required|exists:laundries,id',
       
         ]);
  
@@ -41,8 +41,8 @@ class DriverController extends BaseController
        ]);  
      
             $driver = Driver::create([
-            'user_id' => $user->id, // ربط السائق بالمستخدم
-            'laundry_id' => $request->laundry_id, // ربط السائق بالمغسلة
+            'user_id' => $user->id, 
+            'laundry_id' => $request->laundry_id, 
         ]);
                 $data['token'] = $user->createToken($request->email)->plainTextToken;
                 $data['user'] = $user;
@@ -58,19 +58,40 @@ class DriverController extends BaseController
 {
     try {
         $validator = Validator::make($request->all(), [
-             'laundry_id' => 'required|exists:laundries,id', // التحقق من أن المغسلة موجودة
-       
+             'laundry_id' => 'nullable|exists:laundries,id',
+            
          ]);
   
          if ($validator->fails()) {
              return $this->sendError('Validation Error.', $validator->errors()->all());
          }
 
-        
-        $drivers = Driver::where('laundry_id', $request->laundry_id)
-           ->with('user') 
-          ->paginate(10);
+        $user = $request->user();
+        $query = Driver::with('user');
+        if ($user->user_type_id == 1) {
+            $query->where('laundry_id', $user->laundry->id);
 
+            if ($request->has('name')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->name . '%');
+                });
+            }
+        }
+
+        // إذا كان نوع المستخدم هو 4، عرض جميع السائقين
+        elseif ($user->user_type_id == 4) {
+            if ($request->has('name')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->name . '%');
+                });
+            }
+            if ($request->filled('laundry_id')) {
+                $query->where('laundry_id', $request->laundry_id);
+            }
+        }
+
+       
+        $drivers = $query->paginate(10);
         $filteredDrivers = $drivers->map(function($driver) {
             return [
                 'id' => $driver->user_id,
