@@ -297,7 +297,7 @@ $orders = $query->paginate(10);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-            $order = Order::with(['user','address','Laundry','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
+            $order = Order::with(['user','address','Laundry.LaundryMedia','LaundryAddress','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
         
            $Delivery_cost=$order->total_price -$order->base_cost;
            $order['delivery_cost'] =  $Delivery_cost;
@@ -528,7 +528,7 @@ public function ordersUser(Request $request)
     try {
         $user = Auth::user();
         // Find the address by ID
-        $orders = Order::with('Laundry','OrderType','OrderItems')->where('user_id',$user->id)->orderBy('order_date', 'desc')->get();
+        $orders = Order::with('Laundry','OrderType','OrderItems','LaundryAddress','address')->where('user_id',$user->id)->orderBy('order_date', 'desc')->get();
   // Format the categories data if needed
   return $orders->map(function ($order) {
     return [
@@ -546,6 +546,8 @@ public function ordersUser(Request $request)
         'order_type' => $order->OrderType->type ,
         'order_type_price' => $order->OrderType->price ,
         'order_items' => $order->OrderItems,
+        'LaundryAddress' => $order->LaundryAddress,
+        'UserAddress' => $order->address,
     ];
 });
     

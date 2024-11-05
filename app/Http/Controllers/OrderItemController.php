@@ -34,7 +34,7 @@ class OrderItemController extends BaseController
     {
         try {
         $validator = Validator::make($request->all(), [
-            'laundry_id' => 'required|exists:laundries,id',
+        'laundry_id' => 'required|exists:laundries,id',
         'address_id' => 'required|exists:addresses,id',
         'ids' => 'required|array',
         'ids.*.item_id' => 'required|exists:laundry_items,id',
@@ -64,16 +64,25 @@ class OrderItemController extends BaseController
             }
 
             $laundry = Laundry::findOrFail($request->laundry_id);
-            $address = Address::findOrFail($request->address_id);
+            $userAddress = Address::findOrFail($request->address_id);
             $orderType = OrderType::findOrFail($request->order_type_id);
             $user = Auth::user();
+            $nearestLaundryAddress = $laundry->addresses()->get()->sortBy(function ($address) use ($userAddress) {
+                return $this->calculateDistance($address->lat, $address->lng, $userAddress->lat, $userAddress->lng);
+            })->first();
+
+            if (!$nearestLaundryAddress) {
+                throw new \Exception('No available address for the selected laundry.');
+            }
+
             $order_type = ($user->user_type_id == '4' || $user->user_type_id == '1') ? 'web' : 'app';
 
-            $distance = round($this->calculateDistance($laundry->lat, $laundry->lng, $address->lat, $address->lng), 1);
-            $order = Order::create([
+            $distance = round($this->calculateDistance($nearestLaundryAddress->lat, $nearestLaundryAddress->lng, $userAddress->lat, $userAddress->lng), 1);
+           $order = Order::create([
                 'laundry_id' => $request->laundry_id,
                 'user_id' => $user->id,
                 'address_id' => $request->address_id,
+                'address_laundry_id'=> $nearestLaundryAddress->id,
                 'order_date' => $now,
                 'pickup_time' => $pickupTime,
                 'delivery_time' => $deliveryTime,

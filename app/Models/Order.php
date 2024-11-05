@@ -25,7 +25,8 @@ class Order extends Model
           'order_type_id',
           'point',
           'order_number',
-          'type_order'
+          'type_order',
+          'address_laundry_id'
       
     ];
 
@@ -43,6 +44,12 @@ class Order extends Model
     public function address()
     {
         return $this->belongsTo(Address::class);
+    }
+
+
+    public function LaundryAddress()
+    {
+        return $this->belongsTo(AddressLaundry::class,'address_laundry_id');
     }
     public function Laundry()
     {
