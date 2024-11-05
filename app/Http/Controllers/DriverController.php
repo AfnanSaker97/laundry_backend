@@ -66,8 +66,6 @@ class DriverController extends BaseController
              return $this->sendError('Validation Error.', $validator->errors()->all());
          }
 
-      //  $laundry = Laundry::findOrFail($request->laundry_id);
-
         
         $drivers = Driver::where('laundry_id', $request->laundry_id)
            ->with('user') 

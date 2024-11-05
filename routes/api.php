@@ -165,6 +165,9 @@ Route::get('LaundryByAdmin', [LaundryController::class, 'LaundryByAdmin']);
 Route::post('Laundry', [LaundryController::class, 'store']);
 Route::post('Laundry-update', [LaundryController::class, 'update']);
 Route::post('UpdateStatusLaundery', [LaundryController::class, 'UpdateStatusLaundery']);
+Route::post('UpdateUrgent', [LaundryController::class, 'UpdateUrgent']);
+
+
 
 
 //MyOrder

@@ -369,6 +369,38 @@ $laundry->save();
 }
 
 
+
+
+public function UpdateUrgent(Request $request)
+{
+    
+    try {
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundries', 
+        ]);
+       
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+        // Fetch the laundry belonging to the authenticated user
+        $laundry = Laundry::findOrFail($request->id);
+$laundry->urgent = !$laundry->urgent;  // If 1, it becomes 0, and vice versa
+$laundry->save();
+
+        return $this->sendResponse($laundry,'laundry updated successfully.');
+
+    
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+    
+    } 
+}
+
+
 public function getLaundriesByProximity(Request $request)
 {
     
