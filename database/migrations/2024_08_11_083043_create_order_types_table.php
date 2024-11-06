@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('order_types', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->string('price');//الكلفة لكل كيلومتر
+            $table->string('type_en');
+            $table->string('type_ar');
             $table->timestamps();
         });
     }

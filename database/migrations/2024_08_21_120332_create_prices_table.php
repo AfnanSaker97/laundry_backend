@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('price');
             $table->foreignId('laundry_item_id')->constrained('laundry_items');  
             $table->foreignId('laundry_id')->constrained('laundries');  
-            $table->foreignId('service_id')->constrained('services');  
+            $table->foreignId('service_id')->constrained('services'); 
+            $table->foreignId('order_type_id')->constrained('order_types'); 
+
             $table->timestamps();
         });
     }

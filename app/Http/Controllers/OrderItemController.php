@@ -67,17 +67,11 @@ class OrderItemController extends BaseController
             $userAddress = Address::findOrFail($request->address_id);
             $orderType = OrderType::findOrFail($request->order_type_id);
             $user = Auth::user();
-            $nearestLaundryAddress = $laundry->laundryAddress()->get()->sortBy(function ($address) use ($userAddress) {
-                return $this->calculateDistance($address->lat, $address->lng, $userAddress->lat, $userAddress->lng);
-            })->first();
-
-            if (!$nearestLaundryAddress) {
-                throw new \Exception('No available address for the selected laundry.');
-            }
+         
 
             $order_type = ($user->user_type_id == '4' || $user->user_type_id == '1') ? 'web' : 'app';
 
-            $distance = round($this->calculateDistance($nearestLaundryAddress->lat, $nearestLaundryAddress->lng, $userAddress->lat, $userAddress->lng), 1);
+          //  $distance = round($this->calculateDistance($nearestLaundryAddress->lat, $nearestLaundryAddress->lng, $userAddress->lat, $userAddress->lng), 1);
            $order = Order::create([
                 'laundry_id' => $request->laundry_id,
                 'user_id' => $user->id,
@@ -88,7 +82,7 @@ class OrderItemController extends BaseController
                 'note' => $request->note ?? '0',
                 'type_order' => $order_type,
                 'order_type_id' => $request->order_type_id,
-                'distance' => $distance,
+             //   'distance' => $distance,
                 'order_number' => $this->generateOrderId(),
             ]);
 
@@ -104,6 +98,7 @@ class OrderItemController extends BaseController
                 $priceRecord = Price::where('laundry_item_id', $laundryItem->id)
                     ->where('laundry_id', $laundry->id)
                     ->where('service_id', $service->id)
+                    ->where('order_type_id',$request->order_type_id)
                     ->first();
                 
                    
@@ -125,27 +120,19 @@ class OrderItemController extends BaseController
             }
 
     
-            $orderTypeKmPrice = OrderType::findOrFail(1)->price;
-            $costDeliverKm = $orderTypeKmPrice * $distance;
-            $costDeliver = $costDeliverKm;
-
-            if ($request->order_type_id == 2) {
-                $costDeliver += $orderType->price;
-            }
-
             if ($request->order_type_id == 1) {
                 $order->update([
                     'status' => 'Confirmed',
-                    'point' => $laundry->point,
+                   // 'point' => $laundry->point,
                     'car_id' => 1,
                 ]);
-                $user->increment('points_wallet', $order->point);
+             //   $user->increment('points_wallet', $order->point);
             }
-            $totalPrice = $cartItemsTotal + $costDeliver;
+            $totalPrice = $cartItemsTotal ;
 
             $order->update([
                 'base_cost' => $cartItemsTotal,
-                'total_price' => $totalPrice,
+               // 'total_price' => $totalPrice,
             ]);
 
             return $order;
