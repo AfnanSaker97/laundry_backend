@@ -39,11 +39,10 @@ class LaundryController extends BaseController
                 'array_ids.*.price' => 'required|numeric',
                 'array_ids' => 'required|array',
                 'array_ids.*.service_id' => 'required|exists:services,id',
-                'addresses' => 'required|array', 
-                'addresses.*.city' => 'required|string',
-                'addresses.*.address_line_1' => 'required|string',
-                'addresses.*.lat' => 'required|numeric',
-                'addresses.*.lng' => 'required|numeric',
+                'city' => 'required|string',
+                'address_line_1' => 'required|string',
+                'lat' => 'required|numeric',
+                'lng' => 'required|numeric',
              ]); 
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -72,18 +71,16 @@ class LaundryController extends BaseController
                 ];
             }, $request->array_ids);
             Price::insert($pricesData);
-
-            $addressesData = array_map(function ($address) use ($laundry) {
-                return [
-                    'laundry_id' => $laundry->id,
-                    'city' => $address['city'],
-                    'address_line_1' => $address['address_line_1'],
-                    'lat' => $address['lat'],
-                    'lng' => $address['lng'],
-                ];
-            }, $request->addresses);
-            AddressLaundry::insert($addressesData);
           
+            $addressesData = AddressLaundry::create([
+                'laundry_id' => $laundry->id,
+                'city' => $request->city,
+                'address_line_1' => $request->address_line_1,
+                'lat' => $request->lat ,
+                'lng' => $request->lng,
+             
+            ]);
+
         return $this->sendResponse($laundry,'laundry created successfully.');
     
     } catch (\Throwable $th) {
@@ -156,11 +153,10 @@ class LaundryController extends BaseController
                 'array_ids.*.price' => 'required|numeric',
                 'array_ids' => 'required|array',
                 'array_ids.*.service_id' => 'required|exists:services,id',
-                'addresses' => 'required|array',
-                'addresses.*.city' => 'required|string',
-                'addresses.*.address_line_1' => 'required|string',
-                'addresses.*.lat' => 'required|numeric',
-                'addresses.*.lng' => 'required|numeric',
+                'city' => 'required|string',
+                'address_line_1' => 'required|string',
+                'lat' => 'required|numeric',
+                'lng' => 'required|numeric',
             ]);
     
             // Check for validation errors
@@ -203,19 +199,15 @@ class LaundryController extends BaseController
                 ];
             }, $request->array_ids);
             Price::insert($pricesData);
-    
-            // Update addresses
-            AddressLaundry::where('laundry_id', $laundry->id)->delete(); // Remove old addresses
-            $addressesData = array_map(function ($address) use ($laundry) {
-                return [
-                    'laundry_id' => $laundry->id,
-                    'city' => $address['city'],
-                    'address_line_1' => $address['address_line_1'],
-                    'lat' => $address['lat'],
-                    'lng' => $address['lng'],
-                ];
-            }, $request->addresses);
-            AddressLaundry::insert($addressesData);
+            $addressesData = AddressLaundry::create([
+                'laundry_id' => $laundry->id,
+                'city' => $request->city,
+                'address_line_1' => $request->address_line_1,
+                'lat' => $request->lat ,
+                'lng' => $request->lng,
+             
+            ]);
+
     
             // Return a success response
             return $this->sendResponse($laundry, 'Laundry updated successfully.');

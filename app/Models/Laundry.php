@@ -16,11 +16,6 @@ class Laundry extends Model
         'description_en',
         'email',
         'phone_number',
-        'country',
-        'city',
-        'address_line_1',
-        'lat',
-        'lng',
         'admin_id',
         'point',
         'isActive',
@@ -45,7 +40,7 @@ class Laundry extends Model
 
     public function addresses()
 {
-    return $this->hasMany(AddressLaundry::class);
+    return $this->hasOne(AddressLaundry::class,);
 }
 
 

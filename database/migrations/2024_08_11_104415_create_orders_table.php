@@ -28,7 +28,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses');
             $table->foreignId('laundry_id')->constrained('laundries');
-            $table->foreignId('address_laundry_id')->constrained('address_laundries');
             $table->foreignId('car_id')->nullable()->constrained('cars');
             $table->timestamps();
         });

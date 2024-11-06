@@ -39,7 +39,7 @@ class OrderController extends BaseController
         try {
       
         // Initialize the query builder for orders
-        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+        $query = Order::with(['user','address', 'OrderItems.LaundryItem', 'Laundry.addresses', 'OrderType'])
           ->where('laundry_id',$request->laundry_id)->orderByDesc('order_date');
 
 
@@ -77,7 +77,7 @@ class OrderController extends BaseController
             ];
 
         // Initialize the query builder for orders
-        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry.addresses', 'OrderType'])
           ->orderByDesc('order_date');
              // Apply filters conditionally
              $query->when($request->laundry_id, function ($q) use ($request) {
@@ -137,7 +137,7 @@ class OrderController extends BaseController
 
 
         // Initialize the query builder for orders
-        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+        $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry.addresses', 'OrderType'])
             ->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
             ->orderByDesc('order_date');
             
@@ -232,7 +232,7 @@ $orders = $query->paginate(10);
 
 
             // Initialize the query builder for orders
-            $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+            $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry.addresses', 'OrderType'])
               ->orderByDesc('order_date');
                 
      // Apply filters based on status_id
@@ -297,7 +297,7 @@ $orders = $query->paginate(10);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-            $order = Order::with(['user','address','Laundry.LaundryMedia','LaundryAddress','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
+            $order = Order::with(['user','address','Laundry.LaundryMedia','Laundry.addresses','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
         
            $Delivery_cost=$order->total_price -$order->base_cost;
            $order['delivery_cost'] =  $Delivery_cost;
@@ -512,7 +512,7 @@ public function filterMyOrderUser(Request $request)
             3 => 'confirmed',
             4 => 'cancelled',
         ];
-        $orders = Order::with(['user','address','Laundry','OrderItems.LaundryItem'])
+        $orders = Order::with(['user','address','Laundry.addresses','OrderItems.LaundryItem'])
         ->where('status', $status[$request->status_id])
         ->get();
 
@@ -528,7 +528,7 @@ public function ordersUser(Request $request)
     try {
         $user = Auth::user();
         // Find the address by ID
-        $orders = Order::with('Laundry','OrderType','OrderItems','LaundryAddress','address')->where('user_id',$user->id)->orderBy('order_date', 'desc')->get();
+        $orders = Order::with('Laundry.addresses','OrderType','OrderItems','address')->where('user_id',$user->id)->orderBy('order_date', 'desc')->get();
   // Format the categories data if needed
   return $orders->map(function ($order) {
     return [
@@ -543,10 +543,10 @@ public function ordersUser(Request $request)
         'point' => $order->point ,
         'laundry_name_ar' => $order->laundry->name_ar ,
         'laundry_name_en' => $order->laundry->name_en ,
+        'addresses' => $order->laundry->addresses ,
         'order_type' => $order->OrderType->type ,
         'order_type_price' => $order->OrderType->price ,
         'order_items' => $order->OrderItems,
-        'LaundryAddress' => $order->LaundryAddress,
         'UserAddress' => $order->address,
     ];
 });
@@ -574,7 +574,7 @@ public function search(Request $request)
     if ($validator->fails()) {
         return $this->sendError('Validation Error.', $validator->errors()->all());
     }
-    $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry', 'OrderType'])
+    $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry.addresses', 'OrderType'])
     ->orderByDesc('order_date');
 
     if ($request->has('number')) {

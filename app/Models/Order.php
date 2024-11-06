@@ -43,7 +43,7 @@ class Order extends Model
     // An order belongs to an address
     public function address()
     {
-        return $this->belongsTo(Address::class);
+        return $this->belongsTo(Address::class,'address_id');
     }
 
 
@@ -59,5 +59,5 @@ class Order extends Model
     public function OrderType()
     {
         return $this->belongsTo(OrderType::class);
-    }
+    } 
 }

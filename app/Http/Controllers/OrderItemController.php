@@ -67,7 +67,7 @@ class OrderItemController extends BaseController
             $userAddress = Address::findOrFail($request->address_id);
             $orderType = OrderType::findOrFail($request->order_type_id);
             $user = Auth::user();
-            $nearestLaundryAddress = $laundry->addresses()->get()->sortBy(function ($address) use ($userAddress) {
+            $nearestLaundryAddress = $laundry->laundryAddress()->get()->sortBy(function ($address) use ($userAddress) {
                 return $this->calculateDistance($address->lat, $address->lng, $userAddress->lat, $userAddress->lng);
             })->first();
 
@@ -82,7 +82,6 @@ class OrderItemController extends BaseController
                 'laundry_id' => $request->laundry_id,
                 'user_id' => $user->id,
                 'address_id' => $request->address_id,
-                'address_laundry_id'=> $nearestLaundryAddress->id,
                 'order_date' => $now,
                 'pickup_time' => $pickupTime,
                 'delivery_time' => $deliveryTime,
