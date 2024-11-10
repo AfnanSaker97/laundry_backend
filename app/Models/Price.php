@@ -31,5 +31,9 @@ class Price extends Model
     {
         return $this->belongsTo(Service::class);
     }
+    public function OrderType()
+    {
+        return $this->belongsTo(OrderType::class);
+    }
    
 }

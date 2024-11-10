@@ -285,26 +285,26 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement.Media'])->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement.Media','price.laundryItem','price.OrderType','price.service'])->findOrFail($request->id);
 
   
     $laundryData = $laundry->only([
         'id', 'name_en', 'name_ar', 'description_ar', 'description_en', 'email', 'phone_number'
     ]);
     $laundryData['addresses'] = $laundry->addresses;
-    $laundryData['services'] = $laundry->services->groupBy('id')->map(function ($serviceGroup) {
+    $laundryData['price'] = $laundry->price;/*->groupBy('id')->map(function ($serviceGroup) {
         $service = $serviceGroup->first();
         $service->prices = $serviceGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل خدمة
         return $service;
     })->values();
 
-    // معالجة العناصر لتجنب التكرار
+ /*   // معالجة العناصر لتجنب التكرار
     $laundryData['LaundryItem'] = $laundry->LaundryItem->groupBy('id')->map(function ($itemGroup) {
         $item = $itemGroup->first();
         $item->prices = $itemGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل عنصر
         return $item;
     })->values();
-
+*/
     $laundryData['ads'] = $laundry->advertisement->where('status', 'confirmed')
         ->where('end_date', '>', now())  ->values();  
      $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
