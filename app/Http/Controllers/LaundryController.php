@@ -285,7 +285,7 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses'])->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement'])->findOrFail($request->id);
 
   
     $laundryData = $laundry->only([
@@ -305,9 +305,10 @@ public function show(Request $request)
         return $item;
     })->values();
 
-    // إضافة الوسائط
-    $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
-
+    $laundryData['advertisement'] = $laundry->advertisement->where('status', 'confirmed')
+        ->where('end_date', '>', now())  ->values();  
+     $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
+  
     return $this->sendResponse($laundryData,'laundry fetched successfully.');
 } catch (\Exception $e) {
     // Handle any exceptions and return an error response

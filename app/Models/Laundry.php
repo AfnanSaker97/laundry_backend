@@ -38,6 +38,12 @@ class Laundry extends Model
     }
    
 
+    public function advertisement()
+    {
+        return $this->hasMany(Advertisement::class);
+    }
+   
+
     public function addresses()
 {
     return $this->hasOne(AddressLaundry::class,);

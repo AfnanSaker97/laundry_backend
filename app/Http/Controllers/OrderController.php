@@ -290,6 +290,9 @@ $orders = $query->paginate(10);
     public function OrderDetails(Request $request)
     {   
     
+        try{
+
+      
         $validator = Validator::make($request->all(), [
             'order_id' => 'required|exists:orders,id',  
             ]);
@@ -297,14 +300,33 @@ $orders = $query->paginate(10);
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
-            $order = Order::with(['user','address','Laundry.LaundryMedia','Laundry.addresses','OrderType','OrderItems','OrderItems.LaundryItem'])->findOrFail($request->order_id);
-        
-           $Delivery_cost=$order->total_price -$order->base_cost;
-           $order['delivery_cost'] =  $Delivery_cost;
-     
+            $order = Order::with([
+            'user:id,name,email,photo,lat,lng,points_wallet', // Directly select only needed fields
+            'address:id,address_line_1,address_line_2,country,city,address,postcode,lat,lng,email,contact_number,full_name', 
+          
+                'Laundry.LaundryMedia', 
+                'OrderType',
+                'OrderItems',
+                'OrderItems.LaundryItem'
+            ])->findOrFail($request->order_id);
+
+            $order->Laundry->LaundryMedia->each(function ($media) {
+                $media->makeHidden(['created_at', 'updated_at']);
+            });
+            $order->Laundry->makeHidden(['created_at', 'updated_at']);
+            $order->makeHidden(['created_at', 'updated_at','distance','total_price','address_laundry_id']);
+            $order->OrderItems->each(function ($item) {
+                $item->makeHidden(['created_at', 'updated_at']);
+            });
             $order['user'] =  $order;
        
             return $this->sendResponse($order, 'order fetched successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log error and return empty array
+            return response()->json(['error' =>  $e->getMessage()], 500);
+          
+        }
         }
 
 
