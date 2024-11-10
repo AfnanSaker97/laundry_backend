@@ -7,6 +7,7 @@ use App\Models\Laundry;
 use App\Models\LaundryPrice;
 use App\Models\OrderItem;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\MySession;
 use App\Models\OrderType;
 use App\Models\Address;
@@ -35,7 +36,7 @@ class OrderItemController extends BaseController
         try {
         $validator = Validator::make($request->all(), [
         'laundry_id' => 'required|exists:laundries,id',
-        'address_id' => 'required|exists:addresses,id',
+        'address_id' => 'nullable|exists:addresses,id',
         'ids' => 'required|array',
         'ids.*.item_id' => 'required|exists:laundry_items,id',
         'ids.*.service_id' => 'required|exists:services,id',
@@ -43,6 +44,9 @@ class OrderItemController extends BaseController
         'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
         'pickup_time'=> 'nullable|date',
+        'name'=> 'nullable|string',
+        'email'=> 'nullable|email',
+
     ]);
        
 
@@ -64,17 +68,34 @@ class OrderItemController extends BaseController
             }
 
             $laundry = Laundry::findOrFail($request->laundry_id);
-            $userAddress = Address::findOrFail($request->address_id);
+            if($request->address_id)
+            {
+                $userAddress = Address::findOrFail($request->address_id);
+            }
+          
             $orderType = OrderType::findOrFail($request->order_type_id);
             $user = Auth::user();
          
-
+            $user_id= $user->id;
             $order_type = ($user->user_type_id == '4' || $user->user_type_id == '1') ? 'web' : 'app';
-
-          //  $distance = round($this->calculateDistance($nearestLaundryAddress->lat, $nearestLaundryAddress->lng, $userAddress->lat, $userAddress->lng), 1);
-           $order = Order::create([
+            if( $order_type == 'web')
+            {
+                $existingUser = User::where('email', $request->email)->first();
+                if($existingUser)
+            {
+                $user_id=$existingUser->id;
+            }else{
+                $user = User::create([
+                    'name' =>  $request->name,
+                    'email' =>   $request->email,
+                    'user_type_id' =>  2,
+                   ]);
+                   $user_id= $user->id;
+             }
+           }
+            $order = Order::create([
                 'laundry_id' => $request->laundry_id,
-                'user_id' => $user->id,
+                'user_id' => $user_id,
                 'address_id' => $request->address_id,
                 'order_date' => $now,
                 'pickup_time' => $pickupTime,
@@ -120,7 +141,7 @@ class OrderItemController extends BaseController
             }
 
     
-            if ($request->order_type_id == 1) {
+            if ($request->order_type_id == 2) {
                 $order->update([
                     'status' => 'Confirmed',
                    // 'point' => $laundry->point,

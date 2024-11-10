@@ -251,15 +251,7 @@ class LaundryController extends BaseController
             $latitude = $user->lat;
             $longitude = $user->lng;
     
-            $results = Laundry::with(['addresses' => function ($query) use ($latitude, $longitude) {
-                // حساب المسافة لكل عنوان باستخدام صيغة Haversine
-                $query->selectRaw(
-                    "*, ( 6371 * acos( cos( radians(?) ) * cos( radians( lat ) ) 
-                    * cos( radians( lng ) - radians(?) ) + sin( radians(?) ) 
-                    * sin( radians( lat ) ) ) ) AS distance",
-                    [$latitude, $longitude, $latitude]
-                )->orderBy('distance', 'asc'); // ترتيب العناوين بناءً على المسافة
-            }, 'LaundryMedia'])
+            $results = Laundry::with(['addresses']) 
             ->where('isActive', 1)
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {
@@ -268,10 +260,7 @@ class LaundryController extends BaseController
                 });
             })
             ->get();
-    
-            $results = $results->sortBy(function ($laundry) {
-                return $laundry->addresses->first()->distance ?? INF;
-            })->values();
+           
     
             return $this->sendResponse($results, 'Laundries fetched successfully.');
         } catch (\Exception $e) {

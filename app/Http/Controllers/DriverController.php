@@ -96,9 +96,6 @@ class DriverController extends BaseController
             $drivers = $query->paginate(10);
         }
 
-      
-       
-
         return $this->sendResponse($drivers, 'Drivers fetched successfully.');
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);

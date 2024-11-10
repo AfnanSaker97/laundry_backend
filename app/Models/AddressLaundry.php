@@ -16,4 +16,5 @@ class AddressLaundry extends Model
         'lng',
         'is_primary'
     ];
+    
 }

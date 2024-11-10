@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('order_type_id')->constrained('order_types');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('address_id')->constrained('addresses');
+            $table->foreignId('address_id')->nullable()->constrained('addresses');
             $table->foreignId('laundry_id')->constrained('laundries');
             $table->foreignId('car_id')->nullable()->constrained('cars');
             $table->timestamps();
