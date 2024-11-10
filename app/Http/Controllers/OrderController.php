@@ -304,6 +304,7 @@ $orders = $query->paginate(10);
             'user:id,name,email,photo,lat,lng,points_wallet', // Directly select only needed fields
             'address:id,address_line_1,address_line_2,country,city,address,postcode,lat,lng,email,contact_number,full_name', 
           
+                'Laundry.addresses', 
                 'Laundry.LaundryMedia', 
                 'OrderType',
                 'OrderItems',
