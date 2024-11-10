@@ -120,11 +120,11 @@ Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 //Advertisement
-Route::get('Advertisement', [AdvertisementController::class,'index']);
+Route::get('ads', [AdvertisementController::class,'index']);
 Route::post('Advertisement', [AdvertisementController::class,'store']); // admin
 Route::get('getAdvertisement', [AdvertisementController::class,'getAdvertisement']);//admin
 Route::get('confirmAdvertisement', [AdvertisementController::class,'confirmAdvertisement']);//super admin
-Route::get('AdvertisementById', [AdvertisementController::class,'show']);
+Route::get('ads-id', [AdvertisementController::class,'show']);
 Route::post('Advertisement-update', [AdvertisementController::class,'update']);//admin
 
 //AdvertisementMedia

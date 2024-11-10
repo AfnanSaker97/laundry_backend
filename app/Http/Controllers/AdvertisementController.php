@@ -82,22 +82,23 @@ class AdvertisementController extends BaseController
             'name_en' => 'required|string|max:255',
             'url_media' => 'required|array', // Ensure url_media is an array
             'url_media.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate each image
-            'points' => 'nullable|numeric|min:1|max:99999999.9',
-            'NumberDays' => 'required|numeric|min:1', ]);
+          'points' => 'nullable|numeric|min:1|max:99999999.9',
+          'start_date' => 'required|date',
+            'end_date' => 'required|date', ]);
 
     if ($validator->fails()) {
         return response()->json(['error' => $validator->errors()], 422);
     }
-    $numberDays = (int) $request->NumberDays;
-    $endDate = now()->addDays($numberDays);
-
+    $code = random_int(1000, 9999); 
+  
     $advertisement = Advertisement::create([
         'laundry_id' => $request->laundry_id,
         'name_ar' => $request->name_ar,
         'name_en' => $request->name_en,
         'points' => $request->points ?? 0,
-        'end_date' => $endDate,
-        'number_days'=> $request->NumberDays,
+        'end_date' => $request->end_date,
+        'start_date'=> $request->start_date,
+        'code'=> $code,
     ]);
     foreach ($request->file('url_media') as $image) {
         $imageName = time() . '_' . uniqid() . '.' . $image->extension(); // Create a unique file name
@@ -126,24 +127,26 @@ class AdvertisementController extends BaseController
         try {
             // Validate input data
             $validator = Validator::make($request->all(), [
-                'laundry_id' => 'required|exists:laundries,id',
+                'laundry_id' => 'nullable|exists:laundries,id',
             ]);
     
             if ($validator->fails()) {
                 return response()->json(['error' => $validator->errors()], 422);
             }
     
-            // Set the current date
-            $endDate = now()->format('Y-m-d');
+            $current_day = Carbon::today()->toDateString();
 
-            // Fetch advertisements with conditions
-            $advertisements = Advertisement::where('status', 'confirmed')
-                ->where('end_date', '>', $endDate)
-                 ->where('laundry_id', $request->laundry_id)->with('Media')
-                ->get();
-    
+            $query = Advertisement::where('status', 'confirmed')
+            ->where('end_date', '>', $current_day)
+            ->where('start_date', '<', $current_day)
+            
+            ->with('Media');
+            if ($request->has('laundry_id') ) {
+                $query->where('laundry_id', $request->laundry_id);
+            }
+            $ads=$query->get();
             // Return a successful response with fetched advertisements
-            return $this->sendResponse($advertisements, 'Advertisements fetched successfully.');
+            return $this->sendResponse($ads, 'Advertisements fetched successfully.');
     
         } catch (\Throwable $th) {
             return response()->json([

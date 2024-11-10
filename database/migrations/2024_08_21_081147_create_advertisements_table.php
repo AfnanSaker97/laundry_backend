@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name_ar');
             $table->string('name_en');
+            $table->text('description_ar');
+            $table->text('description_en');
+            $table->string('code');
             $table->string('status')->default('pending');
             $table->decimal('points', 8, 1)->default(0);
-            $table->decimal('number_days');
+            $table->date('start_date');
             $table->date('end_date');
             $table->foreignId('laundry_id')->constrained('laundries');  
             $table->timestamps();

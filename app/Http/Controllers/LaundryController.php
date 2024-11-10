@@ -225,11 +225,11 @@ class LaundryController extends BaseController
     public function index()
     {
         try{
-        $Laundries =  Laundry::with(['LaundryMedia','LaundryItem'])
+        $Laundries =  Laundry::with(['LaundryMedia'])
                            ->where('isActive', 1)
                             ->inRandomOrder()
                             ->get()
-                            ->makeHidden(['isActive']);
+                            ->makeHidden(['isActive','created_at','updated_at']);
     
     
         return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
@@ -251,7 +251,7 @@ class LaundryController extends BaseController
             $latitude = $user->lat;
             $longitude = $user->lng;
     
-            $results = Laundry::with(['addresses']) 
+            $results = Laundry::with(['addresses','LaundryMedia']) 
             ->where('isActive', 1)
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {
@@ -285,7 +285,7 @@ public function show(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
       // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement'])->findOrFail($request->id);
+    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement.Media'])->findOrFail($request->id);
 
   
     $laundryData = $laundry->only([
@@ -305,7 +305,7 @@ public function show(Request $request)
         return $item;
     })->values();
 
-    $laundryData['advertisement'] = $laundry->advertisement->where('status', 'confirmed')
+    $laundryData['ads'] = $laundry->advertisement->where('status', 'confirmed')
         ->where('end_date', '>', now())  ->values();  
      $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
   
@@ -382,36 +382,33 @@ $laundry->save();
     } 
 }
 
-
 public function getLaundriesByProximity(Request $request)
 {
-    
     try {
-        // Get the currently authenticated user
+        // Get the authenticated user's location
         $user = Auth::user();
-    
         $userLatitude = $user->lat;
         $userLongitude = $user->lng;
 
-        // Fetch laundries from the cache or database
-        $laundries =Laundry::select(
-                'id',
-                'name_ar',
-                'name_en',
-                'description_ar',
-                'description_en',
-                'phone_number',
-                'city',
-                'address_line_1',
-                'lat',
-                'lng',
-                DB::raw("( 6371 * acos( cos( radians($userLatitude) ) * cos( radians(lat) ) * cos( radians(lng) - radians($userLongitude) ) + sin( radians($userLatitude) ) * sin( radians(lat) ) ) ) AS distance")
+        // Fetch laundries ordered by proximity using address coordinates
+        $laundries = Laundry::select(
+                'laundries.id',
+                'laundries.name_ar',
+                'laundries.name_en',
+                'laundries.description_ar',
+                'laundries.description_en',
+                'laundries.phone_number',
+                DB::raw("(6371 * acos(cos(radians(?)) * cos(radians(address_laundries.lat)) * cos(radians(address_laundries.lng) - radians(?)) + sin(radians(?)) * sin(radians(address_laundries.lat)))) AS distance")
             )
-            ->orderBy('distance')
-            ->where('isActive',1)
-            ->with(['LaundryMedia','laundryItem']) // Eager load the laundryItem relationship
+            ->addBinding([$userLatitude, $userLongitude, $userLatitude], 'select') // Parameter binding
+            ->join('address_laundries', 'laundries.id', '=', 'address_laundries.laundry_id') // Join with addresses table
+            ->where('laundries.isActive', 1)
+           ->orderBy('distance')
+            ->with([
+                'addresses', 
+                'LaundryMedia', // Select specific fields in LaundryMedia
+            ])
             ->get();
-    
 
         return $this->sendResponse($laundries, 'Laundries fetched successfully.');
         
@@ -419,7 +416,7 @@ public function getLaundriesByProximity(Request $request)
         // Handle any exceptions and return an error response
         return response()->json(['error' => $e->getMessage()], 500);
     }
-}
 
+}
         
 }

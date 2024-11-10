@@ -11,11 +11,14 @@ class Advertisement extends Model
     protected $fillable = [
         'name_en',
         'name_ar',
+        'description_ar',
+        'description_en',
+        'code',
         'points',
         'status',
         'end_date',
         'laundry_id',
-        'number_days'
+        'start_date'
     ];
 
     public function users()
