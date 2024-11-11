@@ -80,6 +80,8 @@ class AdvertisementController extends BaseController
             'laundry_id' => 'nullable|exists:laundries,id',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
+            'description_ar' => 'required|string',
+            'description_en' => 'required|string',
             'url_media' => 'required|array', // Ensure url_media is an array
             'url_media.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Validate each image
           'points' => 'nullable|numeric|min:1|max:99999999.9',
@@ -95,6 +97,8 @@ class AdvertisementController extends BaseController
         'laundry_id' => $request->laundry_id,
         'name_ar' => $request->name_ar,
         'name_en' => $request->name_en,
+        'description_ar' => $request->description_ar,
+        'description_en' => $request->description_en,
         'points' => $request->points ?? 0,
         'end_date' => $request->end_date,
         'start_date'=> $request->start_date,
@@ -248,6 +252,10 @@ class AdvertisementController extends BaseController
                 'points' => $request->points ?? $advertisement->points,
                 'start_date' => $request->start_date ?? $advertisement->start_date,
                 'end_date' => $request->end_date ?? $advertisement->end_date,
+ 
+                'description_ar' => $request->description_ar ?? $advertisement->description_ar,
+                'description_en' => $request->description_en ?? $advertisement->description_en,
+      
             ];
     
     

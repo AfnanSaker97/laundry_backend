@@ -22,11 +22,47 @@ use Illuminate\Support\Facades\Log;
 use Validator;
 use Auth;
 use App\Events\TestingEvent;
+use App\Events\DeliveryLocationUpdated;
 class CarController extends BaseController
 {
 
 
+    function periodicallyUpdateLocation(Request $request) {
+        try{
+        $validator =Validator::make($request->all(), [
+            'car_id' => 'required|exists:cars,id'
+        
+        ]);
+        $carId =$request->car_id;
+
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+        while (true) {
+            $latitude = rand(24000000, 24780000) / 1000000;  
+            $longitude = rand(46700000, 47000000) / 1000000; 
     
+            broadcast(new DeliveryLocationUpdated($carId, $latitude, $longitude));
+            DB::table('car_trackings')->updateOrInsert(
+           ['car_id' => $carId],
+                [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                    'updated_at' => now(),
+                ]
+            );
+            sleep(5); 
+        }
+     return $this->sendResponse('','car fetched successfully.');
+          }  catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500); 
+
+    }
+    
+}
 public function index(Request $request)
 {
     $validator =Validator::make($request->all(), [

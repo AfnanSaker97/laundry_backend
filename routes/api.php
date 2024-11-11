@@ -30,7 +30,7 @@ Broadcast::routes();
 
 
 Route::post('send-location', [CarController::class, 'updateCoordinates']);
-
+Route::post('update-location', [CarController::class, 'periodicallyUpdateLocation']);
 
 
 Route::post('register', [RegisterController::class, 'register']);
