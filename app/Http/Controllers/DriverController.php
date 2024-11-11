@@ -21,7 +21,7 @@ class DriverController extends BaseController
         $validator = Validator::make($request->all(), [
            'name'=>'required|min:3',
             'email' => 'required|email|max:255|unique:users,email',
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        //    'password' => ['required', 'string', 'min:8', 'confirmed'],
             'laundry_id' => 'required|exists:laundries,id',
       
         ]);
@@ -33,7 +33,7 @@ class DriverController extends BaseController
         $user = User::create([
            'name' => $request->name,
            'email' => $request->email,
-           'password' => Hash::make($request->password),
+       //    'password' => Hash::make($request->password),
            'user_type_id'=> 3, 
            'driver_id' => $this->generateDriverId(),
            'photo' => 'https://laundry-backend.tecrek.com/public/User/11.jpg',

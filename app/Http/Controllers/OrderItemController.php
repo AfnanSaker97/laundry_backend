@@ -8,6 +8,7 @@ use App\Models\LaundryPrice;
 use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Car;
 use App\Models\MySession;
 use App\Models\OrderType;
 use App\Models\Address;
@@ -74,6 +75,7 @@ class OrderItemController extends BaseController
             }
           
             $orderType = OrderType::findOrFail($request->order_type_id);
+            $car = Car::first();
             $user = Auth::user();
          
             $user_id= $user->id;
@@ -145,7 +147,7 @@ class OrderItemController extends BaseController
                 $order->update([
                     'status' => 'Confirmed',
                    // 'point' => $laundry->point,
-                    'car_id' => 1,
+                    'car_id' => $car->id,
                 ]);
              //   $user->increment('points_wallet', $order->point);
             }

@@ -229,7 +229,8 @@ class AdvertisementController extends BaseController
                 'name_ar' => 'nullable|string|max:255',
                 'name_en' => 'nullable|string|max:255',
                 'points' => 'nullable|numeric|min:1|max:99999999.9',
-                'NumberDays' => 'nullable|numeric|min:1',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
             ]);
     
             // Handle validation failures
@@ -245,14 +246,10 @@ class AdvertisementController extends BaseController
                 'name_ar' => $request->name_ar ?? $advertisement->name_ar,
                 'name_en' => $request->name_en ?? $advertisement->name_en,
                 'points' => $request->points ?? $advertisement->points,
-                'number_days' => $request->NumberDays ?? $advertisement->number_days,
+                'start_date' => $request->start_date ?? $advertisement->start_date,
+                'end_date' => $request->end_date ?? $advertisement->end_date,
             ];
     
-            // Update end_date if NumberDays is provided
-            if ($request->has('NumberDays')) {
-                $numberDays = (int)$request->NumberDays;
-                $updateData['end_date'] = now()->addDays($numberDays);
-            }
     
             // Update the advertisement
             $advertisement->update($updateData);
