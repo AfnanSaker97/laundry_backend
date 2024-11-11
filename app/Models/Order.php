@@ -17,6 +17,7 @@ class Order extends Model
         'base_cost',
         'total_price',
         'distance',
+        'paid',
         'note',
         'laundry_id',
         'order_id',

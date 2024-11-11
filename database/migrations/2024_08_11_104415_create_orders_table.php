@@ -20,8 +20,8 @@ return new class extends Migration
             $table->timestamp('order_date')->nullable(); 
             $table->string('status')->default('pending');
             $table->decimal('base_cost')->default('0');
-            $table->decimal('total_price')->default('0');
-            $table->decimal('distance')->default('0');
+           // $table->decimal('total_price')->default('0');
+            $table->boolean('paid')->default('0');
             $table->string('note')->default('0');
             $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('order_type_id')->constrained('order_types');

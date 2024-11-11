@@ -251,7 +251,8 @@ class LaundryController extends BaseController
             $latitude = $user->lat;
             $longitude = $user->lng;
     
-            $results = Laundry::with(['addresses','LaundryMedia']) 
+            $results = Laundry::with('LaundryMedia')
+            ->select('id', 'name_en', 'name_ar', 'description_en', 'description_ar') 
             ->where('isActive', 1)
             ->when($query, function ($queryBuilder) use ($query) {
                 $queryBuilder->where(function ($q) use ($query) {

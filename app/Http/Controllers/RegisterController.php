@@ -121,20 +121,7 @@ public function verify(Request $request)
     if($validator->fails()){
         return $this->sendError('Validation Error.', $validator->errors()->all());       
     }
- /*   $userId = $request->input('email'); 
-    $cacheKey = 'api-request-time-' . $userId;
 
-    // تحقق مما إذا كان هناك وقت مخزن في الكاش
-    $lastRequestTime = Cache::get($cacheKey);
-
-    // إذا كان الطلب الأخير منذ أقل من 30 ثانية، أرجع رسالة خطأ
-    if ($lastRequestTime && now()->diffInSeconds($lastRequestTime) < 30) {
-        return response()->json(['error' => 'Please wait 30 seconds before sending another request.'], 429);
-    }
-
-    // قم بتخزين الوقت الحالي كوقت آخر طلب
-    Cache::put($cacheKey, now(), 30); // تخزين لـ 30 ثانية
-*/
     // Retrieve the user by email and check the verification code
     $user = User::where('email', $request->email)
                 ->where('verification_code', $request->verification_code)
@@ -158,7 +145,7 @@ public function verify(Request $request)
             'name' => $user->name,
             'email' => $user->email,
             'email_verified_at' => $user->email_verified_at,
-            
+            'user_type_id' => $user->user_type_id,
         ];
 
         $data = [
