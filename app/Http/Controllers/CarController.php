@@ -21,8 +21,8 @@ use App\Models\Notification; // النموذج المستخدم لتخزين ا�
 use Illuminate\Support\Facades\Log;
 use Validator;
 use Auth;
-use App\Events\TestingEvent;
-use App\Events\DeliveryLocationUpdated;
+
+use App\Jobs\UpdateCarLocation;
 class CarController extends BaseController
 {
 
@@ -38,20 +38,11 @@ class CarController extends BaseController
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
-        while (true) {
-            $latitude = rand(24000000, 24780000) / 1000000;  
-            $longitude = rand(46700000, 47000000) / 1000000; 
-    
-            broadcast(new DeliveryLocationUpdated($carId, $latitude, $longitude));
-            DB::table('car_trackings')->updateOrInsert(
-           ['car_id' => $carId],
-                [
-                    'latitude' => $latitude,
-                    'longitude' => $longitude,
-                    'updated_at' => now(),
-                ]
-            );
-            sleep(5); 
+        $carId = $request->car_id;
+
+        // Dispatch jobs with a delay to update location every 5 seconds
+        for ($i = 0; $i < 12; $i++) { // Run for 1 minute as an example
+            UpdateCarLocation::dispatch($carId)->delay(now()->addSeconds($i * 5));
         }
      return $this->sendResponse('','car fetched successfully.');
           }  catch (\Throwable $th) {

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DeliveryLocationUpdated
+class DeliveryLocationUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -32,13 +32,19 @@ class DeliveryLocationUpdated
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn()
     {
-        return [
-            new PrivateChannel('delivery-tracking'),
-        ];
+        return new Channel('delivery-tracking');
     }
-
+    
+    public function broadcastWith()
+{
+    return [
+        'carId' => $this->carId,
+        'latitude' => $this->latitude,
+        'longitude' => $this->longitude,
+    ];
+}
     public function broadcastAs()
     {
         return 'location-updated';
