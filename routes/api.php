@@ -56,8 +56,8 @@ Route::post('loginAdmin', [AdminController::class, 'loginAdmin']);
 
 Route::middleware('auth:sanctum')->group(function() {
 //Car
-Route::get('CarByLaundry', [CarController::class, 'index']);
-Route::get('Cars', [CarController::class, 'getCars']);
+Route::get('cars', [CarController::class, 'index']);
+//Route::get('Cars', [CarController::class, 'getCars']);
 Route::get('search-cars', [CarController::class, 'search']);
 Route::get('CarById', [CarController::class, 'show']);
 Route::post('Car', [CarController::class, 'store']);

@@ -56,26 +56,36 @@ class CarController extends BaseController
 }
 public function index(Request $request)
 {
-    $validator =Validator::make($request->all(), [
-        'laundry_id' => 'required|exists:laundries,id',
-        'page' => 'nullable|boolean' 
-    
+    // Validate the input
+    $validator = Validator::make($request->all(), [
+        'page' => 'nullable|integer'
     ]);
-   
-    if($validator->fails()){
-        return $this->sendError('Validation Error.', $validator->errors()->all());       
-    }
- 
-      $query = Car::with('driver')
-      ->where('laundry_id', $request->laundry_id);
 
-      if ($request->has('page') && $request->page == 0) {
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    $user = Auth::user();
+    $query = Car::with('driver');
+    if ($user->user_type_id != 1 && $user->user_type_id != 4) {
+        return $this->sendError('Access Denied.');
+    }
+  if ($user->user_type_id == 1) {
+        $query->where('laundry_id', $user->laundry->id);
+    }
+
+    if ($request->has('search')) {
+        $query->where('number_car', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->has('page') && $request->page == 0) {
         $cars = $query->get(); 
     } else {
         $cars = $query->paginate(10);
     }
-    return $this->sendResponse($cars,'car fetched successfully.');
+    return $this->sendResponse($cars, 'Cars fetched successfully.');
 }
+
 
 
 
