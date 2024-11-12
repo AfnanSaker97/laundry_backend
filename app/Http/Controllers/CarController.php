@@ -66,7 +66,7 @@ public function index(Request $request)
     }
 
     $user = Auth::user();
-    $query = Car::with('driver');
+    $query = Car::with('driver','Laundry');
     if ($user->user_type_id != 1 && $user->user_type_id != 4) {
         return $this->sendError('Access Denied.');
     }
