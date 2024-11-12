@@ -10,7 +10,6 @@
     <h1>Car Location Tracker</h1>
 
     <script>
-     
      document.addEventListener("DOMContentLoaded", function () {
             window.Echo.channel('delivery-tracking')
                 .listen('.location-updated', (data) => {
