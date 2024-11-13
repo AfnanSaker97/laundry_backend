@@ -39,6 +39,7 @@ class LaundryController extends BaseController
                 'array_ids.*.price' => 'required|numeric',
                 'array_ids' => 'required|array',
                 'array_ids.*.service_id' => 'required|exists:services,id',
+                'array_ids.*.order_type_id' => 'required|exists:order_types,id',
                 'city' => 'required|string',
                 'address_line_1' => 'required|string',
                 'lat' => 'required|numeric',
@@ -67,6 +68,7 @@ class LaundryController extends BaseController
                     'laundry_id' => $laundry->id,
                     'laundry_item_id' => $item['laundry_item_id'],
                     'service_id' => $item['service_id'],
+                    'order_type_id' => $item['order_type_id'],
                     'price' => $item['price'],
                 ];
             }, $request->array_ids);

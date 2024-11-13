@@ -7,15 +7,21 @@
     @vite('resources/js/app.js')
 </head>
 <body>
+<script src="{{ mix('js/app.js') }}"></script>
+
     <h1>Car Location Tracker</h1>
 
     <script>
-     document.addEventListener("DOMContentLoaded", function () {
-            window.Echo.channel('delivery-tracking')
-                .listen('.location-updated', (data) => {
-                    console.log("New location received:", data.latitude, data.longitude);
-                });
+      
+      if (typeof window.Echo !== 'undefined') {
+    window.Echo.channel('delivery-tracking')
+        .listen('.location-updated', (data) => {
+            console.log(data.latitude, data.longitude);
         });
+} else {
+    console.log('Echo is not defined yet');
+}
+
     </script>
 </body>
 </html>
