@@ -58,7 +58,8 @@ public function index(Request $request)
 {
     // Validate the input
     $validator = Validator::make($request->all(), [
-        'page' => 'nullable|integer'
+        'page' => 'nullable|integer',
+        'laundry_id'=>'nullable|exists:laundries,id',
     ]);
 
     if ($validator->fails()) {
@@ -71,6 +72,10 @@ public function index(Request $request)
         return $this->sendError('Access Denied.');
     }
   if ($user->user_type_id == 1) {
+        $query->where('laundry_id', $user->laundry->id);
+    }
+
+    if ($user->user_type_id == 4 && $request->has('laundry_id')) {
         $query->where('laundry_id', $user->laundry->id);
     }
 
