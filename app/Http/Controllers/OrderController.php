@@ -623,11 +623,14 @@ public function destroy(Request $request)
         return $this->sendError('Validation Error.', $validator->errors()->all());
     }
   
-        $order = Order::findOrFail($request->id);
-        if(!$order)
-        {
-            return $this->sendError('Validation Error.', 'The selected id is invalid');
-    
+          $order = Order::where('id', $request->id)
+                      ->whereNull('deleted_at')
+                      ->first();
+
+        
+        if (!$order) {
+            $msg ='Order already deleted';
+            return $this->sendError('Validation Error',[$msg]  );
         }
      
         $order->delete();
@@ -636,7 +639,8 @@ public function destroy(Request $request)
 
         return response()->json([
             'status' => false,
-            'message' => 'Order not found or could not be deleted'
+            'message' => 'Order not found or could not be deleted',
+            'error' => $e->getMessage() // يمكنك إرجاع الرسالة التفصيلية للاخطاء
         ], Response::HTTP_NOT_FOUND);
     }
 }
