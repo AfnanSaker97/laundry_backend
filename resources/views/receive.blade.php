@@ -7,20 +7,21 @@
     @vite('resources/js/app.js')
 </head>
 <body>
-<script src="{{ mix('js/app.js') }}"></script>
-
-    <h1>Car Location Tracker</h1>
+   <h1>Car Location Tracker</h1>
 
     <script>
-      
-      if (typeof window.Echo !== 'undefined') {
-    window.Echo.channel('delivery-tracking')
-        .listen('.location-updated', (data) => {
-            console.log(data.latitude, data.longitude);
-        });
-} else {
-    console.log('Echo is not defined yet');
+        if (window.Echo) {
+            console.log(window.Echo);
+         window.Echo.channel('delivery-tracking')
+                .listen('.location-updated', (data) => {
+                    console.log('Order status updated: ', data);
+              });
+            } else {
+          console.error("Echo is not defined");
 }
+
+    
+
 
     </script>
 </body>

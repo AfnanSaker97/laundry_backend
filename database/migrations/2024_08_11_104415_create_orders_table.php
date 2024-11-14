@@ -30,6 +30,7 @@ return new class extends Migration
             $table->foreignId('laundry_id')->constrained('laundries');
             $table->foreignId('car_id')->nullable()->constrained('cars');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

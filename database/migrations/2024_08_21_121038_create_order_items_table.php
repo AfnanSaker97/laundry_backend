@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('sub_total_price');
             $table->unsignedBigInteger('order_id')->nullable();
             $table->foreign('order_id') ->references('id')->on('orders')->onDelete('cascade');
-            
+            $table->softDeletes();
             $table->timestamps();
         });
     }

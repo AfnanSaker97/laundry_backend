@@ -32,10 +32,14 @@ class DeliveryLocationUpdated implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn()
-    {
-        return new Channel('delivery-tracking');
-    }
+
+
+     public function broadcastOn()
+     {
+         return new Channel('delivery-tracking');
+     }
+
+  
     
     public function broadcastWith()
 {

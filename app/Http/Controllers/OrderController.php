@@ -610,6 +610,37 @@ public function search(Request $request)
 
 }
 
+
+
+public function destroy(Request $request)
+{ 
+    try { 
+    $validator = Validator::make($request->all(), [
+        'id' => 'required|exists:orders,id', 
+    ]);
+   
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors()->all());
+    }
+  
+        $order = Order::findOrFail($request->id);
+        if(!$order)
+        {
+            return $this->sendError('Validation Error.', 'The selected id is invalid');
+    
+        }
+     
+        $order->delete();
+        return $this->sendResponse($order, 'Order deleted successfully');
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Order not found or could not be deleted'
+        ], Response::HTTP_NOT_FOUND);
+    }
+}
+
 }
 
 

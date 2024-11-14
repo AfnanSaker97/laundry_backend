@@ -176,6 +176,7 @@ Route::get('filterMyOrder', [OrderController::class, 'filterMyOrder']);
 
 Route::get('filterMyOrderUser', [OrderController::class, 'filterMyOrderUser']);
 
+Route::delete('order', [OrderController::class, 'destroy']);
 
 
 Route::post('update-Laundryprice', [LaundryItemController::class,'update']);
