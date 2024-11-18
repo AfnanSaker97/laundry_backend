@@ -24,7 +24,7 @@ class Price extends Model
 
     public function laundryItem()
     {
-        return $this->belongsTo(LaundryItem::class);
+        return $this->belongsTo(LaundryItem::class,'laundry_item_id');
     }
 
     public function service()

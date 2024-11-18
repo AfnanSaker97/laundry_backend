@@ -43,7 +43,10 @@ class CarController extends BaseController
         // Dispatch jobs with a delay to update location every 5 seconds
         for ($i = 0; $i < 12; $i++) { // Run for 1 minute as an example
             UpdateCarLocation::dispatch($carId)->delay(now()->addSeconds($i * 5));
+        
         }
+        \Log::info("Broadcasting successfully: carId {$carId}");
+
      return $this->sendResponse('','car fetched successfully.');
           }  catch (\Throwable $th) {
         return response()->json([

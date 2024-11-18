@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use App\Events\DeliveryLocationUpdated;
+use Illuminate\Support\Facades\Log;
 class UpdateCarLocation implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -30,6 +31,8 @@ class UpdateCarLocation implements ShouldQueue
     {
         $latitude = rand(24000000, 24780000) / 1000000;
         $longitude = rand(46700000, 47000000) / 1000000;
+
+        \Log::info("Broadcasting location: carId {$this->carId}, lat: {$latitude}, long: {$longitude}");
 
         // Broadcast the new location
         broadcast(new DeliveryLocationUpdated($this->carId, $latitude, $longitude));

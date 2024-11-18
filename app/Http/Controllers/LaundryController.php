@@ -276,48 +276,84 @@ class LaundryController extends BaseController
 
 
 
-public function show(Request $request)
-{
-    try{
-    $validator =Validator::make($request->all(), [
-        'id' => 'required|exists:laundries',
+    public function show(Request $request)
+    {
+        try {
+            // التحقق من صحة الإدخال
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:laundries,id',
+            ]);
     
-    ]);
-    $user = Auth::user();
-    if($validator->fails()){
-        return $this->sendError('Validation Error.', $validator->errors()->all());       
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors()->all());
+            }
+
+            $laundry = Laundry::with([
+                'LaundryMedia',
+                'LaundryItem',
+                'services',
+                'addresses',
+                'advertisement.Media',
+                'price.laundryItem',
+                'price.OrderType',
+                'price.service'
+            ])->findOrFail($request->id);
+   
+            // تجميع البيانات بطريقة منظمة
+            $laundryData = [
+                'id' => $laundry->id,
+                'name_en' => $laundry->name_en,
+                'name_ar' => $laundry->name_ar,
+                'description_en' => $laundry->description_en,
+                'description_ar' => $laundry->description_ar,
+                'email' => $laundry->email,
+                'phone_number' => $laundry->phone_number,
+                'urgent' => $laundry->urgent,
+                'addresses' => $laundry->addresses,
+                'details' => $laundry->price
+                ->groupBy('laundryItem.item_type_en') 
+                ->map(function ($items, $itemName) {
+                    return [
+                        'item' => [
+                            'en' => $itemName, 
+                            'ar' => $items->first()->laundryItem->item_type_ar 
+                        ],
+                        'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
+                            return [
+                                'service' => [
+                                    'en' => $serviceName, 
+                                    'ar' => $services->first()->service->name_ar 
+                                ],
+                                'prices' => $services->map(function ($service) {
+                                  
+                                    return [$service->price
+                                    ];
+                                })->values()
+                            ];
+                        })->values()
+                    ];
+                })->values(),
+            'ads' => $laundry->advertisement
+                ->where('status', 'confirmed')
+                ->where('end_date', '>', now())
+                ->values(),
+        
+
+
+                'ads' => $laundry->advertisement
+                    ->where('status', 'confirmed')
+                    ->where('end_date', '>', now())
+                    ->values(),
+                'media' => $laundry->LaundryMedia,
+            ];
+    
+            return $this->sendResponse($laundryData, 'Laundry fetched successfully.');
+        } catch (\Exception $e) {
+            // معالجة الأخطاء وإرجاع استجابة
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
-      // Find the country by ID
-    $laundry = Laundry::with(['LaundryMedia','LaundryItem','services','addresses','advertisement.Media','price.laundryItem','price.OrderType','price.service'])->findOrFail($request->id);
-
-  
-    $laundryData = $laundry->only([
-        'id', 'name_en', 'name_ar', 'description_ar', 'description_en', 'email', 'phone_number'
-    ]);
-    $laundryData['addresses'] = $laundry->addresses;
-    $laundryData['price'] = $laundry->price;/*->groupBy('id')->map(function ($serviceGroup) {
-        $service = $serviceGroup->first();
-        $service->prices = $serviceGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل خدمة
-        return $service;
-    })->values();
-
- /*   // معالجة العناصر لتجنب التكرار
-    $laundryData['LaundryItem'] = $laundry->LaundryItem->groupBy('id')->map(function ($itemGroup) {
-        $item = $itemGroup->first();
-        $item->prices = $itemGroup->pluck('pivot.price'); // جلب جميع الأسعار المرتبطة بكل عنصر
-        return $item;
-    })->values();
-*/
-    $laundryData['ads'] = $laundry->advertisement->where('status', 'confirmed')
-        ->where('end_date', '>', now())  ->values();  
-     $laundryData['LaundryMedia'] = $laundry->LaundryMedia;
-  
-    return $this->sendResponse($laundryData,'laundry fetched successfully.');
-} catch (\Exception $e) {
-    // Handle any exceptions and return an error response
-    return response()->json(['error' => $e->getMessage()], 500);
-}
-}
+    
 
 
 public function UpdateStatusLaundery(Request $request)
