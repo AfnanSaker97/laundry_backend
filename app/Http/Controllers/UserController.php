@@ -48,29 +48,23 @@ class UserController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
-        if ($request->status_id == 1 && $user->user_type_id != 4) {
-            return $this->sendError('Access Denied. Only Super Admin can use status_id = 1.');
-        }
-        $userTypeId = $request->status_id;
-        // Build the query based on the request input
-        $query = User::query();
         if ($user->user_type_id == 4) {
-        $query->where('user_type_id', $userTypeId);  
-        
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
-        }
-    } elseif ($user->user_type_id == 1) { 
-        // انضمام إلى جدول الأوامر للتحقق من ارتباط الزبائن بالمغسلة
-        $query->where('user_type_id', $userTypeId)
+        // Super Admin: Filter by user_type_id and optionally by name or email
+        $query->where('user_type_id', $request->status_id);
+    } elseif ($user->user_type_id == 1) {
+        // Admin: Filter by user_type_id and associated laundry orders
+        $query->where('user_type_id', $request->status_id)
               ->whereHas('orders', function ($q) use ($user) {
                   $q->where('laundry_id', $user->laundry->id);
               });
-
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
-        }
     }
+    if ($request->filled('name')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('name', 'like', '%' . $request->name . '%')
+              ->orWhere('email', 'like', '%' . $request->name . '%');
+        });
+    }
+
        
         // Fetch the users with pagination (optional)
         $users = $query->paginate(10);

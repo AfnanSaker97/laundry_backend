@@ -14,6 +14,7 @@ use App\Models\MySession;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
+use App\Events\DeliveryLocationUpdated;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Exception\MessagingException;
@@ -42,9 +43,24 @@ class CarController extends BaseController
 
         // Dispatch jobs with a delay to update location every 5 seconds
         for ($i = 0; $i < 12; $i++) { // Run for 1 minute as an example
-            UpdateCarLocation::dispatch($carId)->delay(now()->addSeconds($i * 5));
-        
-        }
+            $latitude = rand(24000000, 24780000) / 1000000;
+            $longitude = rand(46700000, 47000000) / 1000000;
+    
+            \Log::info("Broadcasting location: carId {$carId}, lat: {$latitude}, long: {$longitude}");
+    
+            // Broadcast the new location
+            broadcast(new DeliveryLocationUpdated($carId, $latitude, $longitude));
+    
+            // Update the database with the new location
+            DB::table('car_trackings')->updateOrInsert(
+                ['car_id' => $carId],
+                [
+                    'latitude' => $latitude,
+                    'longitude' => $longitude,
+                    'updated_at' => now(),
+                ]
+            );
+        }     
         \Log::info("Broadcasting successfully: carId {$carId}");
 
      return $this->sendResponse('','car fetched successfully.');

@@ -18,7 +18,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\TruckController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Broadcast;
 Route::get('/user', function (Request $request) {
@@ -31,7 +31,7 @@ Broadcast::routes();
 
 Route::post('send-location', [CarController::class, 'updateCoordinates']);
 Route::post('update-location', [CarController::class, 'periodicallyUpdateLocation']);
-
+Route::post('truck/{truckId}', [TruckController::class,'updateLocation']);
 
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('register-Password', [RegisterController::class, 'registerPassword']);
@@ -187,5 +187,6 @@ Route::get('order-stats', [OrderController::class, 'getOrderStats']);
 
 
 Route::post('sendNotification', [CarController::class,'sendNotification']);//super admin
+
 });
 

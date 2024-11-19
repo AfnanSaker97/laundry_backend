@@ -315,12 +315,15 @@ class LaundryController extends BaseController
                 ->map(function ($items, $itemName) {
                     return [
                         'item' => [
+                            'id' => $items->first()->laundryItem->id,
                             'en' => $itemName, 
-                            'ar' => $items->first()->laundryItem->item_type_ar 
+                            'ar' => $items->first()->laundryItem->item_type_ar ,
+                            'url_image' => $items->first()->laundryItem->url_image 
                         ],
                         'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
                             return [
                                 'service' => [
+                                    'id' =>$services->first()->service->id,
                                     'en' => $serviceName, 
                                     'ar' => $services->first()->service->name_ar 
                                 ],
