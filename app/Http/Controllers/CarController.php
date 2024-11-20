@@ -84,7 +84,7 @@ public function index(Request $request)
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
-
+try{
     $user = Auth::user();
     $query = Car::with('driver','Laundry');
     if ($user->user_type_id != 1 && $user->user_type_id != 4) {
@@ -94,8 +94,10 @@ public function index(Request $request)
         $query->where('laundry_id', $user->laundry->id);
     }
 
-    if ($user->user_type_id == 4 && $request->has('laundry_id')) {
-        $query->where('laundry_id', $user->laundry->id);
+    if ($user->user_type_id == 4 ) {
+        if ($request->has('laundry_id')) {
+            $query->where('laundry_id', $request->laundry_id);
+        } 
     }
 
     if ($request->has('search')) {
@@ -108,6 +110,11 @@ public function index(Request $request)
         $cars = $query->paginate(10);
     }
     return $this->sendResponse($cars, 'Cars fetched successfully.');
+} catch (\Exception $e) {
+    // Log error and return empty array
+    return response()->json(['error' =>  $e->getMessage()], 500);
+  
+}
 }
 
 
