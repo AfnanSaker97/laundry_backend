@@ -103,7 +103,7 @@ class LaundryController extends BaseController
  public function LaundryByAdmin(Request $request)
     {
         $validator = Validator::make($request->all(), [
-           'page' => 'nullable|boolean' 
+           'page' => 'nullable' 
         ]);
     
         if ($validator->fails()) {
