@@ -42,7 +42,6 @@ class OrderItemController extends BaseController
         'ids.*.item_id' => 'required|exists:laundry_items,id',
         'ids.*.service_id' => 'required|exists:services,id',
         'ids.*.quantity' => 'required|integer|min:1',
-        'order_type_id' => 'required|exists:order_types,id',
         'note' => 'nullable|string',
         'pickup_time'=> 'nullable|date',
         'name'=> 'nullable|string',
@@ -60,10 +59,12 @@ class OrderItemController extends BaseController
             $pickupTime = null;
             $deliveryTime = null;
 
-            if ($request->order_type_id == 2) {
+            if ($request->pickup_time) {
+                $order_type_id =1;
                 $pickupTime = Carbon::parse($request->pickup_time);
                 $deliveryTime = $pickupTime->copy()->addDay();
-            } elseif ($request->order_type_id == 1) {
+            } else{
+                $order_type_id =2;
                 $pickupTime = $now->copy()->addDay();
                 $deliveryTime = $pickupTime->copy()->addDay();
             }
@@ -74,7 +75,7 @@ class OrderItemController extends BaseController
                 $userAddress = Address::findOrFail($request->address_id);
             }
           
-            $orderType = OrderType::findOrFail($request->order_type_id);
+            $orderType = OrderType::findOrFail($order_type_id);
             $car = Car::first();
             $user = Auth::user();
          
@@ -104,7 +105,7 @@ class OrderItemController extends BaseController
                 'delivery_time' => $deliveryTime,
                 'note' => $request->note ?? '0',
                 'type_order' => $order_type,
-                'order_type_id' => $request->order_type_id,
+                'order_type_id' => $orderType->id,
              //   'distance' => $distance,
                 'order_number' => $this->generateOrderId(),
             ]);
@@ -121,7 +122,7 @@ class OrderItemController extends BaseController
                 $priceRecord = Price::where('laundry_item_id', $laundryItem->id)
                     ->where('laundry_id', $laundry->id)
                     ->where('service_id', $service->id)
-                    ->where('order_type_id',$request->order_type_id)
+                    ->where('order_type_id',$order_type_id)
                     ->first();
                 
                    
