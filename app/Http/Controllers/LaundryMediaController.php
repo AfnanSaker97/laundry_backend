@@ -56,7 +56,7 @@ class LaundryMediaController extends BaseController
     try {
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
-            'laundry_id' => 'required|exists:laundries,id', ]);
+            'laundry_media_id' => 'required|exists:laundry_media,id', ]);
 
         // Handle validation failures
         if ($validator->fails()) {
@@ -64,7 +64,7 @@ class LaundryMediaController extends BaseController
         }
 
         // Find the advertisement media entry
-        $laundryMedia = LaundryMedia::find($request->laundry_id);
+        $laundryMedia = LaundryMedia::find($request->laundry_media_id);
 
         // Delete the entry
         $laundryMedia->delete();
