@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name_en');
             $table->string('description_ar');
             $table->string('description_en');
+            $table->srting('email');
             $table->string('phone_number');
             $table->decimal('point', 8, 1)->default(0);
             $table->foreignId('admin_id')->constrained('users');

@@ -152,6 +152,7 @@ class LaundryController extends BaseController
              //   'admin_id' => 'required|exists:users,id',
               ///  "array_url.*.url_image" => 'sometimes|required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
+                'array_ids.*.order_type_id' => 'required|exists:order_types,id',
                 'array_ids.*.price' => 'required|numeric',
                 'array_ids' => 'required|array',
                 'array_ids.*.service_id' => 'required|exists:services,id',
@@ -197,20 +198,27 @@ class LaundryController extends BaseController
                     'laundry_id' => $laundry->id,
                     'laundry_item_id' => $item['laundry_item_id'],
                     'service_id' => $item['service_id'],
+                    'order_type_id' => $item['order_type_id'],
                     'price' => $item['price'],
                 ];
             }, $request->array_ids);
             Price::insert($pricesData);
-            $addressesData = AddressLaundry::create([
-                'laundry_id' => $laundry->id,
-                'city' => $request->city,
-                'address_line_1' => $request->address_line_1,
-                'lat' => $request->lat ,
-                'lng' => $request->lng,
-             
-            ]);
-
-    
+            if ($laundry->addresses) {
+                $laundry->addresses()->update([
+                    'city' => $request->city,
+                    'address_line_1' => $request->address_line_1,
+                    'lat' => $request->lat,
+                    'lng' => $request->lng,
+                ]);
+            } else {
+                // If no address exists, you can either create a new address or handle the error.
+                $laundry->addresses()->create([
+                    'city' => $request->city,
+                    'address_line_1' => $request->address_line_1,
+                    'lat' => $request->lat,
+                    'lng' => $request->lng,
+                ]);
+            }
             // Return a success response
             return $this->sendResponse($laundry, 'Laundry updated successfully.');
     
@@ -231,7 +239,7 @@ class LaundryController extends BaseController
                            ->where('isActive', 1)
                             ->inRandomOrder()
                             ->get()
-                            ->makeHidden(['isActive','created_at','updated_at']);
+                            ->makeHidden(['isActive','created_at','updated_at','email']);
     
     
         return $this->sendResponse($Laundries, 'Laundries fetched successfully.');
@@ -327,7 +335,8 @@ class LaundryController extends BaseController
                                     'en' => $serviceName, 
                                     'ar' => $services->first()->service->name_ar 
                                 ],
-                                'prices' => $services->map(function ($service) {
+                                'prices' => $services->sortBy('order_type_id') 
+                                ->map(function ($service)  {
                                   
                                     return [$service->price
                                     ];
