@@ -40,6 +40,7 @@ class UserController extends BaseController
 
     public function search(Request $request)
     {
+        try{
         $user = Auth::user(); 
         $validator = Validator::make($request->all(), [
             'name' => 'nullable|string',
@@ -48,6 +49,7 @@ class UserController extends BaseController
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
+        $query = User::query();
         if ($user->user_type_id == 4) {
         // Super Admin: Filter by user_type_id and optionally by name or email
         $query->where('user_type_id', $request->status_id);
@@ -69,6 +71,11 @@ class UserController extends BaseController
         // Fetch the users with pagination (optional)
         $users = $query->paginate(10);
         return $this->sendResponse($users, 'Users fetched successfully.');
-   
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => false,
+            'message' => $th->getMessage()
+        ], 500);
+    }
     }
 }
