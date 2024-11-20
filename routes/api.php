@@ -19,6 +19,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TruckController;
+use App\Http\Controllers\LaundryMediaController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Broadcast;
 Route::get('/user', function (Request $request) {
@@ -99,6 +100,13 @@ Route::get('laundry', [LaundryController::class, 'show']);
 
 
 Route::get('Nearby', [LaundryController::class, 'getLaundriesByProximity']);
+
+
+//LaundryMedia
+Route::post('laundry-media', [LaundryMediaController::class, 'store']); //admin
+Route::delete('laundry-media', [LaundryMediaController::class, 'destroy']); //admin
+
+
 Route::get('getOrderByProximity', [OrderController::class, 'getOrderByProximity']); //driver
 Route::get('filterOrder', [OrderController::class, 'filterOrder']); //supre
 Route::post('confirm-Order', [OrderController::class, 'store']);//admin

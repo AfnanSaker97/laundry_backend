@@ -150,7 +150,7 @@ class LaundryController extends BaseController
                 'description_en' => 'required|string',
                 'phone_number' => 'required|string',
              //   'admin_id' => 'required|exists:users,id',
-                "array_url.*.url_image" => 'sometimes|required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
+              ///  "array_url.*.url_image" => 'sometimes|required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
                 'array_ids.*.price' => 'required|numeric',
                 'array_ids' => 'required|array',
@@ -174,7 +174,7 @@ class LaundryController extends BaseController
             $laundry->update($laundryData);
     
             // Handle image uploads
-            if ($request->hasFile('array_url')) {
+          /*  if ($request->hasFile('array_url')) {
                 // Remove existing images if needed (optional)
                 LaundryMedia::where('laundry_id', $laundry->id)->delete();
     
@@ -188,7 +188,7 @@ class LaundryController extends BaseController
                     ];
                 }
                 LaundryMedia::insert($imagesData);
-            }
+            }*/
     
             // Update prices
             Price::where('laundry_id', $laundry->id)->delete(); // Remove old prices
