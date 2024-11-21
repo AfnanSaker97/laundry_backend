@@ -114,10 +114,10 @@ class LaundryController extends BaseController
         $Laundries = [];
 
         if ($user->user_type_id == 1) {
-            $query = Laundry::with(['LaundryMedia', 'LaundryItem','addresses'])
+            $query = Laundry::with(['LaundryMedia', 'price.laundryItem','price.service', 'price.OrderType','addresses'])
                 ->where('admin_id', $user->id);
         } elseif ($user->user_type_id == 4) {
-            $query = Laundry::with(['LaundryMedia', 'LaundryItem','addresses']);
+            $query = Laundry::with(['LaundryMedia', 'price.laundryItem','price.service','price.OrderType','addresses']);
         }
 
         if ($request->has('page') && $request->page == 0) {
@@ -125,9 +125,47 @@ class LaundryController extends BaseController
         } else {
             $Laundries = $query->paginate(10);
         }
-        return $this->sendResponse($Laundries,'Laundries fetched successfully.');
-        
-    
+
+        $formattedLaundries = $Laundries->map(function ($laundry) {
+            return [
+                'laundry' => [
+                    'id' => $laundry->id,
+                    'name_en' => $laundry->name_en,
+                    'description_en' => $laundry->description_en,
+                    'email' => $laundry->email,
+                    'phone_number' => $laundry->phone_number,
+                    'isActive' => $laundry->isActive,
+                    'urgent' => $laundry->urgent,
+                    'url_image' => $laundry->LaundryMedia->first()->url_image ?? null,
+                ],
+                'details' => $laundry->price->groupBy('laundryItem.item_type_en')->map(function ($items, $itemName) {
+                    return [
+                        'item' => [
+                            'id' => $items->first()->laundryItem->id,
+                            'name_en' => $itemName,
+                        ],
+                        'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
+                            return [
+                                'service' => [
+                                    'id' => $services->first()->service->id,
+                                    'en' => $serviceName,
+                                ],
+                                'prices' => $services->sortBy('order_type_id')
+                                    ->map(function ($service) {
+                                        return $service->price;
+                                    })->values()
+                            ];
+                        })->values(),
+                    ];
+                })->values(),
+            ];
+        });
+
+        return $this->sendResponse(
+            $formattedLaundries,
+            'Laundries fetched successfully.'
+        );
+
     } catch (\Exception $e) {
         // Log error and return empty array
         return response()->json(['error' =>  $e->getMessage()], 500);
