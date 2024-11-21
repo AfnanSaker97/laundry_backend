@@ -139,7 +139,7 @@ class LaundryController extends BaseController
                     'isActive' => $laundry->isActive,
                     'urgent' => $laundry->urgent,
                     'addresses' => $laundry->addresses,
-                    'url_image' => $laundry->LaundryMedia->first()->url_image ?? null,
+                   
                     'details' => $laundry->price->groupBy('laundryItem.item_type_en')->map(function ($items, $itemName) {
                         return [
                             'item' => [
@@ -160,6 +160,7 @@ class LaundryController extends BaseController
                             })->values(),
                         ];
                     })->values(),
+                    'media' => $laundry->LaundryMedia,
                 ]
             ];
         });
