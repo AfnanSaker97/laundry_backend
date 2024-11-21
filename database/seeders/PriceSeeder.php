@@ -43,7 +43,7 @@ class PriceSeeder extends Seeder
 */
 
 
-     
+  /*   
 [ 'laundry_id' => '19', 'laundry_item_id' => '1', 'price' => 8,'order_type_id'=>'2','service_id'=>'1'],
 [ 'laundry_id' => '19', 'laundry_item_id' => '1', 'price' => 4,'order_type_id'=>'2','service_id'=>'2'],
 [ 'laundry_id' => '19', 'laundry_item_id' => '2', 'price' => 11 ,'order_type_id'=>'2','service_id'=>'1'],
@@ -54,7 +54,13 @@ class PriceSeeder extends Seeder
 [ 'laundry_id' => '19', 'laundry_item_id' => '2', 'price' => 15 ,'order_type_id'=>'1','service_id'=>'1'],
 [ 'laundry_id' => '19', 'laundry_item_id' => '2', 'price' => 5,'order_type_id'=>'1','service_id'=>'2'],
 
+*/
 
+[ 'laundry_id' => '20', 'laundry_item_id' => '1', 'price' => 8,'order_type_id'=>'2','service_id'=>'1'],
+[ 'laundry_id' => '20', 'laundry_item_id' => '1', 'price' => 4,'order_type_id'=>'2','service_id'=>'2'],
+[ 'laundry_id' => '20', 'laundry_item_id' => '2', 'price' => 11 ,'order_type_id'=>'2','service_id'=>'1'],
+[ 'laundry_id' => '20', 'laundry_item_id' => '2', 'price' => 4,'order_type_id'=>'2','service_id'=>'2'],
+    
 ];
 
         foreach ($prices as $price) {

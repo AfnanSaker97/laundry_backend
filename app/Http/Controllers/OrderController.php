@@ -217,7 +217,8 @@ $orders = $query->paginate(10);
     public function filterMyOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:1,2,3', // Add validation for allowed status_id values
+            'status_id' => 'required|in:1,2,3', 
+            'laundry_id' => 'nullable|exists:laundries,id',
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -226,31 +227,31 @@ $orders = $query->paginate(10);
 
             $user = Auth::user();
 
-            // Define the start and end of the current day
-            $startOfDay = Carbon::now()->startOfDay(); // 00:00:00 of today
-            $endOfDay = Carbon::now()->endOfDay(); // 23:59:59 of today
-
-
-            // Initialize the query builder for orders
+            $startOfDay = Carbon::now()->startOfDay(); 
+            $endOfDay = Carbon::now()->endOfDay(); 
+       
             $query = Order::with(['user', 'OrderItems.LaundryItem', 'address', 'Laundry.addresses', 'OrderType'])
               ->orderByDesc('order_date');
                 
-     // Apply filters based on status_id
      if ($request->status_id == 1) {
-        // Status ID 1: No additional filters
+    
     } elseif ($request->status_id == 2) {
-        $query->where('order_type_id', '1'); // Filter by order_type_id for غير مباشر
+        $query->where('order_type_id', '1'); 
     } elseif ($request->status_id == 3) {
-        $query->where('order_type_id', '2'); // Filter by order_type_id for مباشر
+        $query->where('order_type_id', '2'); 
     }
     
-     // Apply user_type_id specific conditions
+    
      if ($user->user_type_id == 1) {
         $query->whereHas('Laundry', function ($query) use ($user) {
-            $query->where('admin_id', $user->id); // Filter by Laundry's admin_id
+            $query->where('admin_id', $user->id); 
         });
+    }else{
+        if ($request->has('laundry_id')) {
+            $query->where('laundry_id', $request->laundry_id);
+        } 
     }
-    // Fetch orders with pagination
+   
     $orders = $query->paginate(10);
     
        return $this->sendResponse($orders, 'order fetched successfully.');
