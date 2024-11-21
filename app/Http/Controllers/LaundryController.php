@@ -120,12 +120,18 @@ class LaundryController extends BaseController
             $query = Laundry::with(['LaundryMedia', 'price.laundryItem','price.service','price.OrderType','addresses']);
         }
 
-        if ($request->has('page') && $request->page == 0) {
-            $Laundries = $query->get(); 
+       if ($request->has('page') && $request->page == 0) {
+
+            $Laundries = $query->get();
+            $paginationData = null; 
         } else {
             $Laundries = $query->paginate(10);
+            $paginationData = [
+                'current_page' => $Laundries->currentPage(),
+                'last_page' => $Laundries->lastPage(),
+                'total' => $Laundries->total(),
+            ];
         }
-
         $formattedLaundries = $Laundries->map(function ($laundry) {
             return [
                 'laundry' => [
@@ -145,12 +151,15 @@ class LaundryController extends BaseController
                             'item' => [
                                 'id' => $items->first()->laundryItem->id,
                                 'en' => $itemName,
+                                'ar' => $items->first()->laundryItem->item_type_ar ,
+                              'url_image' => $items->first()->laundryItem->url_image 
                             ],
                             'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
                                 return [
                                     'service' => [
                                         'id' => $services->first()->service->id,
                                         'en' => $serviceName,
+                                        'ar' => $services->first()->service->name_ar ,
                                     ],
                                     'prices' => $services->sortBy('order_type_id')
                                         ->map(function ($service) {
@@ -165,7 +174,10 @@ class LaundryController extends BaseController
             ];
         });
         return $this->sendResponse(
-            $formattedLaundries,
+            [
+                'laundries' => $formattedLaundries,
+                'pagination' => $paginationData
+            ],
             'Laundries fetched successfully.'
         );
 
