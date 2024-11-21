@@ -38,7 +38,6 @@ class OrderController extends BaseController
         }
         try {
       
-        // Initialize the query builder for orders
         $query = Order::with(['user','address', 'OrderItems.LaundryItem', 'Laundry.addresses', 'OrderType'])
           ->where('laundry_id',$request->laundry_id)->orderByDesc('order_date');
 
@@ -58,7 +57,7 @@ class OrderController extends BaseController
     public function FilterOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'laundry_id' => 'nullable|exists:laundries,id', // Add validation for allowed status_id values
+            'laundry_id' => 'nullable|exists:laundries,id', 
             'status_id' => 'nullable|in:1,2,3,4', 
             'order_type_id' => 'nullable|exists:order_types,id',
             'type_order' => 'nullable|in:app,web',
@@ -118,7 +117,7 @@ class OrderController extends BaseController
     }
     
     
-
+/*
     public function MyOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -168,7 +167,7 @@ $orders = $query->paginate(10);
         ], 500);
     }
     }
-
+*/
 
      
     public function store(Request $request)
@@ -217,8 +216,10 @@ $orders = $query->paginate(10);
     public function filterMyOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'status_id' => 'required|in:1,2,3', 
+            'status_id' => 'nullable|in:1,2,3', 
             'laundry_id' => 'nullable|exists:laundries,id',
+            'number' => 'nullable|string',
+            'date'  => 'nullable'
         ]);
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());       
@@ -241,6 +242,14 @@ $orders = $query->paginate(10);
         $query->where('order_type_id', '2'); 
     }
     
+    if ($request->date == 1) {
+        $query->whereBetween('order_date', [$startOfDay, $endOfDay]) // Filter by today's date
+        ->orderByDesc('order_date');
+    }
+    if ($request->has('number')) {
+        $query->where('order_number', 'like', '%' . $request->number . '%')
+        ->orderByDesc('order_date');
+        }
     
      if ($user->user_type_id == 1) {
         $query->whereHas('Laundry', function ($query) use ($user) {
@@ -588,7 +597,7 @@ public function ordersUser(Request $request)
 }
 
 
-
+/*
 public function search(Request $request)
 {
    
@@ -610,7 +619,7 @@ public function search(Request $request)
     return $this->sendResponse($orders, 'Orders fetched successfully.');
 
 }
-
+*/
 
 
 public function destroy(Request $request)
