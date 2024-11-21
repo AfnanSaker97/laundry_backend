@@ -131,36 +131,38 @@ class LaundryController extends BaseController
                 'laundry' => [
                     'id' => $laundry->id,
                     'name_en' => $laundry->name_en,
+                    'name_ar' => $laundry->name_ar,
                     'description_en' => $laundry->description_en,
+                    'description_ar' => $laundry->description_ar,
                     'email' => $laundry->email,
                     'phone_number' => $laundry->phone_number,
                     'isActive' => $laundry->isActive,
                     'urgent' => $laundry->urgent,
+                    'addresses' => $laundry->addresses,
                     'url_image' => $laundry->LaundryMedia->first()->url_image ?? null,
-                ],
-                'details' => $laundry->price->groupBy('laundryItem.item_type_en')->map(function ($items, $itemName) {
-                    return [
-                        'item' => [
-                            'id' => $items->first()->laundryItem->id,
-                            'name_en' => $itemName,
-                        ],
-                        'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
-                            return [
-                                'service' => [
-                                    'id' => $services->first()->service->id,
-                                    'en' => $serviceName,
-                                ],
-                                'prices' => $services->sortBy('order_type_id')
-                                    ->map(function ($service) {
-                                        return $service->price;
-                                    })->values()
-                            ];
-                        })->values(),
-                    ];
-                })->values(),
+                    'details' => $laundry->price->groupBy('laundryItem.item_type_en')->map(function ($items, $itemName) {
+                        return [
+                            'item' => [
+                                'id' => $items->first()->laundryItem->id,
+                                'en' => $itemName,
+                            ],
+                            'services' => $items->groupBy('service.name_en')->map(function ($services, $serviceName) {
+                                return [
+                                    'service' => [
+                                        'id' => $services->first()->service->id,
+                                        'en' => $serviceName,
+                                    ],
+                                    'prices' => $services->sortBy('order_type_id')
+                                        ->map(function ($service) {
+                                            return $service->price;
+                                        })->values()
+                                ];
+                            })->values(),
+                        ];
+                    })->values(),
+                ]
             ];
         });
-
         return $this->sendResponse(
             $formattedLaundries,
             'Laundries fetched successfully.'

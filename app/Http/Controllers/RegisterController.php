@@ -59,32 +59,26 @@ private function createUserSession($userId, $request)
                 'lng' => '0.0',
                 'device_token' => '0.0',
               ]);
-
-                    // Create session for the user
-                   
-    }else{
- // Create a new user
- $user = User::create([
-    'name' =>  $request->name,
-    'email' =>  $email,
-    'verification_code' => $email_verification_code ,
-    'user_type_id' =>  2,
-     'photo' =>  'https://laundry-backend.tecrek.com/public/User/11.jpg',
-   ]);
-   }
-        $this->createUserSession($user->id, $request);
-        $success['user'] =  $user;
-        Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code)); 
+            } else {
+                // إذا لم يكن هناك مستخدم محذوف، نقوم بإنشاء مستخدم جديد
+                $user = User::create([
+                    'name' =>  $request->name,
+                    'email' =>  $email,
+                    'verification_code' => $email_verification_code,
+                    'user_type_id' =>  2,
+                    'photo' =>  'https://laundry-backend.tecrek.com/public/User/11.jpg',
+                ]);
             }
+        $this->createUserSession($user->id, $request);
+        Mail::to($user->email)->send(new VerificationCodeMail($email_verification_code));
+     }
         
-    else{
-        $existingUser->verification_code =$email_verification_code;
+     else {
+ 
+        $existingUser->verification_code = $email_verification_code;
         $existingUser->save();
-         // Create session for the user
-         $this->createUserSession($existingUser->id, $request);
-      //  $success['user'] =  $existingUser;
-        Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code)); 
-       
+        $this->createUserSession($existingUser->id, $request);
+        Mail::to($existingUser->email)->send(new VerificationCodeMail($email_verification_code));
     }
     $response = [
         'success' => true,

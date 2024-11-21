@@ -255,10 +255,14 @@ $orders = $query->paginate(10);
         $query->whereHas('Laundry', function ($query) use ($user) {
             $query->where('admin_id', $user->id); 
         });
-    }else{
+    }elseif ($user->user_type_id == 4){
         if ($request->has('laundry_id')) {
             $query->where('laundry_id', $request->laundry_id);
         } 
+    }else
+    {       
+        return $this->sendResponse('', 'You do not have permission to access.');
+        
     }
    
     $orders = $query->paginate(10);
