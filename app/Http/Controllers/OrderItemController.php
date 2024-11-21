@@ -63,6 +63,8 @@ class OrderItemController extends BaseController
                 $order_type_id =1;
                 $pickupTime = Carbon::parse($request->pickup_time);
                 $deliveryTime = $pickupTime->copy()->addDay();
+
+            
             } else{
                 $order_type_id =2;
                 $pickupTime = $now->copy()->addDay();
@@ -152,6 +154,15 @@ class OrderItemController extends BaseController
                 ]);
              //   $user->increment('points_wallet', $order->point);
             }
+            if ($order->order_type_id == 1) {
+                $notificationContent = [
+                    'title' => 'Urgent Order Received!',
+                    'body' => 'A new urgent order (#' . $order->id . ') has been placed. Please review it immediately.',
+                    'order_id' => $order->id,
+               ];
+            $user_laundry =$laundry->admin; 
+            $this->sendNotification($request, $user_laundry, $notificationContent);
+        }
             $totalPrice = $cartItemsTotal ;
 
             $order->update([
