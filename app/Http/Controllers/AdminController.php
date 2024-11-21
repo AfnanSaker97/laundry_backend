@@ -54,7 +54,7 @@ class AdminController extends BaseController
          $validator = Validator::make($request->all(), [
              'email' => 'required|email|max:255',
              'password' => ['required', 'string'],
-             'device_token' => 'required',
+          //   'device_token' => 'required',
          ]);
      
          if ($validator->fails()) {
@@ -74,7 +74,7 @@ class AdminController extends BaseController
         }
        
              $data['token'] = $user->createToken($request->email)->plainTextToken;
-             $device_token =$user->update(['device_token'=>$request->device_token]);
+         //    $device_token =$user->update(['device_token'=>$request->device_token]);
              $data['user'] = $user;
              return $this->sendResponse($data,'User is logged in successfully.');
             } catch (\Exception $e) {
