@@ -13,6 +13,14 @@ use Validator;
 use Auth;
 class LaundryItemController extends BaseController
 {
+
+
+  
+
+
+
+
+
     public function index(Request $request)
     {
         $validator =Validator::make($request->all(), [
@@ -166,6 +174,41 @@ public function UpdateItem(Request $request)
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
+
+
+
+
+
+public function deleteItem(Request $request)
+{
+    try {
+    
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundry_items,id',
+        ]);
+   
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+
+        $laundryItem = LaundryItem::findOrFail($request->id);
+        if ($laundryItem->url_image) {
+            $imagePath = public_path(parse_url($laundryItem->url_image, PHP_URL_PATH));
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        $laundryItem->delete();
+    
+        Cache::forget('laundryItems');
+        return $this->sendResponse($laundryItem, 'Laundry Item deleted successfully.');
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
 
 
     public function update(Request $request)

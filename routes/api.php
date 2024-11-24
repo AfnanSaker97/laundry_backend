@@ -127,6 +127,8 @@ Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
 
 Route::post('laundryItem', [LaundryItemController::class, 'store']);//super admin
 Route::post('update-laundryItem', [LaundryItemController::class, 'UpdateItem']);//super admin
+Route::delete('delete-laundryItem', [LaundryItemController::class, 'deleteItem']);//super admin
+
 
 
 
