@@ -90,11 +90,16 @@ Route::post('UpdateStatusAddress', [AddressController::class,'UpdateStatusAddres
 
 
 Route::get('Service', [ServiceController::class, 'index']);
+Route::post('service', [ServiceController::class, 'store']); //super admin
+Route::post('update-service', [ServiceController::class, 'update']); //super admin
+Route::delete('delete-service', [ServiceController::class, 'delete']); //super admin
+
 
 
 Route::get('launderies', [LaundryController::class, 'index']);//super admin
 Route::get('search-launderies', [LaundryController::class, 'search']); //users
 Route::get('laundry', [LaundryController::class, 'show']);
+
 
 
 
