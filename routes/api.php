@@ -93,6 +93,8 @@ Route::get('Service', [ServiceController::class, 'index']);
 Route::post('service', [ServiceController::class, 'store']); //super admin
 Route::post('update-service', [ServiceController::class, 'update']); //super admin
 Route::delete('delete-service', [ServiceController::class, 'delete']); //super admin
+Route::get('service-id', [ServiceController::class, 'show']);
+
 
 
 
@@ -129,6 +131,8 @@ Route::post('totalPrice', [OrderItemController::class, 'totalPrice']);//admin
 Route::get('laundryItem', [LaundryItemController::class, 'index']);
 Route::get('laundryItemById', [LaundryItemController::class, 'show']);
 Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
+Route::get('getLaundryItem-id', [LaundryItemController::class, 'showLaundryItem']);
+
 
 Route::post('laundryItem', [LaundryItemController::class, 'store']);//super admin
 Route::post('update-laundryItem', [LaundryItemController::class, 'UpdateItem']);//super admin

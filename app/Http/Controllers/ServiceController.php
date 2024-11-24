@@ -57,6 +57,33 @@ class ServiceController extends BaseController
     }    }
 
 
+
+
+
+    public function show(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'id' => 'required|exists:services,id',  
+    ]);
+
+    if ($validator->fails()) {
+        return $this->sendError('Validation Error.', $validator->errors()->all());
+    }
+
+    try {
+     
+        $service = Service::findOrFail($request->id);
+
+
+        return $this->sendResponse($service, 'service fetched successfully.');
+    } catch (\Exception $e) {
+      
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
+
     
 public function update(Request $request)
 {

@@ -104,6 +104,27 @@ class LaundryItemController extends BaseController
     }
 
 
+
+    public function showLaundryItem(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+           'id' => 'required|exists:laundry_items,id',  
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+    
+        try {
+           
+            $laundryItem = LaundryItem::findOrFail($request->id);
+            return $this->sendResponse($laundryItem, 'Laundry item fetched successfully.');
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
+
     public function show(Request $request)
 {
     $validator = Validator::make($request->all(), [
