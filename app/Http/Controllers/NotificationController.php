@@ -40,13 +40,29 @@ class NotificationController extends BaseController
 
 
 
-    public function getNotificationsForUser()
+    public function getNotificationsForUser(Request $request)
 {
     try {
     $userId = Auth::id();
   
-    $notifications = Notification::where('notifiable_id', $userId)->orderBy('created_at', 'desc')->get();
+    $perPage = $request->input('per_page', null);
+
+    $query = Notification::where('notifiable_id', $userId)->orderBy('created_at', 'desc');
    
+    if ($perPage) {
+        $notifications = $query->paginate($perPage);
+        $paginationData = [
+            'current_page' => $notifications->currentPage(),
+            'total_pages' => $notifications->lastPage(),
+            'per_page' => $notifications->perPage(),
+            'total_items' => $notifications->total(),
+            'next_page_url' => $notifications->nextPageUrl(),
+            'prev_page_url' => $notifications->previousPageUrl(),
+        ];
+    } else {
+        $notifications = $query->get();
+        $paginationData = null;
+    }
       // Decode the JSON data field for each notification
       $notifications = $notifications->map(function ($notification) {
         $notification->data = json_decode($notification->data, true);  // Decode JSON data
@@ -56,8 +72,11 @@ class NotificationController extends BaseController
     $response = [
         'count' => $notifications->count(),
         'notifications' => $notifications,
-    
+
     ];
+    if ($paginationData) {
+        $response['pagination'] = $paginationData;
+    }
     return $this->sendResponse($response,'notification fetched successfully.');
 } catch (\Throwable $th) {
     return response()->json([

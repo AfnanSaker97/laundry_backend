@@ -116,14 +116,13 @@ public function UpdateStatusAddress(Request $request)
         $addressId = $request->id;
         $user = Auth::user();
 
-        // تحديث جميع العناوين الأخرى للمستخدم إلى isActive = 0
-        Address::where('user_id', $user->id)
-               ->where('id', '!=', $addressId) // استثناء العنوان المحدد
+       Address::where('user_id', $user->id)
+               ->where('id', '!=', $addressId) 
                ->update(['isActive' => 0]);
 
-        // تحديث العنوان المحدد إلى isActive = 1
+     
         $address = Address::where('id', $addressId)
-                          ->where('user_id', $user->id) // تأكد من أن العنوان ينتمي للمستخدم
+                          ->where('user_id', $user->id) 
                           ->first();
         
         if ($address) {
@@ -148,7 +147,7 @@ public function addressUser(Request $request)
 {
     try {
         $user = Auth::user();
-        // Find the address by ID
+  
         $address = Address::where('user_id',$user->id)->get();
 
     
@@ -200,21 +199,17 @@ public function addressUser(Request $request)
 public function update(Request $request)
 {
     try {
-        // Validate the request data
+     
         $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:addresses,id', // Ensure the address exists
+            'id' => 'required|exists:addresses,id', 
 
         ]);
-
-        // Return validation errors if any
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
-
-        // Find the address by ID
         $address = Address::findOrFail($request->id);
 
-    // Update the address with the request data
+   
     $address->update([
         'full_name' => $request->full_name ?? $address->full_name,
         'address_line_1' => $request->address_line_1 ?? $address->address_line_1,
