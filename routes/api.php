@@ -125,6 +125,10 @@ Route::get('laundryItem', [LaundryItemController::class, 'index']);
 Route::get('laundryItemById', [LaundryItemController::class, 'show']);
 Route::get('getLaundryItem', [LaundryItemController::class, 'getLaundryItem']);
 
+Route::post('laundryItem', [LaundryItemController::class, 'store']);//super admin
+Route::post('update-laundryItem', [LaundryItemController::class, 'UpdateItem']);//super admin
+
+
 
 Route::get('OrderType', [OrderTypeController::class, 'index']);
 //Advertisement

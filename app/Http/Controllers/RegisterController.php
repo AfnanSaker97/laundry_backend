@@ -60,7 +60,7 @@ private function createUserSession($userId, $request)
                 'device_token' => '0.0',
               ]);
             } else {
-                // إذا لم يكن هناك مستخدم محذوف، نقوم بإنشاء مستخدم جديد
+            
                 $user = User::create([
                     'name' =>  $request->name,
                     'email' =>  $email,
@@ -121,7 +121,6 @@ public function verify(Request $request)
                 ->where('verification_code', $request->verification_code)
                 ->first();
 
-    // If user does not exist or code is incorrect, return an error response
     if (!$user) {
         return $this->sendError('Validation Error.',['Invalid verification code!']);
     }

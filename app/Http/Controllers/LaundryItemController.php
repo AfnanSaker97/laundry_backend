@@ -40,6 +40,44 @@ class LaundryItemController extends BaseController
     }
 
 
+
+
+
+    public function store(Request $request)
+    {
+        try {
+        $validator =Validator::make($request->all(), [
+            'item_type_en' => 'required|string|unique:laundry_items,item_type_en',
+            'item_type_ar' => 'required|string|unique:laundry_items,item_type_ar',
+            'url_image' => 'required|file',
+        ]);
+       
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors()->all());       
+        }
+      
+           $image =$request->file('url_image');
+           $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+           $image->move(public_path('LaundryItem'), $imageName);
+           $url = url('LaundryItem/' . $imageName);
+       
+           $laundryItem = LaundryItem::create([
+            'item_type_en' => $request->item_type_en,
+            'item_type_ar' => $request->item_type_ar,
+            'url_image' => $url,
+        ]);
+
+      
+         Cache::forget('laundryItems');
+        return $this->sendResponse($laundryItem,'Laundry Item added successfully.');
+
+    } catch (\Exception $e) {
+     
+        return response()->json(['error' =>  $e->getMessage()], 500);
+      
+    }    }
+
+
     public function getLaundryItem(Request $request)
     {
       
@@ -90,6 +128,44 @@ class LaundryItemController extends BaseController
     }
 }
 
+
+
+
+public function UpdateItem(Request $request)
+{
+    try {
+    
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundry_items,id',
+            'item_type_en' => 'nullable|string|unique:laundry_items,item_type_en,' . $request->id,
+            'item_type_ar' => 'nullable|string|unique:laundry_items,item_type_ar,' . $request->id,
+            'url_image' => 'nullable|file',
+        ]);
+   
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
+        }
+
+        $laundryItem = LaundryItem::findOrFail($request->id);
+
+        $image = $request->file('url_image');
+        $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+        $image->move(public_path('LaundryItem'), $imageName);
+        $url = url('LaundryItem/' . $imageName);
+
+      
+        $laundryItem->update([
+            'item_type_en' => $request->item_type_en,
+            'item_type_ar' => $request->item_type_ar,
+            'url_image' => $url,
+        ]);
+        Cache::forget('laundryItems');
+        return $this->sendResponse($laundryItem, 'Laundry Item updated successfully.');
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 
 
     public function update(Request $request)
