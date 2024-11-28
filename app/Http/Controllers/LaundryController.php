@@ -13,6 +13,7 @@ use App\Models\LaundryMedia;
 use App\Models\AddressLaundry;
 use App\Models\Price;
 use App\Models\MySession;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,15 @@ class LaundryController extends BaseController
     {
         try {
             $validator =Validator::make($request->all(), [
+                'email' => 'required|email|max:255|unique:users,email',
+                'name'=>'required|min:3',
+                'password' => ['required', 'string', 'min:8', 'confirmed'],    
                 'name_en'=> 'required',
                 'name_ar' => 'required',
                 'description_ar' => 'required',
                 'description_en'=> 'required|string',
                 'phone_number' => 'required|string',
-               // 'point' => 'required',
-                'admin_id'=>'required|exists:users,id',
+                'email_laundry' => 'required|email|max:255',
                 "array_url.*.url_image" => 'required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
                 'array_ids.*.price' => 'required|numeric',
@@ -48,8 +51,16 @@ class LaundryController extends BaseController
             if ($validator->fails()) {
                 return $this->sendError('Validation Error.', $validator->errors()->all());       
             }
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'user_type_id'=> 1, 
+            ]);  
           
-            $laundryData = $request->only(['name_en', 'name_ar', 'description_ar', 'description_en', 'phone_number', 'admin_id']);
+            $laundryData = $request->only(['name_en', 'name_ar', 'description_ar', 'description_en', 'phone_number']);
+            $laundryData['admin_id'] = $user->id; 
+            $laundryData['email'] = $request->email_laundry; 
             $laundry = Laundry::create($laundryData);
     
             $imagesData = [];
@@ -228,19 +239,15 @@ class LaundryController extends BaseController
             $laundryData = $request->only(['name_en', 'name_ar', 'description_ar', 'description_en', 'phone_number']);
             $laundry->update($laundryData);
     
-            // Handle image uploads
+           
          
-            Price::where('laundry_id', $laundry->id)->delete(); // Remove old prices
-            $pricesData = array_map(function ($item) use ($laundry) {
-                return [
-                    'laundry_id' => $laundry->id,
-                    'laundry_item_id' => $item['laundry_item_id'],
-                    'service_id' => $item['service_id'],
-                    'order_type_id' => $item['order_type_id'],
-                    'price' => $item['price'],
-                ];
-            }, $request->array_ids);
-            Price::insert($pricesData);
+            foreach ($request->array_ids as $item) {
+                Price::updateOrCreate(
+                
+                    ['laundry_id' => $laundry->id, 'laundry_item_id' => $item['laundry_item_id'], 'order_type_id' => $item['order_type_id'], 'service_id' => $item['service_id']],
+                    ['price' => $item['price']]
+                );
+            }
             if ($laundry->addresses) {
                 $laundry->addresses()->update([
                     'city' => $request->city,
