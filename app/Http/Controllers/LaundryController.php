@@ -130,6 +130,9 @@ class LaundryController extends BaseController
                 'current_page' => $Laundries->currentPage(),
                 'last_page' => $Laundries->lastPage(),
                 'total' => $Laundries->total(),
+                'from' => $Laundries->firstItem(),
+                  'to' => $Laundries->lastItem(),
+              'per_page' => $Laundries->perPage(),
             ];
         }
         $formattedLaundries = $Laundries->map(function ($laundry) {
@@ -202,8 +205,6 @@ class LaundryController extends BaseController
                 'description_ar' => 'required',
                 'description_en' => 'required|string',
                 'phone_number' => 'required|string',
-             //   'admin_id' => 'required|exists:users,id',
-              ///  "array_url.*.url_image" => 'sometimes|required|file|mimes:jpg,png,jpeg,gif,svg,HEIF,BMP,webp|max:1500',
                 'array_ids.*.laundry_item_id' => 'required|exists:laundry_items,id',
                 'array_ids.*.order_type_id' => 'required|exists:order_types,id',
                 'array_ids.*.price' => 'required|numeric',
@@ -228,23 +229,7 @@ class LaundryController extends BaseController
             $laundry->update($laundryData);
     
             // Handle image uploads
-          /*  if ($request->hasFile('array_url')) {
-                // Remove existing images if needed (optional)
-                LaundryMedia::where('laundry_id', $laundry->id)->delete();
-    
-                $imagesData = [];
-                foreach ($request->file('array_url') as $image) {
-                    $imageName = time() . '_' . uniqid() . '.' . $image->extension();
-                    $image->move(public_path('Laundry'), $imageName);
-                    $imagesData[] = [
-                        'laundry_id' => $laundry->id,
-                        'url_image' => url('Laundry/' . $imageName),
-                    ];
-                }
-                LaundryMedia::insert($imagesData);
-            }*/
-    
-            // Update prices
+         
             Price::where('laundry_id', $laundry->id)->delete(); // Remove old prices
             $pricesData = array_map(function ($item) use ($laundry) {
                 return [

@@ -53,11 +53,12 @@ class NotificationController extends BaseController
         $notifications = $query->paginate($perPage);
         $paginationData = [
             'current_page' => $notifications->currentPage(),
-            'total_pages' => $notifications->lastPage(),
-            'per_page' => $notifications->perPage(),
-            'total_items' => $notifications->total(),
-            'next_page_url' => $notifications->nextPageUrl(),
-            'prev_page_url' => $notifications->previousPageUrl(),
+                'lastPage' => $notifications->lastPage(),
+                'total' => $notifications->total(),
+                'from' => $notifications->firstItem(),
+                  'to' => $notifications->lastItem(),
+                 'per_page' => $perPage,
+
         ];
     } else {
         $notifications = $query->get();
@@ -70,7 +71,7 @@ class NotificationController extends BaseController
     });
 
     $response = [
-        'count' => $notifications->count(),
+        'count' => $notifications->whereNull('read_at')->count(),
         'notifications' => $notifications,
 
     ];
