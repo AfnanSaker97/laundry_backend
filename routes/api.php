@@ -180,6 +180,8 @@ Route::get('laundries-super', [LaundryController::class, 'LaundrySuperAdmin']);
 //SuperAdmin
 Route::get('search-users', [UserController::class, 'search']);
 Route::get('Filter-users', [UserController::class,'index']);//super admin
+Route::get('userById', [UserController::class,'show']);//super admin
+
 
 
 //laundry Admin

@@ -27,7 +27,7 @@ class UserController extends BaseController
     
         $userTypeId = $request->status_id;
          
-    // استرجاع المستخدمين بناءً على نوع المستخدم
+   
     $query = User::where('user_type_id', $userTypeId);
     if ($request->has('page') && $request->page == 0) {
         $users = $query->get(); 
@@ -36,6 +36,56 @@ class UserController extends BaseController
     }
         return $this->sendResponse($users, 'Users fetched successfully.');
     }
+
+    public function show(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:users,id',
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->sendError('Validation Error.', $validator->errors()->all());
+            }
+    
+            $admin = Auth::user();
+            $userId = $request->user_id;
+    
+            $user = User::select('id', 'name', 'email', 'email_verified_at', 'photo', 'points_wallet')
+                ->with(['addresses' => function ($query) {
+                    $query->select('id', 'user_id', 'address_line_1', 'address_line_2', 'country', 'city', 'postcode', 'contact_number', 'full_name');
+                }])
+                ->find($userId);
+    
+            if ($admin->user_type_id == 4) { 
+                $orders = $user->orders()->select(
+                    'id', 'pickup_time', 'delivery_time', 'status', 'user_id', 'order_date',
+                    'base_cost', 'paid', 'note', 'laundry_id', 'order_type_id', 'point',
+                    'order_number', 'type_order'
+                )->get();
+            } elseif ($admin->user_type_id == 1) {
+                $orders = $user->orders()->where('laundry_id', $admin->laundry->id)->select(
+                    'id', 'pickup_time', 'delivery_time', 'status', 'user_id', 'order_date',
+                    'base_cost', 'paid', 'note', 'laundry_id', 'order_type_id', 'point',
+                    'order_number', 'type_order'
+                )->get();
+            } else {
+                $orders = collect(); 
+            }
+    
+           
+            $user->setRelation('orders', $orders);
+    
+            return $this->sendResponse($user, 'Users fetched successfully.');
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+    
 
 
     public function search(Request $request)
@@ -51,10 +101,9 @@ class UserController extends BaseController
         }
         $query = User::query();
         if ($user->user_type_id == 4) {
-        // Super Admin: Filter by user_type_id and optionally by name or email
+     
         $query->where('user_type_id', $request->status_id);
     } elseif ($user->user_type_id == 1) {
-        // Admin: Filter by user_type_id and associated laundry orders
         $query->where('user_type_id', $request->status_id)
               ->whereHas('orders', function ($q) use ($user) {
                   $q->where('laundry_id', $user->laundry->id);
