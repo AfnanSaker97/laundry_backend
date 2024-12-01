@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LaundryItem;
+use App\Models\Price;
 use App\Models\Laundry;
 use Carbon\Carbon;
 use App\Http\Controllers\BaseController as BaseController;
@@ -232,34 +233,41 @@ public function deleteItem(Request $request)
 
 
 
-    public function update(Request $request)
-    {
-        try {
-        $validator =Validator::make($request->all(), [
-            'id' => 'required|exists:laundry_items',
+public function update(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:laundry_items,id',
             'laundry_id' => 'required|exists:laundries,id',
-            'price' => 'required',
+            'order_type_id' => 'required|exists:order_types,id',
+            'service_id' => 'required|exists:services,id',
+            'price' => 'required|numeric',
         ]);
-       
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors()->all());       
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors()->all());
         }
-        // Find the laundry
-        $laundry = Laundry::findOrFail($request->laundry_id);
 
-           // Update the price in the pivot table
-          $laundry->LaundryItem()->updateExistingPivot($request->id, ['price' => $request->price]);
-          // حذف الكاش المرتبط بالعناصر المغسلة
-         Cache::forget('laundryItems_' . $request->laundry_id);
+        $updated = Price::where([
+            'laundry_id' => $request->laundry_id,
+            'laundry_item_id' => $request->id,
+            'order_type_id' => $request->order_type_id,
+            'service_id' => $request->service_id,
+        ])->first();
+        $updated->price = $request->price;
+        $updated->save();
+        
+        if (!$updated) {
+            return $this->sendError('No matching record found to update.', []);
+        }
+        Cache::forget('laundryItems_' . $request->laundry_id);
 
-   
-  
-        return $this->sendResponse($laundry,'Laundry Price updated successfully.');
-
+        return $this->sendResponse($updated, 'Laundry price updated successfully.');
     } catch (\Exception $e) {
-        // Log error and return empty array
-        return response()->json(['error' =>  $e->getMessage()], 500);
-      
-    }    }
+
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
 
 }
