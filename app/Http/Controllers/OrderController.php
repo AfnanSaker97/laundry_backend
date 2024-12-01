@@ -14,6 +14,8 @@ use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
 use Validator;
 use Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OrderExport;
 class OrderController extends BaseController
 {
     public function index()
@@ -211,6 +213,11 @@ $orders = $query->paginate(10);
         }
     
 
+
+        public function export($laundry_id = null) 
+        {
+            return Excel::download(new OrderExport($laundry_id), 'order.xlsx');
+        }
 
         
     public function filterMyOrder(Request $request)

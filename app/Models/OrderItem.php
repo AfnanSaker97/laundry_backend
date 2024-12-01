@@ -27,4 +27,10 @@ class OrderItem extends Model
     {
         return $this->belongsTo(LaundryItem::class);
     }
+
+    
+    public function Service()
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

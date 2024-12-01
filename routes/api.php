@@ -27,7 +27,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Broadcast::routes();
+
+Route::get('report-order/{laundry_id?}', [OrderController::class, 'export']);
 
 
 Route::post('send-location', [CarController::class, 'updateCoordinates']);
@@ -171,6 +172,7 @@ Route::post('order', [OrderItemController::class, 'store']);
 Route::get('order', [OrderItemController::class, 'index']);
 Route::get('OrderDetails', [OrderController::class, 'OrderDetails']);
 Route::get('ordersUser', [OrderController::class, 'ordersUser']);
+
 
 
 
