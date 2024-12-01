@@ -18,11 +18,12 @@ class ServiceController extends BaseController
         try{
         $Services =  Service::all();
 
+
         return $this->sendResponse($Services, 'Services fetched successfully.');
     } catch (\Exception $e) {
      
         return response()->json(['error' =>  $e->getMessage()], 500);
-      
+
     }
     }
 
@@ -32,17 +33,22 @@ class ServiceController extends BaseController
         $validator =Validator::make($request->all(), [
             'name_ar' => 'required|string|unique:services,name_ar',
             'name_en' => 'required|string|unique:services,name_en',
-          
+            'url_image' => 'required|file',
         ]);
        
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors()->all());       
         }
       
-       
+        $image =$request->file('url_image');
+           $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+           $image->move(public_path('Service'), $imageName);
+           $url = url('Service/' . $imageName);
+
            $service = Service::create([
             'name_ar' => $request->name_ar,
             'name_en' => $request->name_en,
+            'url_image' => $url,
          
         ]);
 
@@ -93,16 +99,32 @@ public function update(Request $request)
             'id' => 'required|exists:services,id',
             'name_en' => 'nullable|string|unique:services,name_en,' . $request->id,
             'name_ar' => 'nullable|string|unique:services,name_ar,' . $request->id,
+            'url_image' => 'nullable|file',
        ]);
    
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors()->all());
         }
 
-        $service = Service::findOrFail($request->id);   
+        $service = Service::findOrFail($request->id); 
+        $url = $service->url_image; 
+
+        if ($request->hasFile('url_image')) {
+            $image = $request->file('url_image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->extension();
+            $image->move(public_path('Service'), $imageName);
+            $url = url('Service/' . $imageName);
+
+           
+            if ($service->url_image && file_exists(public_path(parse_url($service->url_image, PHP_URL_PATH)))) {
+                unlink(public_path(parse_url($service->url_image, PHP_URL_PATH)));
+            }
+        }
+
         $service->update([
             'name_en' => $request->name_en,
             'name_ar' => $request->name_ar,
+            'url_image' => $url,
         ]);
         Cache::forget('services');
         return $this->sendResponse($service, 'service updated successfully.');
