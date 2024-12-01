@@ -8,6 +8,7 @@ use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Support\Facades\DB;
 use Validator;
 use Auth;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 class ServiceController extends BaseController
 {
@@ -152,14 +153,20 @@ public function delete(Request $request)
 
         $service = Service::findOrFail($request->id);
        
+      
         $service->delete();
     
         Cache::forget('services');
         return $this->sendResponse($service, 'service deleted successfully.');
-
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
+        catch (QueryException $e) {
+            if ($e->getCode() == 23000) {
+             
+                return $this->sendError('error', 'Cannot delete the service because it has related items in the prices table.');
+            }
+        
+        return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 }
